@@ -1738,6 +1738,7 @@ export function BoardView() {
                   placeholder="Describe the feature..."
                   previewMap={newFeaturePreviewMap}
                   onPreviewMapChange={setNewFeaturePreviewMap}
+                  autoFocus
                 />
               </div>
               <div className="space-y-2">

@@ -30,6 +30,7 @@ interface DescriptionImageDropZoneProps {
   // Optional: pass preview map from parent to persist across tab switches
   previewMap?: ImagePreviewMap;
   onPreviewMapChange?: (map: ImagePreviewMap) => void;
+  autoFocus?: boolean;
 }
 
 const ACCEPTED_IMAGE_TYPES = [
@@ -53,6 +54,7 @@ export function DescriptionImageDropZone({
   maxFileSize = DEFAULT_MAX_FILE_SIZE,
   previewMap,
   onPreviewMapChange,
+  autoFocus = false,
 }: DescriptionImageDropZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -303,6 +305,7 @@ export function DescriptionImageDropZone({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
+          autoFocus={autoFocus}
           className={cn(
             "min-h-[120px]",
             isProcessing && "opacity-50 pointer-events-none"

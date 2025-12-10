@@ -235,14 +235,16 @@ class AutoModeService {
 
       // Update feature status based on result
       // For skipTests features, go to waiting_approval on success instead of verified
-      // On failure, skipTests features should also go to waiting_approval for user review
+      // On failure, ALL features go to waiting_approval so user can review and decide next steps
+      // This prevents infinite retry loops when the same issue keeps failing
       let newStatus;
       if (result.passes) {
         newStatus = feature.skipTests ? "waiting_approval" : "verified";
       } else {
-        // For skipTests features, keep in waiting_approval so user can review
-        // For normal TDD features, move to backlog for retry
-        newStatus = feature.skipTests ? "waiting_approval" : "backlog";
+        // On failure, go to waiting_approval for user review
+        // Don't automatically move back to backlog to avoid infinite retry loops
+        // (especially when hitting rate limits or persistent errors)
+        newStatus = "waiting_approval";
       }
       await featureLoader.updateFeatureStatus(
         feature.id,
@@ -507,11 +509,13 @@ class AutoModeService {
 
       // Update feature status based on final result
       // For skipTests features, go to waiting_approval on success instead of verified
+      // On failure, go to waiting_approval so user can review and decide next steps
       let newStatus;
       if (finalResult.passes) {
         newStatus = feature.skipTests ? "waiting_approval" : "verified";
       } else {
-        newStatus = "in_progress";
+        // On failure after all retry attempts, go to waiting_approval for user review
+        newStatus = "waiting_approval";
       }
       await featureLoader.updateFeatureStatus(
         featureId,
@@ -691,14 +695,16 @@ class AutoModeService {
 
       // Update feature status based on result
       // For skipTests features, go to waiting_approval on success instead of verified
-      // On failure, skipTests features should also go to waiting_approval for user review
+      // On failure, ALL features go to waiting_approval so user can review and decide next steps
+      // This prevents infinite retry loops when the same issue keeps failing
       let newStatus;
       if (result.passes) {
         newStatus = feature.skipTests ? "waiting_approval" : "verified";
       } else {
-        // For skipTests features, keep in waiting_approval so user can review
-        // For normal TDD features, move to backlog for retry
-        newStatus = feature.skipTests ? "waiting_approval" : "backlog";
+        // On failure, go to waiting_approval for user review
+        // Don't automatically move back to backlog to avoid infinite retry loops
+        // (especially when hitting rate limits or persistent errors)
+        newStatus = "waiting_approval";
       }
       await featureLoader.updateFeatureStatus(
         feature.id,
@@ -936,11 +942,12 @@ class AutoModeService {
       );
 
       // For skipTests features, go to waiting_approval on success instead of verified
+      // On failure, go to waiting_approval so user can review and decide next steps
       const newStatus = result.passes
         ? feature.skipTests
           ? "waiting_approval"
           : "verified"
-        : "in_progress";
+        : "waiting_approval";
 
       await featureLoader.updateFeatureStatus(
         feature.id,

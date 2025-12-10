@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "id": "feature-1765387670653-bl83444lj",
+    "category": "Kanban",
+    "description": "In the output logs of the proc agent output in the file diffs Can you add a scroll bar so it actually scroll to see all these new styles right now it seems like I can't scroll",
+    "steps": [],
+    "status": "in_progress",
+    "startedAt": "2025-12-10T17:32:30.636Z",
+    "imagePaths": [],
+    "skipTests": true,
+    "summary": "Added always-visible scrollbar to file diffs in agent output modal. Created new 'scrollbar-visible' CSS utility class in globals.css with theme support for all themes (light, dark, retro, etc.). Applied scrollbar-visible class to: git-diff-panel.tsx (FileDiffSection expanded content), agent-output-modal.tsx (changes view container and logs/raw view container). Scrollbars now remain visible even on macOS where they normally auto-hide.",
+    "model": "opus",
+    "thinkingLevel": "none"
+  },
+  {
+    "id": "feature-1765387746902-na752mp1y",
+    "category": "Kanban",
+    "description": "When the add feature modal pops up, make sure that the description is always the main focus. When it first loads up. Do not focus the prompt tab, which is currently doing this.",
+    "steps": [],
+    "status": "waiting_approval",
+    "startedAt": "2025-12-10T17:29:13.854Z",
+    "imagePaths": [],
+    "skipTests": true,
+    "summary": "Added autoFocus prop to DescriptionImageDropZone component. Modified: description-image-dropzone.tsx (added autoFocus prop support), board-view.tsx (enabled autoFocus on add feature modal). Now the description textarea receives focus when the modal opens instead of the prompt tab.",
+    "model": "opus",
+    "thinkingLevel": "none"
+  }
+]

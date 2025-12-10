@@ -333,7 +333,7 @@ function FileDiffSection({
         </div>
       </button>
       {isExpanded && (
-        <div className="bg-background border-t border-border max-h-[400px] overflow-y-auto">
+        <div className="bg-background border-t border-border max-h-[400px] overflow-y-auto scrollbar-visible">
           {fileDiff.hunks.map((hunk, hunkIndex) => (
             <div key={hunkIndex} className="border-b border-border-glass last:border-b-0">
               {hunk.lines.map((line, lineIndex) => (
@@ -458,7 +458,7 @@ export function GitDiffPanel({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border bg-card backdrop-blur-sm overflow-hidden",
+        "rounded-xl border border-border bg-card backdrop-blur-sm overflow-hidden flex flex-col h-full",
         className
       )}
       data-testid="git-diff-panel"
@@ -466,7 +466,7 @@ export function GitDiffPanel({
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-accent/50 transition-colors text-left"
+        className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-accent/50 transition-colors text-left flex-shrink-0"
         data-testid="git-diff-panel-toggle"
       >
         <div className="flex items-center gap-2">
@@ -497,7 +497,7 @@ export function GitDiffPanel({
 
       {/* Content */}
       {isExpanded && (
-        <div className="border-t border-border">
+        <div className="border-t border-border flex-1 overflow-y-auto scrollbar-visible">
           {isLoading ? (
             <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin" />

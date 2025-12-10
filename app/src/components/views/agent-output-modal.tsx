@@ -154,29 +154,31 @@ export function AgentOutputModal({
         case "auto_mode_ultrathink_preparation":
           // Format thinking level preparation information
           let prepContent = `\n🧠 Ultrathink Preparation\n`;
-          
+
           if (event.warnings && event.warnings.length > 0) {
             prepContent += `\n⚠️ Warnings:\n`;
             event.warnings.forEach((warning: string) => {
               prepContent += `  • ${warning}\n`;
             });
           }
-          
+
           if (event.recommendations && event.recommendations.length > 0) {
             prepContent += `\n💡 Recommendations:\n`;
             event.recommendations.forEach((rec: string) => {
               prepContent += `  • ${rec}\n`;
             });
           }
-          
+
           if (event.estimatedCost !== undefined) {
-            prepContent += `\n💰 Estimated Cost: ~$${event.estimatedCost.toFixed(2)} per execution\n`;
+            prepContent += `\n💰 Estimated Cost: ~$${event.estimatedCost.toFixed(
+              2
+            )} per execution\n`;
           }
-          
+
           if (event.estimatedTime) {
             prepContent += `\n⏱️ Estimated Time: ${event.estimatedTime}\n`;
           }
-          
+
           newContent = prepContent;
           break;
         case "auto_mode_feature_complete":
@@ -299,7 +301,7 @@ export function AgentOutputModal({
         </DialogHeader>
 
         {viewMode === "changes" ? (
-          <div className="flex-1 overflow-y-auto min-h-[400px] max-h-[60vh]">
+          <div className="flex-1 overflow-y-auto min-h-[400px] max-h-[60vh] scrollbar-visible">
             {projectPath ? (
               <GitDiffPanel
                 projectPath={projectPath}
@@ -320,7 +322,7 @@ export function AgentOutputModal({
             <div
               ref={scrollRef}
               onScroll={handleScroll}
-              className="flex-1 overflow-y-auto bg-zinc-950 rounded-lg p-4 font-mono text-xs min-h-[400px] max-h-[60vh]"
+              className="flex-1 overflow-y-auto bg-zinc-950 rounded-lg p-4 font-mono text-xs min-h-[400px] max-h-[60vh] scrollbar-visible"
             >
               {isLoading && !output ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">

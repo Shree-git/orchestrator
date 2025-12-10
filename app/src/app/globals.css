@@ -1039,6 +1039,62 @@
     background: var(--background);
 }
 
+/* Always visible scrollbar for file diffs and code blocks */
+.scrollbar-visible {
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) var(--muted);
+}
+
+.scrollbar-visible::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+  min-height: 40px;
+}
+
+.scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-secondary);
+}
+
+/* Force scrollbar to always be visible (not auto-hide) */
+.scrollbar-visible::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+/* Light mode scrollbar-visible adjustments */
+.light .scrollbar-visible::-webkit-scrollbar-track {
+  background: oklch(0.95 0 0);
+}
+
+.light .scrollbar-visible::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0 0);
+}
+
+.light .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.6 0 0);
+}
+
+/* Retro mode scrollbar-visible adjustments */
+.retro .scrollbar-visible::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 0;
+}
+
+.retro .scrollbar-visible::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 0;
+}
+
 /* Glass morphism utilities */
 @layer utilities {
   .glass {
