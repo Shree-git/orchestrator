@@ -1422,9 +1422,9 @@ export function SettingsView() {
                                     setShortcutError(null);
                                   }
                                 }}
-                                className="w-20 h-8 text-center font-mono"
+                                className="w-24 h-8 text-center font-mono"
                                 placeholder="Key"
-                                maxLength={1}
+                                maxLength={2}
                                 autoFocus
                                 data-testid={`edit-shortcut-${key}`}
                               />
@@ -1534,9 +1534,9 @@ export function SettingsView() {
                                     setShortcutError(null);
                                   }
                                 }}
-                                className="w-20 h-8 text-center font-mono"
+                                className="w-24 h-8 text-center font-mono"
                                 placeholder="Key"
-                                maxLength={1}
+                                maxLength={2}
                                 autoFocus
                                 data-testid={`edit-shortcut-${key}`}
                               />
@@ -1649,9 +1649,9 @@ export function SettingsView() {
                                     setShortcutError(null);
                                   }
                                 }}
-                                className="w-20 h-8 text-center font-mono"
+                                className="w-24 h-8 text-center font-mono"
                                 placeholder="Key"
-                                maxLength={1}
+                                maxLength={2}
                                 autoFocus
                                 data-testid={`edit-shortcut-${key}`}
                               />

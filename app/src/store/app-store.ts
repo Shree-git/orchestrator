@@ -78,15 +78,17 @@ export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
   toggleSidebar: "`",
   
   // Actions
-  addFeature: "N",
-  addContextFile: "F",
-  startNext: "G",
-  newSession: "N",
-  openProject: "O",
-  projectPicker: "P",
-  cyclePrevProject: "Q",
-  cycleNextProject: "E",
-  addProfile: "N",
+  // Note: Some shortcuts share the same key (e.g., "N" for addFeature, newSession, addProfile)
+  // This is intentional as they are context-specific and only active in their respective views
+  addFeature: "N",        // Only active in board view
+  addContextFile: "F",    // Only active in context view
+  startNext: "G",         // Only active in board view
+  newSession: "N",        // Only active in agent view
+  openProject: "O",       // Global shortcut
+  projectPicker: "P",     // Global shortcut
+  cyclePrevProject: "Q",  // Global shortcut
+  cycleNextProject: "E",  // Global shortcut
+  addProfile: "N",        // Only active in profiles view
 };
 
 export interface ImageAttachment {
