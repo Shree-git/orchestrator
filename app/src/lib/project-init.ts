@@ -57,7 +57,7 @@ export async function initializeProject(
       const exists = await api.exists(fullPath);
 
       if (!exists) {
-        await api.writeFile(fullPath, defaultContent);
+        await api.writeFile(fullPath, defaultContent as string);
         createdFiles.push(relativePath);
       } else {
         existingFiles.push(relativePath);

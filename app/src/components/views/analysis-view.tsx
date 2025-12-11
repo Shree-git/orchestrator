@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAppStore, FileTreeNode, ProjectAnalysis } from "@/store/app-store";
+import {
+  useAppStore,
+  FileTreeNode,
+  ProjectAnalysis,
+  Feature,
+} from "@/store/app-store";
 import { getElectronAPI } from "@/lib/electron";
 import {
   Card,
@@ -763,7 +768,17 @@ ${Object.entries(projectAnalysis.filesByExtension)
         throw new Error("Features API not available");
       }
 
-      for (const feature of detectedFeatures) {
+      // Convert DetectedFeature to Feature by adding required id and status
+      for (const detectedFeature of detectedFeatures) {
+        const feature: Feature = {
+          id: `feature-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          category: detectedFeature.category,
+          description: detectedFeature.description,
+          steps: detectedFeature.steps,
+          status: "backlog" as const,
+        };
         await api.features.create(currentProject.path, feature);
       }
 

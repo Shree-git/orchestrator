@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { Project } from "@/store/app-store";
+import type { Project } from "@/lib/electron";
 
 interface DeleteProjectDialogProps {
   open: boolean;
@@ -49,14 +49,19 @@ export function DeleteProjectDialog({
               <Folder className="w-5 h-5 text-brand-500" />
             </div>
             <div className="min-w-0">
-              <p className="font-medium text-foreground truncate">{project.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{project.path}</p>
+              <p className="font-medium text-foreground truncate">
+                {project.name}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {project.path}
+              </p>
             </div>
           </div>
         )}
 
         <p className="text-sm text-muted-foreground">
-          The folder will remain on disk until you permanently delete it from Trash.
+          The folder will remain on disk until you permanently delete it from
+          Trash.
         </p>
 
         <DialogFooter className="gap-2 sm:gap-0">

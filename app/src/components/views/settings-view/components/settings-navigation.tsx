@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Project } from "@/store/app-store";
+import type { Project } from "@/lib/electron";
 import type { NavigationItem } from "../config/navigation";
 
 interface SettingsNavigationProps {

@@ -61,7 +61,12 @@ function StatusBadge({
   status,
   label,
 }: {
-  status: "installed" | "not_installed" | "checking" | "authenticated" | "not_authenticated";
+  status:
+    | "installed"
+    | "not_installed"
+    | "checking"
+    | "authenticated"
+    | "not_authenticated";
   label: string;
 }) {
   const getStatusConfig = () => {
@@ -128,8 +133,8 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
           Welcome to Automaker
         </h2>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Let&apos;s set up your development environment. We&apos;ll check for required
-          CLI tools and help you configure them.
+          Let&apos;s set up your development environment. We&apos;ll check for
+          required CLI tools and help you configure them.
         </p>
       </div>
 
@@ -143,7 +148,8 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Anthropic&apos;s powerful AI assistant for code generation and analysis
+              Anthropic&apos;s powerful AI assistant for code generation and
+              analysis
             </p>
           </CardContent>
         </Card>
@@ -200,7 +206,9 @@ function ClaudeSetupStep({
 
   const [isChecking, setIsChecking] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"token" | "api_key" | null>(null);
+  const [authMethod, setAuthMethod] = useState<"token" | "api_key" | null>(
+    null
+  );
   const [oauthToken, setOAuthToken] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -213,9 +221,18 @@ function ClaudeSetupStep({
       const setupApi = api.setup;
 
       // Debug: Check what's available
-      console.log("[Claude Setup] isElectron:", typeof window !== "undefined" && (window as any).isElectron);
-      console.log("[Claude Setup] electronAPI exists:", typeof window !== "undefined" && !!(window as any).electronAPI);
-      console.log("[Claude Setup] electronAPI.setup exists:", typeof window !== "undefined" && !!(window as any).electronAPI?.setup);
+      console.log(
+        "[Claude Setup] isElectron:",
+        typeof window !== "undefined" && (window as any).isElectron
+      );
+      console.log(
+        "[Claude Setup] electronAPI exists:",
+        typeof window !== "undefined" && !!(window as any).electronAPI
+      );
+      console.log(
+        "[Claude Setup] electronAPI.setup exists:",
+        typeof window !== "undefined" && !!(window as any).electronAPI?.setup
+      );
       console.log("[Claude Setup] Setup API available:", !!setupApi);
 
       if (setupApi?.getClaudeStatus) {
@@ -224,7 +241,7 @@ function ClaudeSetupStep({
 
         if (result.success) {
           const cliStatus = {
-            installed: result.installed || result.status === "installed",
+            installed: result.status === "installed",
             path: result.path || null,
             version: result.version || null,
             method: result.method || "none",
@@ -235,14 +252,16 @@ function ClaudeSetupStep({
           if (result.auth) {
             const authStatus = {
               authenticated: result.auth.authenticated,
-              method: result.auth.method === "oauth_token"
-                ? "oauth"
-                : result.auth.method?.includes("api_key")
-                ? "api_key"
-                : "none",
+              method:
+                result.auth.method === "oauth_token"
+                  ? "oauth"
+                  : result.auth.method?.includes("api_key")
+                  ? "api_key"
+                  : "none",
               hasCredentialsFile: false,
               oauthTokenValid: result.auth.hasStoredOAuthToken,
-              apiKeyValid: result.auth.hasStoredApiKey || result.auth.hasEnvApiKey,
+              apiKeyValid:
+                result.auth.hasStoredApiKey || result.auth.hasEnvApiKey,
             };
             console.log("[Claude Setup] Auth Status:", authStatus);
             setClaudeAuthStatus(authStatus as any);
@@ -274,13 +293,18 @@ function ClaudeSetupStep({
       const setupApi = api.setup;
 
       if (setupApi?.installClaude) {
-        const unsubscribe = setupApi.onInstallProgress?.((progress: { cli?: string; data?: string; type?: string }) => {
-          if (progress.cli === "claude") {
-            setClaudeInstallProgress({
-              output: [...claudeInstallProgress.output, progress.data || progress.type || ""],
-            });
+        const unsubscribe = setupApi.onInstallProgress?.(
+          (progress: { cli?: string; data?: string; type?: string }) => {
+            if (progress.cli === "claude") {
+              setClaudeInstallProgress({
+                output: [
+                  ...claudeInstallProgress.output,
+                  progress.data || progress.type || "",
+                ],
+              });
+            }
           }
-        });
+        );
 
         const result = await setupApi.installClaude();
         unsubscribe?.();
@@ -290,17 +314,17 @@ function ClaudeSetupStep({
           // Wait a bit for installation to complete and PATH to update, then retry status check
           let retries = 5;
           let detected = false;
-          
+
           // Initial delay to let the installation script finish setting up
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+
           for (let i = 0; i < retries; i++) {
             // Check status
             await checkStatus();
-            
+
             // Small delay to let state update
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
+            await new Promise((resolve) => setTimeout(resolve, 300));
+
             // Check if CLI is now detected by re-reading from store
             const currentStatus = useSetupStore.getState().claudeCliStatus;
             if (currentStatus?.installed) {
@@ -308,18 +332,21 @@ function ClaudeSetupStep({
               toast.success("Claude CLI installed and detected successfully");
               break;
             }
-            
+
             // Wait before next retry (longer delays for later retries)
             if (i < retries - 1) {
-              await new Promise(resolve => setTimeout(resolve, 2000 + (i * 500)));
+              await new Promise((resolve) =>
+                setTimeout(resolve, 2000 + i * 500)
+              );
             }
           }
-          
+
           // Show appropriate message based on detection
           if (!detected) {
             // Installation completed but CLI not detected - this is common if PATH wasn't updated in current process
             toast.success("Claude CLI installation completed", {
-              description: "The CLI was installed but may need a terminal restart to be detected. You can continue with authentication if you have a token.",
+              description:
+                "The CLI was installed but may need a terminal restart to be detected. You can continue with authentication if you have a token.",
               duration: 7000,
             });
           }
@@ -349,7 +376,10 @@ function ClaudeSetupStep({
       const setupApi = api.setup;
 
       if (setupApi?.storeApiKey) {
-        const result = await setupApi.storeApiKey("anthropic_oauth_token", oauthToken);
+        const result = await setupApi.storeApiKey(
+          "anthropic_oauth_token",
+          oauthToken
+        );
         console.log("[Claude Setup] Store OAuth token result:", result);
 
         if (result.success) {
@@ -434,7 +464,8 @@ function ClaudeSetupStep({
   const getAuthMethodLabel = () => {
     if (!isAuthenticated) return null;
     if (claudeAuthStatus?.method === "oauth") return "Subscription Token";
-    if (apiKeys.anthropic || claudeAuthStatus?.method === "api_key") return "API Key";
+    if (apiKeys.anthropic || claudeAuthStatus?.method === "api_key")
+      return "API Key";
     return "Authenticated";
   };
 
@@ -457,8 +488,15 @@ function ClaudeSetupStep({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Status</CardTitle>
-            <Button variant="ghost" size="sm" onClick={checkStatus} disabled={isChecking}>
-              <RefreshCw className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`} />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={checkStatus}
+              disabled={isChecking}
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
+              />
             </Button>
           </div>
         </CardHeader>
@@ -477,7 +515,9 @@ function ClaudeSetupStep({
           {claudeCliStatus?.version && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Version</span>
-              <span className="text-sm font-mono text-foreground">{claudeCliStatus.version}</span>
+              <span className="text-sm font-mono text-foreground">
+                {claudeCliStatus.version}
+              </span>
             </div>
           )}
 
@@ -487,11 +527,16 @@ function ClaudeSetupStep({
               <div className="flex items-center gap-2">
                 <StatusBadge status="authenticated" label="Authenticated" />
                 {getAuthMethodLabel() && (
-                  <span className="text-xs text-muted-foreground">({getAuthMethodLabel()})</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({getAuthMethodLabel()})
+                  </span>
                 )}
               </div>
             ) : (
-              <StatusBadge status="not_authenticated" label="Not Authenticated" />
+              <StatusBadge
+                status="not_authenticated"
+                label="Not Authenticated"
+              />
             )}
           </div>
         </CardContent>
@@ -505,16 +550,28 @@ function ClaudeSetupStep({
               <Download className="w-5 h-5" />
               Install Claude CLI
             </CardTitle>
-            <CardDescription>Required for subscription-based authentication</CardDescription>
+            <CardDescription>
+              Required for subscription-based authentication
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">macOS / Linux</Label>
+              <Label className="text-sm text-muted-foreground">
+                macOS / Linux
+              </Label>
               <div className="flex items-center gap-2">
                 <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
                   curl -fsSL https://claude.ai/install.sh | bash
                 </code>
-                <Button variant="ghost" size="icon" onClick={() => copyCommand("curl -fsSL https://claude.ai/install.sh | bash")}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    copyCommand(
+                      "curl -fsSL https://claude.ai/install.sh | bash"
+                    )
+                  }
+                >
                   <Copy className="w-4 h-4" />
                 </Button>
               </div>
@@ -526,13 +583,21 @@ function ClaudeSetupStep({
                 <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
                   irm https://claude.ai/install.ps1 | iex
                 </code>
-                <Button variant="ghost" size="icon" onClick={() => copyCommand("irm https://claude.ai/install.ps1 | iex")}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    copyCommand("irm https://claude.ai/install.ps1 | iex")
+                  }
+                >
                   <Copy className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
-            {claudeInstallProgress.isInstalling && <TerminalOutput lines={claudeInstallProgress.output} />}
+            {claudeInstallProgress.isInstalling && (
+              <TerminalOutput lines={claudeInstallProgress.output} />
+            )}
 
             <Button
               onClick={handleInstall}
@@ -573,25 +638,37 @@ function ClaudeSetupStep({
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 text-brand-500 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">Subscription Token</p>
-                    <p className="text-sm text-muted-foreground mb-3">Use your Claude subscription (no API charges)</p>
+                    <p className="font-medium text-foreground">
+                      Subscription Token
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Use your Claude subscription (no API charges)
+                    </p>
 
                     {claudeCliStatus?.installed ? (
                       <>
                         <div className="mb-3">
-                          <p className="text-sm text-muted-foreground mb-2">1. Run this command in your terminal:</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            1. Run this command in your terminal:
+                          </p>
                           <div className="flex items-center gap-2">
                             <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
                               claude setup-token
                             </code>
-                            <Button variant="ghost" size="icon" onClick={() => copyCommand("claude setup-token")}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => copyCommand("claude setup-token")}
+                            >
                               <Copy className="w-4 h-4" />
                             </Button>
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label className="text-foreground">2. Paste the token here:</Label>
+                          <Label className="text-foreground">
+                            2. Paste the token here:
+                          </Label>
                           <Input
                             type="password"
                             placeholder="Paste token from claude setup-token..."
@@ -603,7 +680,11 @@ function ClaudeSetupStep({
                         </div>
 
                         <div className="flex gap-2 mt-3">
-                          <Button variant="outline" onClick={() => setAuthMethod(null)} className="border-border">
+                          <Button
+                            variant="outline"
+                            onClick={() => setAuthMethod(null)}
+                            className="border-border"
+                          >
                             Cancel
                           </Button>
                           <Button
@@ -612,7 +693,11 @@ function ClaudeSetupStep({
                             className="flex-1 bg-brand-500 hover:bg-brand-600 text-white"
                             data-testid="save-oauth-token-button"
                           >
-                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Token"}
+                            {isSaving ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              "Save Token"
+                            )}
                           </Button>
                         </div>
                       </>
@@ -620,7 +705,8 @@ function ClaudeSetupStep({
                       <div className="p-3 rounded bg-yellow-500/10 border border-yellow-500/20">
                         <p className="text-sm text-yellow-600">
                           <AlertCircle className="w-4 h-4 inline mr-1" />
-                          Install Claude CLI first to use subscription authentication
+                          Install Claude CLI first to use subscription
+                          authentication
                         </p>
                       </div>
                     )}
@@ -634,10 +720,17 @@ function ClaudeSetupStep({
                   <Key className="w-5 h-5 text-green-500 mt-0.5" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">API Key</p>
-                    <p className="text-sm text-muted-foreground mb-3">Pay-per-use with your Anthropic API key</p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Pay-per-use with your Anthropic API key
+                    </p>
 
                     <div className="space-y-2">
-                      <Label htmlFor="anthropic-key" className="text-foreground">Anthropic API Key</Label>
+                      <Label
+                        htmlFor="anthropic-key"
+                        className="text-foreground"
+                      >
+                        Anthropic API Key
+                      </Label>
                       <Input
                         id="anthropic-key"
                         type="password"
@@ -662,7 +755,11 @@ function ClaudeSetupStep({
                     </div>
 
                     <div className="flex gap-2 mt-3">
-                      <Button variant="outline" onClick={() => setAuthMethod(null)} className="border-border">
+                      <Button
+                        variant="outline"
+                        onClick={() => setAuthMethod(null)}
+                        className="border-border"
+                      >
                         Cancel
                       </Button>
                       <Button
@@ -671,7 +768,11 @@ function ClaudeSetupStep({
                         className="flex-1 bg-green-500 hover:bg-green-600 text-white"
                         data-testid="save-anthropic-key-button"
                       >
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save API Key"}
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Save API Key"
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -688,9 +789,15 @@ function ClaudeSetupStep({
                   <div className="flex items-start gap-3">
                     <Shield className="w-6 h-6 text-brand-500" />
                     <div>
-                      <p className="font-medium text-foreground">Subscription</p>
-                      <p className="text-sm text-muted-foreground mt-1">Use your Claude subscription</p>
-                      <p className="text-xs text-brand-500 mt-2">No API charges</p>
+                      <p className="font-medium text-foreground">
+                        Subscription
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Use your Claude subscription
+                      </p>
+                      <p className="text-xs text-brand-500 mt-2">
+                        No API charges
+                      </p>
                     </div>
                   </div>
                 </button>
@@ -704,7 +811,9 @@ function ClaudeSetupStep({
                     <Key className="w-6 h-6 text-green-500" />
                     <div>
                       <p className="font-medium text-foreground">API Key</p>
-                      <p className="text-sm text-muted-foreground mt-1">Use Anthropic API key</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Use Anthropic API key
+                      </p>
                       <p className="text-xs text-green-500 mt-2">Pay-per-use</p>
                     </div>
                   </div>
@@ -724,9 +833,12 @@ function ClaudeSetupStep({
                 <CheckCircle2 className="w-6 h-6 text-green-500" />
               </div>
               <div>
-                <p className="font-medium text-foreground">Claude is ready to use!</p>
+                <p className="font-medium text-foreground">
+                  Claude is ready to use!
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  {getAuthMethodLabel() && `Using ${getAuthMethodLabel()}. `}You can proceed to the next step
+                  {getAuthMethodLabel() && `Using ${getAuthMethodLabel()}. `}You
+                  can proceed to the next step
                 </p>
               </div>
             </div>
@@ -736,15 +848,27 @@ function ClaudeSetupStep({
 
       {/* Navigation */}
       <div className="flex justify-between pt-4">
-        <Button variant="ghost" onClick={onBack} className="text-muted-foreground">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="text-muted-foreground"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
+          <Button
+            variant="ghost"
+            onClick={onSkip}
+            className="text-muted-foreground"
+          >
             Skip for now
           </Button>
-          <Button onClick={onNext} className="bg-brand-500 hover:bg-brand-600 text-white" data-testid="claude-next-button">
+          <Button
+            onClick={onNext}
+            className="bg-brand-500 hover:bg-brand-600 text-white"
+            data-testid="claude-next-button"
+          >
             Continue
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -804,7 +928,10 @@ function CodexSetupStep({
       const setupApi = api.setup;
 
       console.log("[Codex Setup] Setup API available:", !!setupApi);
-      console.log("[Codex Setup] getCodexStatus available:", !!setupApi?.getCodexStatus);
+      console.log(
+        "[Codex Setup] getCodexStatus available:",
+        !!setupApi?.getCodexStatus
+      );
 
       if (setupApi?.getCodexStatus) {
         const result = await setupApi.getCodexStatus();
@@ -822,12 +949,15 @@ function CodexSetupStep({
 
           if (result.auth) {
             const method = mapAuthMethod(result.auth.method);
-            
+
             const authStatus: CodexAuthStatus = {
               authenticated: result.auth.authenticated,
               method,
               // Only set apiKeyValid for actual API key methods, not CLI login
-              apiKeyValid: method === "cli_verified" || method === "cli_tokens" ? undefined : result.auth.authenticated,
+              apiKeyValid:
+                method === "cli_verified" || method === "cli_tokens"
+                  ? undefined
+                  : result.auth.authenticated,
             };
             console.log("[Codex Setup] Auth Status:", authStatus);
             setCodexAuthStatus(authStatus);
@@ -866,16 +996,18 @@ function CodexSetupStep({
       const setupApi = api.setup;
 
       if (setupApi?.installCodex) {
-        const unsubscribe = setupApi.onInstallProgress?.((progress: { cli?: string; data?: string; type?: string }) => {
-          if (progress.cli === "codex") {
-            setCodexInstallProgress({
-              output: [
-                ...codexInstallProgress.output,
-                progress.data || progress.type || "",
-              ],
-            });
+        const unsubscribe = setupApi.onInstallProgress?.(
+          (progress: { cli?: string; data?: string; type?: string }) => {
+            if (progress.cli === "codex") {
+              setCodexInstallProgress({
+                output: [
+                  ...codexInstallProgress.output,
+                  progress.data || progress.type || "",
+                ],
+              });
+            }
           }
-        });
+        );
 
         const result = await setupApi.installCodex();
 
@@ -912,7 +1044,10 @@ function CodexSetupStep({
       const api = getElectronAPI();
       const setupApi = api.setup;
 
-      console.log("[Codex Setup] storeApiKey available:", !!setupApi?.storeApiKey);
+      console.log(
+        "[Codex Setup] storeApiKey available:",
+        !!setupApi?.storeApiKey
+      );
 
       if (setupApi?.storeApiKey) {
         console.log("[Codex Setup] Calling storeApiKey for openai...");
@@ -920,7 +1055,9 @@ function CodexSetupStep({
         console.log("[Codex Setup] storeApiKey result:", result);
 
         if (result.success) {
-          console.log("[Codex Setup] API key stored successfully, updating state...");
+          console.log(
+            "[Codex Setup] API key stored successfully, updating state..."
+          );
           setApiKeys({ ...apiKeys, openai: apiKey });
           setCodexAuthStatus({
             authenticated: true,
@@ -933,7 +1070,9 @@ function CodexSetupStep({
           console.log("[Codex Setup] Failed to store API key:", result.error);
         }
       } else {
-        console.log("[Codex Setup] Web mode - storing API key in app state only");
+        console.log(
+          "[Codex Setup] Web mode - storing API key in app state only"
+        );
         setApiKeys({ ...apiKeys, openai: apiKey });
         setCodexAuthStatus({
           authenticated: true,
@@ -957,13 +1096,14 @@ function CodexSetupStep({
   };
 
   const isAuthenticated = codexAuthStatus?.authenticated || apiKeys.openai;
-  
+
   const getAuthMethodLabel = () => {
     if (!isAuthenticated) return null;
     if (apiKeys.openai) return "API Key (Manual)";
     if (codexAuthStatus?.method === "api_key") return "API Key (Auth File)";
     if (codexAuthStatus?.method === "env") return "API Key (Environment)";
-    if (codexAuthStatus?.method === "cli_verified") return "CLI Login (ChatGPT)";
+    if (codexAuthStatus?.method === "cli_verified")
+      return "CLI Login (ChatGPT)";
     return "Authenticated";
   };
 
@@ -1031,7 +1171,10 @@ function CodexSetupStep({
                 )}
               </div>
             ) : (
-              <StatusBadge status="not_authenticated" label="Not Authenticated" />
+              <StatusBadge
+                status="not_authenticated"
+                label="Not Authenticated"
+              />
             )}
           </div>
         </CardContent>
@@ -1114,9 +1257,7 @@ function CodexSetupStep({
               <Key className="w-5 h-5" />
               Authentication
             </CardTitle>
-            <CardDescription>
-              Codex requires an OpenAI API key
-            </CardDescription>
+            <CardDescription>Codex requires an OpenAI API key</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {codexCliStatus?.installed && (
@@ -1236,7 +1377,8 @@ function CodexSetupStep({
                   Codex is ready to use!
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {getAuthMethodLabel() && `Authenticated via ${getAuthMethodLabel()}. `}
+                  {getAuthMethodLabel() &&
+                    `Authenticated via ${getAuthMethodLabel()}. `}
                   You can proceed to complete setup
                 </p>
               </div>
@@ -1381,22 +1523,34 @@ function CompleteStep({ onFinish }: { onFinish: () => void }) {
 
 // Main Setup View
 export function SetupView() {
-  const { currentStep, setCurrentStep, completeSetup, setSkipClaudeSetup, setSkipCodexSetup } =
-    useSetupStore();
+  const {
+    currentStep,
+    setCurrentStep,
+    completeSetup,
+    setSkipClaudeSetup,
+    setSkipCodexSetup,
+  } = useSetupStore();
   const { setCurrentView } = useAppStore();
 
   const steps = ["welcome", "claude", "codex", "complete"] as const;
-  type StepName = typeof steps[number];
+  type StepName = (typeof steps)[number];
   const getStepName = (): StepName => {
-    if (currentStep === "claude_detect" || currentStep === "claude_auth") return "claude";
-    if (currentStep === "codex_detect" || currentStep === "codex_auth") return "codex";
+    if (currentStep === "claude_detect" || currentStep === "claude_auth")
+      return "claude";
+    if (currentStep === "codex_detect" || currentStep === "codex_auth")
+      return "codex";
     if (currentStep === "welcome") return "welcome";
     return "complete";
   };
   const currentIndex = steps.indexOf(getStepName());
 
   const handleNext = (from: string) => {
-    console.log("[Setup Flow] handleNext called from:", from, "currentStep:", currentStep);
+    console.log(
+      "[Setup Flow] handleNext called from:",
+      from,
+      "currentStep:",
+      currentStep
+    );
     switch (from) {
       case "welcome":
         console.log("[Setup Flow] Moving to claude_detect step");
@@ -1445,10 +1599,7 @@ export function SetupView() {
   };
 
   return (
-    <div
-      className="h-full flex flex-col content-bg"
-      data-testid="setup-view"
-    >
+    <div className="h-full flex flex-col content-bg" data-testid="setup-view">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-border bg-glass backdrop-blur-md titlebar-drag-region">
         <div className="px-8 py-4">
@@ -1467,7 +1618,10 @@ export function SetupView() {
         <div className="p-8">
           <div className="w-full max-w-2xl mx-auto">
             <div className="mb-8">
-              <StepIndicator currentStep={currentIndex} totalSteps={steps.length} />
+              <StepIndicator
+                currentStep={currentIndex}
+                totalSteps={steps.length}
+              />
             </div>
 
             <div className="py-8">

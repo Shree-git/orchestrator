@@ -272,7 +272,10 @@ export interface SpecRegenerationAPI {
 }
 
 export interface AutoModeAPI {
-  start: (projectPath: string, maxConcurrency?: number) => Promise<{
+  start: (
+    projectPath: string,
+    maxConcurrency?: number
+  ) => Promise<{
     success: boolean;
     error?: string;
   }>;
@@ -299,25 +302,38 @@ export interface AutoModeAPI {
     error?: string;
   }>;
 
-  runFeature: (projectPath: string, featureId: string, useWorktrees?: boolean) => Promise<{
+  runFeature: (
+    projectPath: string,
+    featureId: string,
+    useWorktrees?: boolean
+  ) => Promise<{
     success: boolean;
     passes?: boolean;
     error?: string;
   }>;
 
-  verifyFeature: (projectPath: string, featureId: string) => Promise<{
+  verifyFeature: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     passes?: boolean;
     error?: string;
   }>;
 
-  resumeFeature: (projectPath: string, featureId: string) => Promise<{
+  resumeFeature: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     passes?: boolean;
     error?: string;
   }>;
 
-  contextExists: (projectPath: string, featureId: string) => Promise<{
+  contextExists: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     exists?: boolean;
     error?: string;
@@ -329,13 +345,21 @@ export interface AutoModeAPI {
     error?: string;
   }>;
 
-  followUpFeature: (projectPath: string, featureId: string, prompt: string, imagePaths?: string[]) => Promise<{
+  followUpFeature: (
+    projectPath: string,
+    featureId: string,
+    prompt: string,
+    imagePaths?: string[]
+  ) => Promise<{
     success: boolean;
     passes?: boolean;
     error?: string;
   }>;
 
-  commitFeature: (projectPath: string, featureId: string) => Promise<{
+  commitFeature: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     error?: string;
   }>;
@@ -345,6 +369,9 @@ export interface AutoModeAPI {
 
 export interface ElectronAPI {
   ping: () => Promise<string>;
+  openExternalLink: (
+    url: string
+  ) => Promise<{ success: boolean; error?: string }>;
 
   // Dialog APIs
   openDirectory: () => Promise<{
@@ -362,7 +389,10 @@ export interface ElectronAPI {
     content?: string;
     error?: string;
   }>;
-  writeFile: (filePath: string, content: string) => Promise<{
+  writeFile: (
+    filePath: string,
+    content: string
+  ) => Promise<{
     success: boolean;
     error?: string;
   }>;
@@ -525,25 +555,35 @@ export interface FileDiffResult {
 
 export interface WorktreeAPI {
   // Revert feature changes by removing the worktree
-  revertFeature: (projectPath: string, featureId: string) => Promise<{
+  revertFeature: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     removedPath?: string;
     error?: string;
   }>;
 
   // Merge feature worktree changes back to main branch
-  mergeFeature: (projectPath: string, featureId: string, options?: {
-    squash?: boolean;
-    commitMessage?: string;
-    squashMessage?: string;
-  }) => Promise<{
+  mergeFeature: (
+    projectPath: string,
+    featureId: string,
+    options?: {
+      squash?: boolean;
+      commitMessage?: string;
+      squashMessage?: string;
+    }
+  ) => Promise<{
     success: boolean;
     mergedBranch?: string;
     error?: string;
   }>;
 
   // Get worktree info for a feature
-  getInfo: (projectPath: string, featureId: string) => Promise<{
+  getInfo: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<{
     success: boolean;
     worktreePath?: string;
     branchName?: string;
@@ -552,7 +592,10 @@ export interface WorktreeAPI {
   }>;
 
   // Get worktree status (changed files, commits)
-  getStatus: (projectPath: string, featureId: string) => Promise<WorktreeStatus>;
+  getStatus: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<WorktreeStatus>;
 
   // List all feature worktrees
   list: (projectPath: string) => Promise<{
@@ -562,10 +605,17 @@ export interface WorktreeAPI {
   }>;
 
   // Get file diffs for a feature worktree
-  getDiffs: (projectPath: string, featureId: string) => Promise<FileDiffsResult>;
+  getDiffs: (
+    projectPath: string,
+    featureId: string
+  ) => Promise<FileDiffsResult>;
 
   // Get diff for a specific file in a worktree
-  getFileDiff: (projectPath: string, featureId: string, filePath: string) => Promise<FileDiffResult>;
+  getFileDiff: (
+    projectPath: string,
+    featureId: string,
+    filePath: string
+  ) => Promise<FileDiffResult>;
 }
 
 export interface GitAPI {
@@ -573,7 +623,10 @@ export interface GitAPI {
   getDiffs: (projectPath: string) => Promise<FileDiffsResult>;
 
   // Get diff for a specific file in the main project
-  getFileDiff: (projectPath: string, filePath: string) => Promise<FileDiffResult>;
+  getFileDiff: (
+    projectPath: string,
+    filePath: string
+  ) => Promise<FileDiffResult>;
 }
 
 // Model definition type

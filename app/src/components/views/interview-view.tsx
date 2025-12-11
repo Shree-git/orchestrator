@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, Feature } from "@/store/app-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -313,11 +313,11 @@ export function InterviewView() {
       );
 
       // Create initial feature in the features folder
-      const initialFeature = {
+      const initialFeature: Feature = {
         id: `feature-${Date.now()}-0`,
         category: "Core",
         description: "Initial project setup",
-        status: "backlog",
+        status: "backlog" as const,
         steps: [
           "Step 1: Review app_spec.txt",
           "Step 2: Set up development environment",
@@ -325,6 +325,9 @@ export function InterviewView() {
         ],
         skipTests: true,
       };
+      if (!api.features) {
+        throw new Error("Features API not available");
+      }
       await api.features.create(fullProjectPath, initialFeature);
 
       const project = {
