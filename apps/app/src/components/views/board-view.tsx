@@ -2246,13 +2246,6 @@ export function BoardView() {
                               model: profile.model,
                               thinkingLevel: profile.thinkingLevel,
                             });
-                            if (profile.thinkingLevel === "ultrathink") {
-                              toast.warning("Ultrathink Selected", {
-                                description:
-                                  "Ultrathink uses extensive reasoning (45-180s, ~$0.48/task).",
-                                duration: 4000,
-                              });
-                            }
                           }}
                           className={cn(
                             "flex items-center gap-2 p-2 rounded-lg border text-left transition-all",
@@ -2262,9 +2255,7 @@ export function BoardView() {
                           )}
                           data-testid={`profile-quick-select-${profile.id}`}
                         >
-                          <div
-                            className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10"
-                          >
+                          <div className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10">
                             {IconComponent && (
                               <IconComponent className="w-4 h-4 text-primary" />
                             )}
@@ -2355,13 +2346,6 @@ export function BoardView() {
                                 ...newFeature,
                                 thinkingLevel: level,
                               });
-                              if (level === "ultrathink") {
-                                toast.warning("Ultrathink Selected", {
-                                  description:
-                                    "Ultrathink uses extensive reasoning (45-180s, ~$0.48/task). Best for complex architecture, migrations, or debugging.",
-                                  duration: 5000,
-                                });
-                              }
                             }}
                             className={cn(
                               "flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors min-w-[60px]",
@@ -2387,7 +2371,6 @@ export function BoardView() {
                   )}
                 </div>
               )}
-
             </TabsContent>
 
             {/* Testing Tab */}
@@ -2627,13 +2610,6 @@ export function BoardView() {
                                 model: profile.model,
                                 thinkingLevel: profile.thinkingLevel,
                               });
-                              if (profile.thinkingLevel === "ultrathink") {
-                                toast.warning("Ultrathink Selected", {
-                                  description:
-                                    "Ultrathink uses extensive reasoning (45-180s, ~$0.48/task).",
-                                  duration: 4000,
-                                });
-                              }
                             }}
                             className={cn(
                               "flex items-center gap-2 p-2 rounded-lg border text-left transition-all",
@@ -2643,9 +2619,7 @@ export function BoardView() {
                             )}
                             data-testid={`edit-profile-quick-select-${profile.id}`}
                           >
-                            <div
-                              className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10"
-                            >
+                            <div className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10">
                               {IconComponent && (
                                 <IconComponent className="w-4 h-4 text-primary" />
                               )}
@@ -2727,13 +2701,6 @@ export function BoardView() {
                                   ...editingFeature,
                                   thinkingLevel: level,
                                 });
-                                if (level === "ultrathink") {
-                                  toast.warning("Ultrathink Selected", {
-                                    description:
-                                      "Ultrathink uses extensive reasoning (45-180s, ~$0.48/task). Best for complex architecture, migrations, or debugging.",
-                                    duration: 5000,
-                                  });
-                                }
                               }}
                               className={cn(
                                 "flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors min-w-[60px]",
@@ -2760,7 +2727,6 @@ export function BoardView() {
                     )}
                   </div>
                 )}
-
               </TabsContent>
 
               {/* Testing Tab */}
