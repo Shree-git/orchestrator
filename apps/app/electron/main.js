@@ -6,10 +6,84 @@
  */
 
 const path = require("path");
-const { spawn } = require("child_process");
+const { spawn, execSync } = require("child_process");
 const fs = require("fs");
 const http = require("http");
 const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+
+/**
+ * Find Node.js executable - handles Finder launch where PATH isn't available
+ */
+function findNodeExecutable() {
+  // Common node installation paths on macOS
+  const commonPaths = [
+    "/opt/homebrew/bin/node",      // Homebrew on Apple Silicon
+    "/usr/local/bin/node",         // Homebrew on Intel Mac
+    "/usr/bin/node",               // System node
+    process.env.NODE_PATH ? path.join(path.dirname(process.env.NODE_PATH), "node") : null,
+  ].filter(Boolean);
+
+  // Check NVM paths
+  const homeDir = process.env.HOME || app.getPath("home");
+  const nvmDir = path.join(homeDir, ".nvm/versions/node");
+  if (fs.existsSync(nvmDir)) {
+    try {
+      const versions = fs.readdirSync(nvmDir);
+      // Sort to get latest version first
+      versions.sort().reverse();
+      for (const version of versions) {
+        const nodePath = path.join(nvmDir, version, "bin/node");
+        if (fs.existsSync(nodePath)) {
+          commonPaths.unshift(nodePath);
+          break;
+        }
+      }
+    } catch (error) {
+      console.warn("[Electron] Error reading NVM directory:", error.message);
+    }
+  }
+
+  // Check fnm paths
+  const fnmDir = path.join(homeDir, ".local/share/fnm/node-versions");
+  if (fs.existsSync(fnmDir)) {
+    try {
+      const versions = fs.readdirSync(fnmDir);
+      versions.sort().reverse();
+      for (const version of versions) {
+        const nodePath = path.join(fnmDir, version, "installation/bin/node");
+        if (fs.existsSync(nodePath)) {
+          commonPaths.unshift(nodePath);
+          break;
+        }
+      }
+    } catch (error) {
+      console.warn("[Electron] Error reading fnm directory:", error.message);
+    }
+  }
+
+  // Try each path
+  for (const nodePath of commonPaths) {
+    if (fs.existsSync(nodePath)) {
+      console.log("[Electron] Found Node.js at:", nodePath);
+      return nodePath;
+    }
+  }
+
+  // Last resort: try to resolve from shell (works when launched from terminal)
+  try {
+    const shellNode = execSync("which node", { encoding: "utf-8" }).trim();
+    if (shellNode && fs.existsSync(shellNode)) {
+      console.log("[Electron] Found Node.js via shell:", shellNode);
+      return shellNode;
+    }
+  } catch (error) {
+    console.warn("[Electron] Could not find node via shell:", error.message);
+  }
+
+  // Fallback to just "node" and hope PATH works
+  console.warn("[Electron] Using fallback 'node' command");
+  return "node";
+}
 
 // Load environment variables from .env file (development only)
 if (!app.isPackaged) {
@@ -56,6 +130,20 @@ function getIconPath() {
 async function startStaticServer() {
   const staticPath = path.join(__dirname, "../out");
 
+  console.log("[Electron] Static server path:", staticPath);
+
+  // Verify static path exists
+  if (!fs.existsSync(staticPath)) {
+    throw new Error(`Static files not found at: ${staticPath}`);
+  }
+
+  const indexPath = path.join(staticPath, "index.html");
+  if (!fs.existsSync(indexPath)) {
+    throw new Error(`index.html not found at: ${indexPath}`);
+  }
+
+  console.log("[Electron] Static files verified, starting server...");
+
   staticServer = http.createServer((request, response) => {
     // Parse the URL and remove query string
     let filePath = path.join(staticPath, request.url.split("?")[0]);
@@ -77,6 +165,7 @@ async function startStaticServer() {
       // Read and serve the file
       fs.readFile(filePath, (error, content) => {
         if (error) {
+          console.error(`[Static Server] Error reading file ${filePath}:`, error.message);
           response.writeHead(500);
           response.end("Server Error");
           return;
@@ -161,7 +250,8 @@ async function startServer() {
     args = [tsxCliPath, "watch", serverPath];
   } else {
     // In production, use compiled JavaScript
-    command = "node";
+    // Use findNodeExecutable() to handle Finder launch where PATH isn't available
+    command = findNodeExecutable();
     serverPath = path.join(process.resourcesPath, "server", "index.js");
     args = [serverPath];
 
@@ -189,8 +279,21 @@ async function startServer() {
     }
   }
 
+  // Build PATH that includes the node binary directory
+  // This is needed for the SDK to find node when spawning Claude Code
+  let enhancedPath = process.env.PATH || "";
+  if (app.isPackaged) {
+    // Add the directory containing our node executable to PATH
+    const nodeDir = path.dirname(command);
+    if (!enhancedPath.includes(nodeDir)) {
+      enhancedPath = `${nodeDir}:${enhancedPath}`;
+    }
+    console.log("[Electron] Enhanced PATH for server:", nodeDir);
+  }
+
   const env = {
     ...process.env,
+    PATH: enhancedPath,
     PORT: SERVER_PORT.toString(),
     DATA_DIR: app.getPath("userData"),
     NODE_PATH: serverNodeModules,
@@ -301,6 +404,16 @@ function createWindow() {
     mainWindow = null;
   });
 
+  // Handle load failures
+  mainWindow.webContents.on("did-fail-load", (_event, errorCode, errorDescription, validatedURL) => {
+    console.error(`[Electron] Failed to load URL: ${validatedURL}, Error: ${errorDescription} (${errorCode})`);
+  });
+
+  // Log when page finishes loading
+  mainWindow.webContents.on("did-finish-load", () => {
+    console.log("[Electron] Page finished loading");
+  });
+
   // Handle external links - open in default browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -335,6 +448,11 @@ app.whenReady().then(async () => {
     createWindow();
   } catch (error) {
     console.error("[Electron] Failed to start:", error);
+    // Show error dialog to user
+    dialog.showErrorBox(
+      "Automaker Failed to Start",
+      `Error: ${error.message}\n\nPlease ensure Node.js is installed and accessible.`
+    );
     app.quit();
   }
 
