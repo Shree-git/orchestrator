@@ -719,6 +719,8 @@ export interface WorktreeAPI {
       prUrl?: string;
       prCreated: boolean;
       prError?: string;
+      browserUrl?: string;
+      ghCliAvailable?: boolean;
     };
     error?: string;
   }>;

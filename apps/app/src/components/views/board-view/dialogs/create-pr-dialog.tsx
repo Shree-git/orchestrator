@@ -47,6 +47,8 @@ export function CreatePRDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [prUrl, setPrUrl] = useState<string | null>(null);
+  const [browserUrl, setBrowserUrl] = useState<string | null>(null);
+  const [showBrowserFallback, setShowBrowserFallback] = useState(false);
 
   // Reset state when dialog opens or worktree changes
   useEffect(() => {
@@ -58,6 +60,8 @@ export function CreatePRDialog({
       setIsDraft(false);
       setError(null);
       setPrUrl(null);
+      setBrowserUrl(null);
+      setShowBrowserFallback(false);
     }
   }, [open, worktree?.path]);
 
@@ -93,14 +97,26 @@ export function CreatePRDialog({
           });
           onCreated();
         } else {
+          // Branch was pushed successfully
           toast.success("Branch pushed", {
             description: result.result.committed
               ? `Commit ${result.result.commitHash} pushed to ${result.result.branch}`
               : `Branch ${result.result.branch} pushed`,
           });
-          if (!result.result.prCreated) {
-            // Show the specific error if available
+
+          // Check if we should show browser fallback
+          if (!result.result.prCreated && result.result.browserUrl) {
             const prError = result.result.prError;
+
+            // If gh CLI is not available, show browser fallback UI
+            if (prError === "gh_cli_not_available" || !result.result.ghCliAvailable) {
+              setBrowserUrl(result.result.browserUrl);
+              setShowBrowserFallback(true);
+              onCreated();
+              return; // Don't close dialog, show browser fallback UI
+            }
+
+            // gh CLI is available but failed - show error with browser option
             if (prError) {
               // Parse common gh CLI errors for better messages
               let errorMessage = prError;
@@ -111,15 +127,24 @@ export function CreatePRDialog({
               } else if (prError.includes("not logged in") || prError.includes("auth")) {
                 errorMessage = "GitHub CLI not authenticated. Run 'gh auth login' in terminal.";
               }
+
+              // Show error but also provide browser option
+              setBrowserUrl(result.result.browserUrl);
+              setShowBrowserFallback(true);
               toast.error("PR creation failed", {
                 description: errorMessage,
                 duration: 8000,
               });
-            } else {
-              toast.info("PR not created", {
-                description: "GitHub CLI (gh) may not be installed or authenticated",
-              });
+              onCreated();
+              return;
             }
+          }
+
+          // No browser URL available, just close
+          if (!result.result.prCreated) {
+            toast.info("PR not created", {
+              description: "GitHub CLI (gh) may not be installed or authenticated",
+            });
           }
           onCreated();
           onOpenChange(false);
@@ -145,6 +170,8 @@ export function CreatePRDialog({
       setIsDraft(false);
       setError(null);
       setPrUrl(null);
+      setBrowserUrl(null);
+      setShowBrowserFallback(false);
     }, 200);
   };
 
@@ -184,6 +211,32 @@ export function CreatePRDialog({
               <ExternalLink className="w-4 h-4" />
               View Pull Request
             </Button>
+          </div>
+        ) : showBrowserFallback && browserUrl ? (
+          <div className="py-6 text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/10">
+              <GitPullRequest className="w-8 h-8 text-blue-500" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Branch Pushed!</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Your changes have been pushed to GitHub.
+                <br />
+                Click below to create a pull request in your browser.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Button
+                onClick={() => window.open(browserUrl, "_blank")}
+                className="gap-2 w-full"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Create PR in Browser
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Tip: Install the GitHub CLI (<code className="bg-muted px-1 rounded">gh</code>) to create PRs directly from the app
+              </p>
+            </div>
           </div>
         ) : (
           <>

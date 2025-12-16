@@ -1,10 +1,8 @@
 /**
  * Branch tracking utilities
  *
- * Tracks active branches in external automaker storage so users
+ * Tracks active branches in .automaker so users
  * can switch between branches even after worktrees are removed.
- *
- * Data is stored outside the git repo to avoid worktree/symlink conflicts.
  */
 
 import { readFile, writeFile } from "fs/promises";
@@ -31,7 +29,7 @@ export async function getTrackedBranches(
   projectPath: string
 ): Promise<TrackedBranch[]> {
   try {
-    const filePath = await getBranchTrackingPath(projectPath);
+    const filePath = getBranchTrackingPath(projectPath);
     const content = await readFile(filePath, "utf-8");
     const data: BranchTrackingData = JSON.parse(content);
     return data.branches || [];

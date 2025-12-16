@@ -42,7 +42,7 @@ export async function parseAndCreateFeatures(
     logger.info(`Parsed ${parsed.features?.length || 0} features`);
     logger.info("Parsed features:", JSON.stringify(parsed.features, null, 2));
 
-    const featuresDir = await getFeaturesDir(projectPath);
+    const featuresDir = getFeaturesDir(projectPath);
     await fs.mkdir(featuresDir, { recursive: true });
 
     const createdFeatures: Array<{ id: string; title: string }> = [];

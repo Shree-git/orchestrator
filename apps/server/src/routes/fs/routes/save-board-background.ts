@@ -27,8 +27,8 @@ export function createSaveBoardBackgroundHandler() {
         return;
       }
 
-      // Get external board directory
-      const boardDir = await getBoardDir(projectPath);
+      // Get board directory
+      const boardDir = getBoardDir(projectPath);
       await fs.mkdir(boardDir, { recursive: true });
 
       // Decode base64 data (remove data URL prefix if present)

@@ -111,7 +111,7 @@ export function createCreatePRHandler() {
         return;
       }
 
-      // Create PR using gh CLI
+      // Create PR using gh CLI or provide browser fallback
       const base = baseBranch || "main";
       const title = prTitle || branchName;
       const body = prBody || `Changes from branch ${branchName}`;
@@ -119,65 +119,97 @@ export function createCreatePRHandler() {
 
       let prUrl: string | null = null;
       let prError: string | null = null;
+      let browserUrl: string | null = null;
+      let ghCliAvailable = false;
+
+      // Check if gh CLI is available
       try {
-        // Check if gh CLI is available (use extended PATH for Homebrew/etc)
         await execAsync("command -v gh", { env: execEnv });
+        ghCliAvailable = true;
+      } catch {
+        ghCliAvailable = false;
+      }
 
-        // Check if this is a fork by looking for upstream remote
-        let upstreamRepo: string | null = null;
-        let originOwner: string | null = null;
-        try {
-          const { stdout: remotes } = await execAsync("git remote -v", {
-            cwd: worktreePath,
-            env: execEnv,
-          });
-
-          // Parse remotes to detect fork workflow
-          const lines = remotes.split("\n");
-          for (const line of lines) {
-            const match = line.match(/^(\w+)\s+.*[:/]([^/]+)\/([^/\s]+?)(?:\.git)?\s+\(fetch\)/);
-            if (match) {
-              const [, remoteName, owner] = match;
-              if (remoteName === "upstream") {
-                upstreamRepo = line.match(/[:/]([^/]+\/[^/\s]+?)(?:\.git)?\s+\(fetch\)/)?.[1] || null;
-              } else if (remoteName === "origin") {
-                originOwner = owner;
-              }
-            }
-          }
-        } catch {
-          // Couldn't parse remotes, continue without fork detection
-        }
-
-        // Build gh pr create command
-        let prCmd = `gh pr create --base "${base}"`;
-
-        // If this is a fork (has upstream remote), specify the repo and head
-        if (upstreamRepo && originOwner) {
-          // For forks: --repo specifies where to create PR, --head specifies source
-          prCmd += ` --repo "${upstreamRepo}" --head "${originOwner}:${branchName}"`;
-        } else {
-          // Not a fork, just specify the head branch
-          prCmd += ` --head "${branchName}"`;
-        }
-
-        prCmd += ` --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"')}" ${draftFlag}`;
-        prCmd = prCmd.trim();
-
-        console.log("[CreatePR] Running:", prCmd);
-        const { stdout: prOutput } = await execAsync(prCmd, {
+      // Get repository URL for browser fallback
+      let repoUrl: string | null = null;
+      let upstreamRepo: string | null = null;
+      let originOwner: string | null = null;
+      try {
+        const { stdout: remotes } = await execAsync("git remote -v", {
           cwd: worktreePath,
           env: execEnv,
         });
-        prUrl = prOutput.trim();
-      } catch (ghError: unknown) {
-        // gh CLI not available or PR creation failed
-        const err = ghError as { stderr?: string; message?: string };
-        prError = err.stderr || err.message || "PR creation failed";
-        console.warn("[CreatePR] gh CLI error:", prError);
+
+        // Parse remotes to detect fork workflow and get repo URL
+        const lines = remotes.split("\n");
+        for (const line of lines) {
+          const match = line.match(/^(\w+)\s+.*[:/]([^/]+)\/([^/\s]+?)(?:\.git)?\s+\(fetch\)/);
+          if (match) {
+            const [, remoteName, owner, repo] = match;
+            if (remoteName === "upstream") {
+              upstreamRepo = `${owner}/${repo}`;
+              repoUrl = `https://github.com/${owner}/${repo}`;
+            } else if (remoteName === "origin") {
+              originOwner = owner;
+              if (!repoUrl) {
+                repoUrl = `https://github.com/${owner}/${repo}`;
+              }
+            }
+          }
+        }
+      } catch {
+        // Couldn't parse remotes
       }
 
-      // Return result with any error info
+      // Construct browser URL for PR creation
+      if (repoUrl) {
+        const encodedTitle = encodeURIComponent(title);
+        const encodedBody = encodeURIComponent(body);
+
+        if (upstreamRepo && originOwner) {
+          // Fork workflow: PR to upstream from origin
+          browserUrl = `https://github.com/${upstreamRepo}/compare/${base}...${originOwner}:${branchName}?expand=1&title=${encodedTitle}&body=${encodedBody}`;
+        } else {
+          // Regular repo
+          browserUrl = `${repoUrl}/compare/${base}...${branchName}?expand=1&title=${encodedTitle}&body=${encodedBody}`;
+        }
+      }
+
+      if (ghCliAvailable) {
+        try {
+          // Build gh pr create command
+          let prCmd = `gh pr create --base "${base}"`;
+
+          // If this is a fork (has upstream remote), specify the repo and head
+          if (upstreamRepo && originOwner) {
+            // For forks: --repo specifies where to create PR, --head specifies source
+            prCmd += ` --repo "${upstreamRepo}" --head "${originOwner}:${branchName}"`;
+          } else {
+            // Not a fork, just specify the head branch
+            prCmd += ` --head "${branchName}"`;
+          }
+
+          prCmd += ` --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"')}" ${draftFlag}`;
+          prCmd = prCmd.trim();
+
+          console.log("[CreatePR] Running:", prCmd);
+          const { stdout: prOutput } = await execAsync(prCmd, {
+            cwd: worktreePath,
+            env: execEnv,
+          });
+          prUrl = prOutput.trim();
+        } catch (ghError: unknown) {
+          // gh CLI failed
+          const err = ghError as { stderr?: string; message?: string };
+          prError = err.stderr || err.message || "PR creation failed";
+          console.warn("[CreatePR] gh CLI error:", prError);
+        }
+      } else {
+        prError = "gh_cli_not_available";
+        console.log("[CreatePR] gh CLI not available, returning browser URL");
+      }
+
+      // Return result with browser fallback URL
       res.json({
         success: true,
         result: {
@@ -188,6 +220,8 @@ export function createCreatePRHandler() {
           prUrl,
           prCreated: !!prUrl,
           prError: prError || undefined,
+          browserUrl: browserUrl || undefined,
+          ghCliAvailable,
         },
       });
     } catch (error) {

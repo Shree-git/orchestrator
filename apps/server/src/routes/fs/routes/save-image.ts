@@ -1,5 +1,5 @@
 /**
- * POST /save-image endpoint - Save image to external automaker images directory
+ * POST /save-image endpoint - Save image to .automaker images directory
  */
 
 import type { Request, Response } from "express";
@@ -27,8 +27,8 @@ export function createSaveImageHandler() {
         return;
       }
 
-      // Get external images directory
-      const imagesDir = await getImagesDir(projectPath);
+      // Get images directory
+      const imagesDir = getImagesDir(projectPath);
       await fs.mkdir(imagesDir, { recursive: true });
 
       // Decode base64 data (remove data URL prefix if present)

@@ -474,6 +474,16 @@ export class HttpApiClient implements ElectronAPI {
       error?: string;
     }> => this.post("/api/setup/verify-claude-auth", { authMethod }),
 
+    getGhStatus: (): Promise<{
+      success: boolean;
+      installed: boolean;
+      authenticated: boolean;
+      version: string | null;
+      path: string | null;
+      user: string | null;
+      error?: string;
+    }> => this.get("/api/setup/gh-status"),
+
     onInstallProgress: (callback: (progress: unknown) => void) => {
       return this.subscribeToEvent("agent:stream", callback);
     },

@@ -1,8 +1,6 @@
 /**
  * Feature Loader - Handles loading and managing features from individual feature folders
- * Each feature is stored in external automaker storage: ~/.automaker/projects/{project-id}/features/{featureId}/feature.json
- *
- * Features are stored outside the git repo to avoid worktree conflicts.
+ * Each feature is stored in .automaker/features/{featureId}/feature.json
  */
 
 import path from "path";
@@ -29,17 +27,14 @@ export class FeatureLoader {
   /**
    * Get the features directory path
    */
-  async getFeaturesDir(projectPath: string): Promise<string> {
+  getFeaturesDir(projectPath: string): string {
     return getFeaturesDir(projectPath);
   }
 
   /**
    * Get the images directory path for a feature
    */
-  async getFeatureImagesDir(
-    projectPath: string,
-    featureId: string
-  ): Promise<string> {
+  getFeatureImagesDir(projectPath: string, featureId: string): string {
     return getFeatureImagesDir(projectPath, featureId);
   }
 
@@ -95,10 +90,7 @@ export class FeatureLoader {
       return imagePaths;
     }
 
-    const featureImagesDir = await this.getFeatureImagesDir(
-      projectPath,
-      featureId
-    );
+    const featureImagesDir = this.getFeatureImagesDir(projectPath, featureId);
     await fs.mkdir(featureImagesDir, { recursive: true });
 
     const updatedPaths: Array<string | { path: string; [key: string]: unknown }> =
@@ -166,30 +158,22 @@ export class FeatureLoader {
   /**
    * Get the path to a specific feature folder
    */
-  async getFeatureDir(projectPath: string, featureId: string): Promise<string> {
+  getFeatureDir(projectPath: string, featureId: string): string {
     return getFeatureDir(projectPath, featureId);
   }
 
   /**
    * Get the path to a feature's feature.json file
    */
-  async getFeatureJsonPath(
-    projectPath: string,
-    featureId: string
-  ): Promise<string> {
-    const featureDir = await this.getFeatureDir(projectPath, featureId);
-    return path.join(featureDir, "feature.json");
+  getFeatureJsonPath(projectPath: string, featureId: string): string {
+    return path.join(this.getFeatureDir(projectPath, featureId), "feature.json");
   }
 
   /**
    * Get the path to a feature's agent-output.md file
    */
-  async getAgentOutputPath(
-    projectPath: string,
-    featureId: string
-  ): Promise<string> {
-    const featureDir = await this.getFeatureDir(projectPath, featureId);
-    return path.join(featureDir, "agent-output.md");
+  getAgentOutputPath(projectPath: string, featureId: string): string {
+    return path.join(this.getFeatureDir(projectPath, featureId), "agent-output.md");
   }
 
   /**
@@ -204,7 +188,7 @@ export class FeatureLoader {
    */
   async getAll(projectPath: string): Promise<Feature[]> {
     try {
-      const featuresDir = await this.getFeaturesDir(projectPath);
+      const featuresDir = this.getFeaturesDir(projectPath);
 
       // Check if features directory exists
       try {
@@ -221,10 +205,7 @@ export class FeatureLoader {
       const features: Feature[] = [];
       for (const dir of featureDirs) {
         const featureId = dir.name;
-        const featureJsonPath = await this.getFeatureJsonPath(
-          projectPath,
-          featureId
-        );
+        const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
 
         try {
           const content = await fs.readFile(featureJsonPath, "utf-8");
@@ -273,10 +254,7 @@ export class FeatureLoader {
    */
   async get(projectPath: string, featureId: string): Promise<Feature | null> {
     try {
-      const featureJsonPath = await this.getFeatureJsonPath(
-        projectPath,
-        featureId
-      );
+      const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
       const content = await fs.readFile(featureJsonPath, "utf-8");
       return JSON.parse(content);
     } catch (error) {
@@ -299,8 +277,8 @@ export class FeatureLoader {
     featureData: Partial<Feature>
   ): Promise<Feature> {
     const featureId = featureData.id || this.generateFeatureId();
-    const featureDir = await this.getFeatureDir(projectPath, featureId);
-    const featureJsonPath = await this.getFeatureJsonPath(projectPath, featureId);
+    const featureDir = this.getFeatureDir(projectPath, featureId);
+    const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
 
     // Ensure automaker directory exists
     await ensureAutomakerDir(projectPath);
@@ -376,7 +354,7 @@ export class FeatureLoader {
     };
 
     // Write back to file
-    const featureJsonPath = await this.getFeatureJsonPath(projectPath, featureId);
+    const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
     await fs.writeFile(
       featureJsonPath,
       JSON.stringify(updatedFeature, null, 2),
@@ -392,7 +370,7 @@ export class FeatureLoader {
    */
   async delete(projectPath: string, featureId: string): Promise<boolean> {
     try {
-      const featureDir = await this.getFeatureDir(projectPath, featureId);
+      const featureDir = this.getFeatureDir(projectPath, featureId);
       await fs.rm(featureDir, { recursive: true, force: true });
       console.log(`[FeatureLoader] Deleted feature ${featureId}`);
       return true;
@@ -413,10 +391,7 @@ export class FeatureLoader {
     featureId: string
   ): Promise<string | null> {
     try {
-      const agentOutputPath = await this.getAgentOutputPath(
-        projectPath,
-        featureId
-      );
+      const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
       const content = await fs.readFile(agentOutputPath, "utf-8");
       return content;
     } catch (error) {
@@ -439,10 +414,10 @@ export class FeatureLoader {
     featureId: string,
     content: string
   ): Promise<void> {
-    const featureDir = await this.getFeatureDir(projectPath, featureId);
+    const featureDir = this.getFeatureDir(projectPath, featureId);
     await fs.mkdir(featureDir, { recursive: true });
 
-    const agentOutputPath = await this.getAgentOutputPath(projectPath, featureId);
+    const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
     await fs.writeFile(agentOutputPath, content, "utf-8");
   }
 
@@ -454,10 +429,7 @@ export class FeatureLoader {
     featureId: string
   ): Promise<void> {
     try {
-      const agentOutputPath = await this.getAgentOutputPath(
-        projectPath,
-        featureId
-      );
+      const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
       await fs.unlink(agentOutputPath);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {

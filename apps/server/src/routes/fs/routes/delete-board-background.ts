@@ -21,8 +21,8 @@ export function createDeleteBoardBackgroundHandler() {
         return;
       }
 
-      // Get external board directory
-      const boardDir = await getBoardDir(projectPath);
+      // Get board directory
+      const boardDir = getBoardDir(projectPath);
 
       try {
         // Try to remove all background files in the board directory

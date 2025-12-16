@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { getElectronAPI } from "@/lib/electron";
-import { cn } from "@/lib/utils";
+import { cn, pathsEqual, normalizePath } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface WorktreeInfo {
@@ -225,10 +225,10 @@ export function WorktreeSelector({
       const result = await api.worktree.startDevServer(projectPath, targetPath);
 
       if (result.success && result.result) {
-        // Update running servers map
+        // Update running servers map (normalize path for cross-platform compatibility)
         setRunningDevServers((prev) => {
           const next = new Map(prev);
-          next.set(targetPath, {
+          next.set(normalizePath(targetPath), {
             worktreePath: result.result!.worktreePath,
             port: result.result!.port,
             url: result.result!.url,
@@ -260,10 +260,10 @@ export function WorktreeSelector({
       const result = await api.worktree.stopDevServer(targetPath);
 
       if (result.success) {
-        // Update running servers map
+        // Update running servers map (normalize path for cross-platform compatibility)
         setRunningDevServers((prev) => {
           const next = new Map(prev);
-          next.delete(targetPath);
+          next.delete(normalizePath(targetPath));
           return next;
         });
         toast.success(result.result?.message || "Dev server stopped");
@@ -285,8 +285,10 @@ export function WorktreeSelector({
   };
 
   // Helper to get the path key for a worktree (for looking up in runningDevServers)
+  // Normalizes path for cross-platform compatibility
   const getWorktreeKey = (worktree: WorktreeInfo) => {
-    return worktree.isMain ? projectPath : worktree.path;
+    const path = worktree.isMain ? projectPath : worktree.path;
+    return path ? normalizePath(path) : path;
   };
 
   // Helper to check if a worktree has running features
@@ -301,12 +303,13 @@ export function WorktreeSelector({
       if (!feature) return false;
 
       // For main worktree, check features with no worktreePath or matching projectPath
+      // Use pathsEqual for cross-platform compatibility (Windows uses backslashes)
       if (worktree.isMain) {
-        return !feature.worktreePath || feature.worktreePath === projectPath;
+        return !feature.worktreePath || pathsEqual(feature.worktreePath, projectPath);
       }
 
       // For other worktrees, check if worktreePath matches
-      return feature.worktreePath === worktreeKey;
+      return pathsEqual(feature.worktreePath, worktreeKey);
     });
   };
 
@@ -459,7 +462,7 @@ export function WorktreeSelector({
   // currentWorktree.path is null for main, or the worktree path for others
   const currentWorktreePath = currentWorktree?.path ?? null;
   const selectedWorktree = currentWorktreePath
-    ? worktrees.find((w) => w.path === currentWorktreePath)
+    ? worktrees.find((w) => pathsEqual(w.path, currentWorktreePath))
     : worktrees.find((w) => w.isMain);
 
 
@@ -469,7 +472,7 @@ export function WorktreeSelector({
     // Default to main selected if currentWorktree is null/undefined or path is null
     const isSelected = worktree.isMain
       ? currentWorktree === null || currentWorktree === undefined || currentWorktree.path === null
-      : worktree.path === currentWorktreePath;
+      : pathsEqual(worktree.path, currentWorktreePath);
 
     const isRunning = hasRunningFeatures(worktree);
 

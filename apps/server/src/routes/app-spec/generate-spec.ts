@@ -210,9 +210,9 @@ ${getAppSpecFormatInstruction()}`;
     logger.error("❌ WARNING: responseText is empty! Nothing to save.");
   }
 
-  // Save spec to external automaker directory
+  // Save spec to .automaker directory
   const specDir = await ensureAutomakerDir(projectPath);
-  const specPath = await getAppSpecPath(projectPath);
+  const specPath = getAppSpecPath(projectPath);
 
   logger.info("Saving spec to:", specPath);
   logger.info(`Content to save (${responseText.length} chars)`);

@@ -387,6 +387,15 @@ export interface ElectronAPI {
       authenticated: boolean;
       error?: string;
     }>;
+    getGhStatus?: () => Promise<{
+      success: boolean;
+      installed: boolean;
+      authenticated: boolean;
+      version: string | null;
+      path: string | null;
+      user: string | null;
+      error?: string;
+    }>;
     onInstallProgress?: (callback: (progress: any) => void) => () => void;
     onAuthProgress?: (callback: (progress: any) => void) => () => void;
   };
@@ -910,6 +919,15 @@ interface SetupAPI {
     authenticated: boolean;
     error?: string;
   }>;
+  getGhStatus?: () => Promise<{
+    success: boolean;
+    installed: boolean;
+    authenticated: boolean;
+    version: string | null;
+    path: string | null;
+    user: string | null;
+    error?: string;
+  }>;
   onInstallProgress?: (callback: (progress: any) => void) => () => void;
   onAuthProgress?: (callback: (progress: any) => void) => () => void;
 }
@@ -993,6 +1011,18 @@ function createMockSetupAPI(): SetupAPI {
         success: true,
         authenticated: false,
         error: "Mock environment - authentication not available",
+      };
+    },
+
+    getGhStatus: async () => {
+      console.log("[Mock] Getting GitHub CLI status");
+      return {
+        success: true,
+        installed: false,
+        authenticated: false,
+        version: null,
+        path: null,
+        user: null,
       };
     },
 

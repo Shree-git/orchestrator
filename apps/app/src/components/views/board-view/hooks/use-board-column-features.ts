@@ -1,5 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { Feature } from "@/store/app-store";
+import { pathsEqual } from "@/lib/utils";
 
 type ColumnId = Feature["status"];
 
@@ -65,8 +66,8 @@ export function useBoardColumnFeatures({
         // No worktree or branch assigned - show only on main
         matchesWorktree = !currentWorktreePath;
       } else if (f.worktreePath) {
-        // Has worktreePath - match by path
-        matchesWorktree = f.worktreePath === effectiveWorktreePath;
+        // Has worktreePath - match by path (use pathsEqual for cross-platform compatibility)
+        matchesWorktree = pathsEqual(f.worktreePath, effectiveWorktreePath);
       } else if (effectiveBranch === null) {
         // We're selecting a non-main worktree but can't determine its branch yet
         // (worktrees haven't loaded). Don't show branch-only features until we know.

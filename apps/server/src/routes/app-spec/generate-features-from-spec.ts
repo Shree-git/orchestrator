@@ -26,8 +26,8 @@ export async function generateFeaturesFromSpec(
   logger.debug("projectPath:", projectPath);
   logger.debug("maxFeatures:", featureCount);
 
-  // Read existing spec from external automaker directory
-  const specPath = await getAppSpecPath(projectPath);
+  // Read existing spec from .automaker directory
+  const specPath = getAppSpecPath(projectPath);
   let spec: string;
 
   logger.debug("Reading spec from:", specPath);
