@@ -2,42 +2,19 @@
  * Event emitter for streaming events to WebSocket clients
  */
 
-export type EventType =
-  | "agent:stream"
-  | "auto-mode:event"
-  | "auto-mode:started"
-  | "auto-mode:stopped"
-  | "auto-mode:idle"
-  | "auto-mode:error"
-  | "feature:started"
-  | "feature:completed"
-  | "feature:stopped"
-  | "feature:error"
-  | "feature:progress"
-  | "feature:tool-use"
-  | "feature:follow-up-started"
-  | "feature:follow-up-completed"
-  | "feature:verified"
-  | "feature:committed"
-  | "project:analysis-started"
-  | "project:analysis-progress"
-  | "project:analysis-completed"
-  | "project:analysis-error"
-  | "suggestions:event"
-  | "spec-regeneration:event";
-
-export type EventCallback = (type: EventType, payload: unknown) => void;
+// Re-export event types from shared package
+export type { EventType, EventCallback } from "@automaker/types";
 
 export interface EventEmitter {
-  emit: (type: EventType, payload: unknown) => void;
-  subscribe: (callback: EventCallback) => () => void;
+  emit: (type: import("@automaker/types").EventType, payload: unknown) => void;
+  subscribe: (callback: import("@automaker/types").EventCallback) => () => void;
 }
 
 export function createEventEmitter(): EventEmitter {
-  const subscribers = new Set<EventCallback>();
+  const subscribers = new Set<import("@automaker/types").EventCallback>();
 
   return {
-    emit(type: EventType, payload: unknown) {
+    emit(type: import("@automaker/types").EventType, payload: unknown) {
       for (const callback of subscribers) {
         try {
           callback(type, payload);
@@ -47,7 +24,7 @@ export function createEventEmitter(): EventEmitter {
       }
     },
 
-    subscribe(callback: EventCallback) {
+    subscribe(callback: import("@automaker/types").EventCallback) {
       subscribers.add(callback);
       return () => {
         subscribers.delete(callback);

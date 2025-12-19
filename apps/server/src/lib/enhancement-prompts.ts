@@ -10,18 +10,10 @@
  * Uses chain-of-thought prompting with few-shot examples for consistent results.
  */
 
-/**
- * Available enhancement modes for transforming task descriptions
- */
-export type EnhancementMode = "improve" | "technical" | "simplify" | "acceptance";
+import type { EnhancementMode, EnhancementExample } from "@automaker/types";
 
-/**
- * Example input/output pair for few-shot learning
- */
-export interface EnhancementExample {
-  input: string;
-  output: string;
-}
+// Re-export enhancement types from shared package
+export type { EnhancementMode, EnhancementExample } from "@automaker/types";
 
 /**
  * System prompt for the "improve" enhancement mode.

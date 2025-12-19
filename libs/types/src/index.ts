@@ -49,3 +49,23 @@ export {
   DEFAULT_MODELS,
   type ModelAlias,
 } from './model';
+
+// Event types
+export type {
+  EventType,
+  EventCallback,
+} from './event';
+
+// Spec types
+export type {
+  SpecOutput,
+} from './spec';
+export {
+  specOutputSchema,
+} from './spec';
+
+// Enhancement types
+export type {
+  EnhancementMode,
+  EnhancementExample,
+} from './enhancement';
