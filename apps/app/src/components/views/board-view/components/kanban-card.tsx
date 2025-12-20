@@ -646,14 +646,25 @@ export const KanbanCard = memo(function KanbanCard({
             </div>
           )}
           <div className="flex-1 min-w-0 overflow-hidden">
-            <CardTitle
+            {/* AI-generated title displayed above description */}
+            {feature.title && (
+              <CardTitle
+                className="text-sm font-semibold text-foreground mb-1 truncate"
+                data-testid={`feature-title-${feature.id}`}
+                title={feature.title}
+              >
+                {feature.title}
+              </CardTitle>
+            )}
+            <CardDescription
               className={cn(
-                "text-sm leading-snug break-words hyphens-auto overflow-hidden font-medium text-foreground/90",
+                "text-sm leading-snug break-words hyphens-auto overflow-hidden text-muted-foreground",
+                !feature.title && "font-medium text-foreground/90",
                 !isDescriptionExpanded && "line-clamp-3"
               )}
             >
               {feature.description || feature.summary || feature.id}
-            </CardTitle>
+            </CardDescription>
             {(feature.description || feature.summary || "").length > 100 && (
               <button
                 onClick={(e) => {

@@ -200,6 +200,11 @@ export interface FeaturesAPI {
     projectPath: string,
     featureId: string
   ) => Promise<{ success: boolean; content?: string | null; error?: string }>;
+  generateTitle: (
+    projectPath: string,
+    featureId: string,
+    description: string
+  ) => Promise<{ success: boolean; title?: string; error?: string }>;
 }
 
 export interface AutoModeAPI {

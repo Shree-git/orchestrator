@@ -512,6 +512,16 @@ export class HttpApiClient implements ElectronAPI {
       this.post("/api/features/delete", { projectPath, featureId }),
     getAgentOutput: (projectPath: string, featureId: string) =>
       this.post("/api/features/agent-output", { projectPath, featureId }),
+    generateTitle: (
+      projectPath: string,
+      featureId: string,
+      description: string
+    ) =>
+      this.post("/api/features/generate-title", {
+        projectPath,
+        featureId,
+        description,
+      }),
   };
 
   // Auto Mode API

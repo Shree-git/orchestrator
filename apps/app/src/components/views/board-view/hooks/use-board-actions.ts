@@ -150,8 +150,38 @@ export function useBoardActions({
       // Must await to ensure feature exists on server before user can drag it
       await persistFeatureCreate(createdFeature);
       saveCategory(featureData.category);
+
+      // Generate title asynchronously in the background using Haiku
+      if (currentProject && featureData.description.trim()) {
+        const api = getElectronAPI();
+        if (api?.features?.generateTitle) {
+          api.features
+            .generateTitle(
+              currentProject.path,
+              createdFeature.id,
+              featureData.description
+            )
+            .then((result) => {
+              if (result.success && result.title) {
+                // Update the feature in store with the generated title
+                updateFeature(createdFeature.id, { title: result.title });
+                console.log(
+                  `[Board] Generated title for feature ${createdFeature.id}: "${result.title}"`
+                );
+              } else {
+                console.warn(
+                  `[Board] Failed to generate title for feature ${createdFeature.id}:`,
+                  result.error
+                );
+              }
+            })
+            .catch((error) => {
+              console.warn("[Board] Error generating title:", error);
+            });
+        }
+      }
     },
-    [addFeature, persistFeatureCreate, saveCategory, useWorktrees, currentProject, onWorktreeCreated]
+    [addFeature, persistFeatureCreate, saveCategory, useWorktrees, currentProject, onWorktreeCreated, updateFeature]
   );
 
   const handleUpdateFeature = useCallback(

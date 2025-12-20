@@ -15,6 +15,7 @@ import {
 export interface Feature {
   id: string;
   category: string;
+  title?: string; // AI-generated haiku title for the feature
   description: string;
   steps?: string[];
   passes?: boolean;
