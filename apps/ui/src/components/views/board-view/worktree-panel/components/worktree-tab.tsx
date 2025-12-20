@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-<<<<<<< Updated upstream
-import { RefreshCw, Globe, Loader2, CircleDot } from "lucide-react";
+import { RefreshCw, Globe, Loader2, CircleDot, GitPullRequest } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -9,12 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { WorktreeInfo, BranchInfo, DevServerInfo } from "../types";
-=======
-import { RefreshCw, Globe, Loader2, GitPullRequest } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { WorktreeInfo, BranchInfo, DevServerInfo, PRInfo } from "../types";
->>>>>>> Stashed changes
 import { BranchSwitchDropdown } from "./branch-switch-dropdown";
 import { WorktreeActionsDropdown } from "./worktree-actions-dropdown";
 
@@ -95,7 +89,6 @@ export function WorktreeTab({
   onStopDevServer,
   onOpenDevServerUrl,
 }: WorktreeTabProps) {
-<<<<<<< Updated upstream
   // Determine border color based on state:
   // - Running features: cyan border (high visibility, indicates active work)
   // - Uncommitted changes: amber border (warning state, needs attention)
@@ -111,7 +104,7 @@ export function WorktreeTab({
   };
 
   const borderClasses = getBorderClasses();
-=======
+
   let prBadge: JSX.Element | null = null;
   if (worktree.pr) {
     const prState = worktree.pr.state?.toLowerCase() ?? "open";
@@ -197,7 +190,6 @@ export function WorktreeTab({
       </button>
     );
   }
->>>>>>> Stashed changes
 
   return (
     <div className={cn("flex items-center rounded-md", borderClasses)}>
@@ -225,7 +217,6 @@ export function WorktreeTab({
                 {cardCount}
               </span>
             )}
-<<<<<<< Updated upstream
             {hasChanges && (
               <TooltipProvider>
                 <Tooltip>
@@ -246,9 +237,7 @@ export function WorktreeTab({
                 </Tooltip>
               </TooltipProvider>
             )}
-=======
             {prBadge}
->>>>>>> Stashed changes
           </Button>
           <BranchSwitchDropdown
             worktree={worktree}
@@ -292,7 +281,6 @@ export function WorktreeTab({
               {cardCount}
             </span>
           )}
-<<<<<<< Updated upstream
           {hasChanges && (
             <TooltipProvider>
               <Tooltip>
@@ -313,9 +301,7 @@ export function WorktreeTab({
               </Tooltip>
             </TooltipProvider>
           )}
-=======
           {prBadge}
->>>>>>> Stashed changes
         </Button>
       )}
 

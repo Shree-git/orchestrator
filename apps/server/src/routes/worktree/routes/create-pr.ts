@@ -8,6 +8,24 @@ import { promisify } from "util";
 import { getErrorMessage, logError } from "../common.js";
 import { updateWorktreePRInfo } from "../../../lib/worktree-metadata.js";
 
+// Shell escaping utility to prevent command injection
+function shellEscape(arg: string): string {
+  if (process.platform === "win32") {
+    // Windows CMD shell escaping
+    return `"${arg.replace(/"/g, '""')}"`;
+  } else {
+    // Unix shell escaping
+    return `'${arg.replace(/'/g, "'\\''")}'`;
+  }
+}
+
+// Validate branch name to prevent command injection
+function isValidBranchName(name: string): boolean {
+  // Git branch names cannot contain: space, ~, ^, :, ?, *, [, \, or control chars
+  // Also reject shell metacharacters for safety
+  return /^[a-zA-Z0-9._\-/]+$/.test(name) && name.length < 250;
+}
+
 const execAsync = promisify(exec);
 
 // Extended PATH to include common tool installation locations
@@ -77,6 +95,15 @@ export function createCreatePRHandler() {
         { cwd: worktreePath, env: execEnv }
       );
       const branchName = branchOutput.trim();
+
+      // Validate branch name for security
+      if (!isValidBranchName(branchName)) {
+        res.status(400).json({
+          success: false,
+          error: "Invalid branch name contains unsafe characters",
+        });
+        return;
+      }
 
       // Check for uncommitted changes
       const { stdout: status } = await execAsync("git status --porcelain", {

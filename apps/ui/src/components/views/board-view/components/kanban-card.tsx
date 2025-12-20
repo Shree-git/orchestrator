@@ -699,24 +699,30 @@ export const KanbanCard = memo(function KanbanCard({
         )}
 
         {/* PR URL Display */}
-        {feature.prUrl && (
-          <div className="mb-2">
-            <a
-              href={feature.prUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1.5 text-[11px] text-purple-500 hover:text-purple-400 transition-colors"
-              title={feature.prUrl}
-              data-testid={`pr-url-${feature.id}`}
-            >
-              <GitPullRequest className="w-3 h-3 shrink-0" />
-              <span className="truncate max-w-[150px]">Pull Request</span>
-              <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-            </a>
-          </div>
-        )}
+        {typeof feature.prUrl === "string" &&
+          /^https?:\/\//i.test(feature.prUrl) && (() => {
+            const prNumber = feature.prUrl.split('/').pop();
+            return (
+              <div className="mb-2">
+                <a
+                  href={feature.prUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1.5 text-[11px] text-purple-500 hover:text-purple-400 transition-colors"
+                  title={feature.prUrl}
+                  data-testid={`pr-url-${feature.id}`}
+                >
+                  <GitPullRequest className="w-3 h-3 shrink-0" />
+                  <span className="truncate max-w-[150px]">
+                    {prNumber ? `Pull Request #${prNumber}` : 'Pull Request'}
+                  </span>
+                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                </a>
+              </div>
+            );
+          })()}
 
         {/* Steps Preview */}
         {showSteps && feature.steps && feature.steps.length > 0 && (

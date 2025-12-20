@@ -42,6 +42,15 @@ const execEnv = {
   PATH: extendedPath,
 };
 
+/**
+ * Validate branch name to prevent command injection.
+ * Git branch names cannot contain: space, ~, ^, :, ?, *, [, \, or control chars.
+ * We also reject shell metacharacters for safety.
+ */
+function isValidBranchName(name: string): boolean {
+  return /^[a-zA-Z0-9._\-/]+$/.test(name) && name.length < 250;
+}
+
 export interface PRComment {
   id: number;
   author: string;
@@ -75,6 +84,15 @@ export function createPRInfoHandler() {
         res.status(400).json({
           success: false,
           error: "worktreePath and branchName required",
+        });
+        return;
+      }
+
+      // Validate branch name to prevent command injection
+      if (!isValidBranchName(branchName)) {
+        res.status(400).json({
+          success: false,
+          error: "Invalid branch name contains unsafe characters",
         });
         return;
       }
@@ -226,35 +244,38 @@ export function createPRInfoHandler() {
 
         // Get review comments (inline code comments)
         let reviewComments: PRComment[] = [];
-        try {
-          const reviewsEndpoint = targetRepo
-            ? `repos/${targetRepo}/pulls/${prNumber}/comments`
-            : `repos/{owner}/{repo}/pulls/${prNumber}/comments`;
-          const reviewsCmd = `gh api ${reviewsEndpoint}`;
-          const { stdout: reviewsOutput } = await execAsync(
-            reviewsCmd,
-            { cwd: worktreePath, env: execEnv }
-          );
-          const reviewsData = JSON.parse(reviewsOutput);
-          reviewComments = reviewsData.map((c: {
-            id: number;
-            user: { login: string };
-            body: string;
-            path: string;
-            line?: number;
-            original_line?: number;
-            created_at: string;
-          }) => ({
-            id: c.id,
-            author: c.user?.login || "unknown",
-            body: c.body,
-            path: c.path,
-            line: c.line || c.original_line,
-            createdAt: c.created_at,
-            isReviewComment: true,
-          }));
-        } catch (error) {
-          console.warn("[PRInfo] Failed to fetch review comments:", error);
+        // Only fetch review comments if we have repository info
+        if (targetRepo) {
+          try {
+            const reviewsEndpoint = `repos/${targetRepo}/pulls/${prNumber}/comments`;
+            const reviewsCmd = `gh api ${reviewsEndpoint}`;
+            const { stdout: reviewsOutput } = await execAsync(
+              reviewsCmd,
+              { cwd: worktreePath, env: execEnv }
+            );
+            const reviewsData = JSON.parse(reviewsOutput);
+            reviewComments = reviewsData.map((c: {
+              id: number;
+              user: { login: string };
+              body: string;
+              path: string;
+              line?: number;
+              original_line?: number;
+              created_at: string;
+            }) => ({
+              id: c.id,
+              author: c.user?.login || "unknown",
+              body: c.body,
+              path: c.path,
+              line: c.line || c.original_line,
+              createdAt: c.created_at,
+              isReviewComment: true,
+            }));
+          } catch (error) {
+            console.warn("[PRInfo] Failed to fetch review comments:", error);
+          }
+        } else {
+          console.warn("[PRInfo] Cannot fetch review comments: repository info not available");
         }
 
         const prInfo: PRInfo = {

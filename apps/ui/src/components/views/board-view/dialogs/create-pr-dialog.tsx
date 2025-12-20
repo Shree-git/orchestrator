@@ -29,12 +29,8 @@ interface CreatePRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   worktree: WorktreeInfo | null;
-<<<<<<< Updated upstream
-  onCreated: (prUrl?: string) => void;
-=======
   projectPath: string | null;
-  onCreated: () => void;
->>>>>>> Stashed changes
+  onCreated: (prUrl?: string) => void;
 }
 
 export function CreatePRDialog({

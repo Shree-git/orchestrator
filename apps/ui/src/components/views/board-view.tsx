@@ -421,69 +421,21 @@ export function BoardView() {
   // Handler for addressing PR comments - creates a feature and starts it automatically
   const handleAddressPRComments = useCallback(
     async (worktree: WorktreeInfo, prInfo: PRInfo) => {
-      // If comments are empty, fetch them from GitHub
-      let fullPRInfo = prInfo;
-      if (prInfo.comments.length === 0 && prInfo.reviewComments.length === 0) {
-        try {
-          const api = getElectronAPI();
-          if (api?.worktree?.getPRInfo) {
-            const result = await api.worktree.getPRInfo(
-              worktree.path,
-              worktree.branch
-            );
-            if (
-              result.success &&
-              result.result?.hasPR &&
-              result.result.prInfo
-            ) {
-              fullPRInfo = result.result.prInfo;
-            }
-          }
-        } catch (error) {
-          console.error("[Board] Failed to fetch PR comments:", error);
-        }
-      }
-
-      // Format PR comments into a feature description
-      const allComments = [
-        ...fullPRInfo.comments.map((c) => ({
-          ...c,
-          type: "comment" as const,
-        })),
-        ...fullPRInfo.reviewComments.map((c) => ({
-          ...c,
-          type: "review" as const,
-        })),
-      ].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-
-      let description = `Address PR #${fullPRInfo.number} feedback: "${fullPRInfo.title}"\n\n`;
-      description += `PR URL: ${fullPRInfo.url}\n\n`;
-
-      if (allComments.length === 0) {
-        description += `No comments found on this PR yet. Check the PR for any new feedback.\n`;
-      } else {
-        description += `## Feedback to address:\n\n`;
-        for (const comment of allComments) {
-          if (comment.type === "review" && comment.path) {
-            description += `### ${comment.path}${comment.line ? `:${comment.line}` : ""}\n`;
-          }
-          description += `**@${comment.author}:**\n${comment.body}\n\n`;
-        }
-      }
+      // Use a simple prompt that instructs the agent to read and address PR feedback
+      // The agent will fetch the PR comments directly, which is more reliable and up-to-date
+      const prNumber = prInfo.number;
+      const description = `Read the review requests on PR #${prNumber} and address any feedback the best you can.`;
 
       // Create the feature
       const featureData = {
         category: "PR Review",
-        description: description.trim(),
+        description,
         steps: [],
         images: [],
         imagePaths: [],
         skipTests: defaultSkipTests,
-        model: "sonnet" as const,
-        thinkingLevel: "medium" as const,
+        model: "opus" as const,
+        thinkingLevel: "none" as const,
         branchName: worktree.branch,
         priority: 1, // High priority for PR feedback
         planningMode: "skip" as const,
@@ -500,7 +452,7 @@ export function BoardView() {
           (f) =>
             f.branchName === worktree.branch &&
             f.status === "backlog" &&
-            f.description.includes(`PR #${fullPRInfo.number}`)
+            f.description.includes(`PR #${prNumber}`)
         );
 
         if (newFeature) {
@@ -1255,12 +1207,19 @@ export function BoardView() {
           // If a PR was created and we have the worktree branch, update all features on that branch with the PR URL
           if (prUrl && selectedWorktreeForAction?.branch) {
             const branchName = selectedWorktreeForAction.branch;
-            hookFeatures
-              .filter((f) => f.branchName === branchName)
-              .forEach((feature) => {
-                updateFeature(feature.id, { prUrl });
-                persistFeatureUpdate(feature.id, { prUrl });
-              });
+            const featuresToUpdate = hookFeatures.filter((f) => f.branchName === branchName);
+
+            // Update local state synchronously
+            featuresToUpdate.forEach((feature) => {
+              updateFeature(feature.id, { prUrl });
+            });
+
+            // Persist changes asynchronously and in parallel
+            Promise.all(
+              featuresToUpdate.map((feature) =>
+                persistFeatureUpdate(feature.id, { prUrl })
+              )
+            ).catch(console.error);
           }
           setWorktreeRefreshKey((k) => k + 1);
           setSelectedWorktreeForAction(null);

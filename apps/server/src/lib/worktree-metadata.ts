@@ -21,11 +21,37 @@ export interface WorktreeMetadata {
 }
 
 /**
+ * Sanitize branch name for cross-platform filesystem safety
+ */
+function sanitizeBranchName(branch: string): string {
+  // Replace characters that are invalid or problematic on various filesystems:
+  // - Forward and backslashes (path separators)
+  // - Windows invalid chars: : * ? " < > |
+  // - Other potentially problematic chars
+  let safeBranch = branch
+    .replace(/[/\\:*?"<>|]/g, "-")  // Replace invalid chars with dash
+    .replace(/\s+/g, "_")           // Replace spaces with underscores
+    .replace(/\.+$/g, "")           // Remove trailing dots (Windows issue)
+    .replace(/-+/g, "-")            // Collapse multiple dashes
+    .replace(/^-|-$/g, "");         // Remove leading/trailing dashes
+
+  // Truncate to safe length (leave room for path components)
+  safeBranch = safeBranch.substring(0, 200);
+
+  // Handle Windows reserved names (CON, PRN, AUX, NUL, COM1-9, LPT1-9)
+  const windowsReserved = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+  if (windowsReserved.test(safeBranch) || safeBranch.length === 0) {
+    safeBranch = `_${safeBranch || "branch"}`;
+  }
+
+  return safeBranch;
+}
+
+/**
  * Get the path to the worktree metadata directory
  */
 function getWorktreeMetadataDir(projectPath: string, branch: string): string {
-  // Sanitize branch name for filesystem (replace / with -)
-  const safeBranch = branch.replace(/\//g, "-");
+  const safeBranch = sanitizeBranchName(branch);
   return path.join(projectPath, ".automaker", "worktrees", safeBranch);
 }
 
