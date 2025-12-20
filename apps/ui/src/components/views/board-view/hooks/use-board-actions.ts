@@ -40,8 +40,7 @@ interface UseBoardActionsProps {
   inProgressFeaturesForShortcuts: Feature[];
   outputFeature: Feature | null;
   projectPath: string | null;
-  onWorktreeCreated?: () => void;
-  onWorktreeAutoSelect?: (worktree: { path: string; branch: string }) => void;
+  onWorktreeCreated?: (branchName?: string) => void;
   currentWorktreeBranch: string | null; // Branch name of the selected worktree for filtering
 }
 
@@ -69,7 +68,6 @@ export function useBoardActions({
   outputFeature,
   projectPath,
   onWorktreeCreated,
-  onWorktreeAutoSelect,
   currentWorktreeBranch,
 }: UseBoardActionsProps) {
   const {
@@ -122,14 +120,9 @@ export function useBoardActions({
                   result.worktree?.isNew ? "created" : "already exists"
                 }`
               );
-              // Auto-select the worktree when creating a feature for it
-              onWorktreeAutoSelect?.({
-                path: result.worktree.path,
-                branch: result.worktree.branch,
-              });
-              // Refresh worktree list in UI
-              onWorktreeCreated?.();
-            } else if (!result.success) {
+              // Refresh worktree list in UI and auto-select the newly created worktree
+              onWorktreeCreated?.(finalBranchName);
+            } else {
               console.error(
                 `[Board] Failed to create worktree for branch "${finalBranchName}":`,
                 result.error
@@ -158,7 +151,7 @@ export function useBoardActions({
       await persistFeatureCreate(createdFeature);
       saveCategory(featureData.category);
     },
-    [addFeature, persistFeatureCreate, saveCategory, useWorktrees, currentProject, onWorktreeCreated, onWorktreeAutoSelect]
+    [addFeature, persistFeatureCreate, saveCategory, useWorktrees, currentProject, onWorktreeCreated]
   );
 
   const handleUpdateFeature = useCallback(
@@ -196,8 +189,8 @@ export function useBoardActions({
                   result.worktree?.isNew ? "created" : "already exists"
                 }`
               );
-              // Refresh worktree list in UI
-              onWorktreeCreated?.();
+              // Refresh worktree list in UI and auto-select the newly created worktree
+              onWorktreeCreated?.(finalBranchName);
             } else {
               console.error(
                 `[Board] Failed to create worktree for branch "${finalBranchName}":`,

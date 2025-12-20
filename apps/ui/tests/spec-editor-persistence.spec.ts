@@ -77,8 +77,15 @@ test.describe("Spec Editor Persistence", () => {
     const specEditorAfterReload = await getByTestId(page, "spec-editor");
     await specEditorAfterReload.locator(".cm-content").waitFor({ state: "visible", timeout: 10000 });
 
-    // Small delay to ensure editor content is loaded
-    await page.waitForTimeout(500);
+    // Wait for the editor content to actually load (not just be visible)
+    // The content should be "hello world" after persistence
+    await page.waitForFunction(
+      () => {
+        const editor = document.querySelector('[data-testid="spec-editor"] .cm-content');
+        return editor?.textContent?.trim() === "hello world";
+      },
+      { timeout: 10000 }
+    );
 
     // Step 11: Verify the content was persisted
     const persistedContent = await getEditorContent(page);

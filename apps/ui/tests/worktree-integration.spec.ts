@@ -873,28 +873,32 @@ test.describe("Worktree Integration Tests", () => {
     // Confirm
     await confirmAddFeature(page);
 
-    // Wait for feature to be saved and worktree to be created
-    await page.waitForTimeout(2000);
+    // Wait for feature to be saved, worktree to be created, and UI to auto-select it
+    await page.waitForTimeout(3000);
 
-    // Verify the new worktree is auto-selected (highlighted/active in the worktree panel)
-    // The worktree button should now be in a selected state (indicated by data-selected or similar class)
-    const worktreeButton = page.getByRole("button", {
-      name: new RegExp(branchName.replace("/", "\\/"), "i"),
-    });
-    await expect(worktreeButton).toBeVisible({ timeout: 5000 });
+    // Verify branch WAS created
+    const branchesAfter = await listBranches(testRepo.path);
+    expect(branchesAfter).toContain(branchName);
 
-    // Check that the worktree button has the selected state (using the aria-pressed attribute or data-state)
-    // The selected worktree should have a different visual state
-    await expect(worktreeButton).toHaveAttribute("data-state", "active", { timeout: 5000 }).catch(async () => {
-      // Fallback: check if the button has a specific class that indicates selection
-      // or verify the feature is visible, which would only happen if the worktree is selected
-      const featureText = page.getByText("Feature with auto-select worktree");
-      await expect(featureText).toBeVisible({ timeout: 5000 });
-    });
+    // Verify worktree was created
+    const worktreePath = getWorktreePath(testRepo.path, branchName);
+    expect(fs.existsSync(worktreePath)).toBe(true);
 
-    // Verify the feature is visible in the backlog (which means the worktree is selected)
-    const featureText = page.getByText("Feature with auto-select worktree");
-    await expect(featureText).toBeVisible({ timeout: 5000 });
+    // Verify the worktree button for the new branch is selected (has primary variant styling)
+    // Wait for the worktree selector to update
+    await page.waitForTimeout(1000);
+
+    // Find the worktree button for the branch we just created
+    // Use .first() to get the worktree button (not the kanban card)
+    const worktreeButton = page
+      .getByRole("button", {
+        name: new RegExp(branchName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
+      })
+      .first();
+    await expect(worktreeButton).toBeVisible({ timeout: 10000 });
+
+    // Verify the button is selected (has bg-primary class)
+    await expect(worktreeButton).toHaveClass(/bg-primary/, { timeout: 5000 });
   });
 
   test("should reset feature branch and worktree when worktree is deleted", async ({
