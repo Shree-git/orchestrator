@@ -5,12 +5,20 @@
  * Does NOT include tracked branches - only real worktrees with separate directories.
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { existsSync } from "fs";
-import { isGitRepo, getErrorMessage, logError, normalizePath } from "../common.js";
-import { readAllWorktreeMetadata, type WorktreePRInfo } from "../../../lib/worktree-metadata.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { existsSync } from 'fs';
+import {
+  isGitRepo,
+  getErrorMessage,
+  logError,
+  normalizePath,
+} from '../common.js';
+import {
+  readAllWorktreeMetadata,
+  type WorktreePRInfo,
+} from '../../../lib/worktree-metadata.js';
 
 const execAsync = promisify(exec);
 
@@ -27,10 +35,10 @@ interface WorktreeInfo {
 
 async function getCurrentBranch(cwd: string): Promise<string> {
   try {
-    const { stdout } = await execAsync("git branch --show-current", { cwd });
+    const { stdout } = await execAsync('git branch --show-current', { cwd });
     return stdout.trim();
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -43,7 +51,7 @@ export function createListHandler() {
       };
 
       if (!projectPath) {
-        res.status(400).json({ success: false, error: "projectPath required" });
+        res.status(400).json({ success: false, error: 'projectPath required' });
         return;
       }
 
@@ -56,23 +64,23 @@ export function createListHandler() {
       const currentBranch = await getCurrentBranch(projectPath);
 
       // Get actual worktrees from git
-      const { stdout } = await execAsync("git worktree list --porcelain", {
+      const { stdout } = await execAsync('git worktree list --porcelain', {
         cwd: projectPath,
       });
 
       const worktrees: WorktreeInfo[] = [];
       const removedWorktrees: Array<{ path: string; branch: string }> = [];
-      const lines = stdout.split("\n");
+      const lines = stdout.split('\n');
       let current: { path?: string; branch?: string } = {};
       let isFirst = true;
 
       // First pass: detect removed worktrees
       for (const line of lines) {
-        if (line.startsWith("worktree ")) {
+        if (line.startsWith('worktree ')) {
           current.path = normalizePath(line.slice(9));
-        } else if (line.startsWith("branch ")) {
-          current.branch = line.slice(7).replace("refs/heads/", "");
-        } else if (line === "") {
+        } else if (line.startsWith('branch ')) {
+          current.branch = line.slice(7).replace('refs/heads/', '');
+        } else if (line === '') {
           if (current.path && current.branch) {
             const isMainWorktree = isFirst;
             // Check if the worktree directory actually exists
@@ -102,7 +110,7 @@ export function createListHandler() {
       // Prune removed worktrees from git (only if any were detected)
       if (removedWorktrees.length > 0) {
         try {
-          await execAsync("git worktree prune", { cwd: projectPath });
+          await execAsync('git worktree prune', { cwd: projectPath });
         } catch {
           // Prune failed, but we'll still report the removed worktrees
         }
@@ -116,12 +124,12 @@ export function createListHandler() {
         for (const worktree of worktrees) {
           try {
             const { stdout: statusOutput } = await execAsync(
-              "git status --porcelain",
+              'git status --porcelain',
               { cwd: worktree.path }
             );
             const changedFiles = statusOutput
               .trim()
-              .split("\n")
+              .split('\n')
               .filter((line) => line.trim());
             worktree.hasChanges = changedFiles.length > 0;
             worktree.changedFilesCount = changedFiles.length;
@@ -140,13 +148,14 @@ export function createListHandler() {
         }
       }
 
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         worktrees,
-        removedWorktrees: removedWorktrees.length > 0 ? removedWorktrees : undefined,
+        removedWorktrees:
+          removedWorktrees.length > 0 ? removedWorktrees : undefined,
       });
     } catch (error) {
-      logError(error, "List worktrees failed");
+      logError(error, 'List worktrees failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

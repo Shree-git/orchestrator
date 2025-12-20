@@ -76,7 +76,9 @@ export abstract class BaseProvider {
   /**
    * Execute a query and stream responses
    */
-  abstract executeQuery(options: ExecuteOptions): AsyncGenerator<ProviderMessage>;
+  abstract executeQuery(
+    options: ExecuteOptions
+  ): AsyncGenerator<ProviderMessage>;
 
   /**
    * Detect provider installation status
@@ -125,10 +127,10 @@ Output messages streamed from providers:
 
 ```typescript
 export interface ProviderMessage {
-  type: "assistant" | "user" | "error" | "result";
-  subtype?: "success" | "error";
+  type: 'assistant' | 'user' | 'error' | 'result';
+  subtype?: 'success' | 'error';
   message?: {
-    role: "user" | "assistant";
+    role: 'user' | 'assistant';
     content: ContentBlock[];
   };
   result?: string;
@@ -142,7 +144,7 @@ Individual content blocks in messages:
 
 ```typescript
 export interface ContentBlock {
-  type: "text" | "tool_use" | "thinking" | "tool_result";
+  type: 'text' | 'tool_use' | 'thinking' | 'tool_result';
   text?: string;
   thinking?: string;
   name?: string;
@@ -174,12 +176,14 @@ Uses `@anthropic-ai/claude-agent-sdk` for direct SDK integration.
 #### Model Detection
 
 Routes models that:
+
 - Start with `"claude-"` (e.g., `"claude-opus-4-5-20251101"`)
 - Are Claude aliases: `"opus"`, `"sonnet"`, `"haiku"`
 
 #### Authentication
 
 Requires:
+
 - `ANTHROPIC_API_KEY` environment variable
 
 #### Example Usage
@@ -188,21 +192,21 @@ Requires:
 const provider = new ClaudeProvider();
 
 const stream = provider.executeQuery({
-  prompt: "What is 2+2?",
-  model: "claude-opus-4-5-20251101",
-  cwd: "/project/path",
-  systemPrompt: "You are a helpful assistant.",
+  prompt: 'What is 2+2?',
+  model: 'claude-opus-4-5-20251101',
+  cwd: '/project/path',
+  systemPrompt: 'You are a helpful assistant.',
   maxTurns: 20,
-  allowedTools: ["Read", "Write", "Bash"],
+  allowedTools: ['Read', 'Write', 'Bash'],
   abortController: new AbortController(),
   conversationHistory: [
-    { role: "user", content: "Hello" },
-    { role: "assistant", content: "Hi! How can I help?" }
-  ]
+    { role: 'user', content: 'Hello' },
+    { role: 'assistant', content: 'Hi! How can I help?' },
+  ],
 });
 
 for await (const msg of stream) {
-  if (msg.type === "assistant") {
+  if (msg.type === 'assistant') {
     console.log(msg.message?.content);
   }
 }
@@ -215,7 +219,7 @@ Uses `convertHistoryToMessages()` utility to convert history to SDK format:
 ```typescript
 const historyMessages = convertHistoryToMessages(conversationHistory);
 for (const msg of historyMessages) {
-  yield msg;  // Yield to SDK
+  yield msg; // Yield to SDK
 }
 ```
 
@@ -240,28 +244,31 @@ Spawns OpenAI Codex CLI as a subprocess and converts JSONL output to provider fo
 #### Model Detection
 
 Routes models that:
+
 - Start with `"gpt-"` (e.g., `"gpt-5.2"`, `"gpt-5.1-codex-max"`)
 - Start with `"o"` (e.g., `"o1"`, `"o1-mini"`)
 
 #### Available Models
 
-| Model | Description | Context | Max Output | Vision |
-|-------|-------------|---------|------------|--------|
-| `gpt-5.2` | Latest Codex model | 256K | 32K | Yes |
-| `gpt-5.1-codex-max` | Maximum capability | 256K | 32K | Yes |
-| `gpt-5.1-codex` | Standard Codex | 256K | 32K | Yes |
-| `gpt-5.1-codex-mini` | Lightweight | 256K | 16K | No |
-| `gpt-5.1` | General-purpose | 256K | 32K | Yes |
+| Model                | Description        | Context | Max Output | Vision |
+| -------------------- | ------------------ | ------- | ---------- | ------ |
+| `gpt-5.2`            | Latest Codex model | 256K    | 32K        | Yes    |
+| `gpt-5.1-codex-max`  | Maximum capability | 256K    | 32K        | Yes    |
+| `gpt-5.1-codex`      | Standard Codex     | 256K    | 32K        | Yes    |
+| `gpt-5.1-codex-mini` | Lightweight        | 256K    | 16K        | No     |
+| `gpt-5.1`            | General-purpose    | 256K    | 32K        | Yes    |
 
 #### Authentication
 
 Supports two methods:
+
 1. **CLI login**: `codex login` (OAuth tokens stored in `~/.codex/auth.json`)
 2. **API key**: `OPENAI_API_KEY` environment variable
 
 #### Installation Detection
 
 Uses `CodexCliDetector` to check:
+
 - PATH for `codex` command
 - npm global: `npm list -g @openai/codex`
 - Homebrew (macOS): `/opt/homebrew/bin/codex`
@@ -273,17 +280,17 @@ Uses `CodexCliDetector` to check:
 const provider = new CodexProvider();
 
 const stream = provider.executeQuery({
-  prompt: "Fix the bug in main.ts",
-  model: "gpt-5.2",
-  cwd: "/project/path",
-  systemPrompt: "You are an expert TypeScript developer.",
-  abortController: new AbortController()
+  prompt: 'Fix the bug in main.ts',
+  model: 'gpt-5.2',
+  cwd: '/project/path',
+  systemPrompt: 'You are an expert TypeScript developer.',
+  abortController: new AbortController(),
 });
 
 for await (const msg of stream) {
-  if (msg.type === "assistant") {
+  if (msg.type === 'assistant') {
     console.log(msg.message?.content);
-  } else if (msg.type === "error") {
+  } else if (msg.type === 'error') {
     console.error(msg.error);
   }
 }
@@ -293,15 +300,15 @@ for await (const msg of stream) {
 
 Codex CLI outputs JSONL events that get converted to `ProviderMessage` format:
 
-| Codex Event | Provider Message |
-|-------------|------------------|
-| `item.completed` (reasoning) | `{ type: "assistant", content: [{ type: "thinking" }] }` |
-| `item.completed` (agent_message) | `{ type: "assistant", content: [{ type: "text" }] }` |
-| `item.completed` (command_execution) | `{ type: "assistant", content: [{ type: "text", text: "```bash\n...\n```" }] }` |
-| `item.started` (command_execution) | `{ type: "assistant", content: [{ type: "tool_use" }] }` |
-| `item.updated` (todo_list) | `{ type: "assistant", content: [{ type: "text", text: "**Updated Todo List:**..." }] }` |
-| `thread.completed` | `{ type: "result", subtype: "success" }` |
-| `error` | `{ type: "error", error: "..." }` |
+| Codex Event                          | Provider Message                                                                        |
+| ------------------------------------ | --------------------------------------------------------------------------------------- |
+| `item.completed` (reasoning)         | `{ type: "assistant", content: [{ type: "thinking" }] }`                                |
+| `item.completed` (agent_message)     | `{ type: "assistant", content: [{ type: "text" }] }`                                    |
+| `item.completed` (command_execution) | `{ type: "assistant", content: [{ type: "text", text: "```bash\n...\n```" }] }`         |
+| `item.started` (command_execution)   | `{ type: "assistant", content: [{ type: "tool_use" }] }`                                |
+| `item.updated` (todo_list)           | `{ type: "assistant", content: [{ type: "text", text: "**Updated Todo List:**..." }] }` |
+| `thread.completed`                   | `{ type: "result", subtype: "success" }`                                                |
+| `error`                              | `{ type: "error", error: "..." }`                                                       |
 
 #### Conversation History Handling
 
@@ -323,6 +330,7 @@ await codexConfigManager.configureMcpServer(cwd, mcpServerScriptPath);
 ```
 
 Generates `.codex/config.toml`:
+
 ```toml
 [mcp_servers.automaker-tools]
 command = "node"
@@ -349,13 +357,15 @@ export class ProviderFactory {
     const lowerModel = modelId.toLowerCase();
 
     // OpenAI/Codex models
-    if (lowerModel.startsWith("gpt-") || lowerModel.startsWith("o")) {
+    if (lowerModel.startsWith('gpt-') || lowerModel.startsWith('o')) {
       return new CodexProvider();
     }
 
     // Claude models
-    if (lowerModel.startsWith("claude-") ||
-        ["haiku", "sonnet", "opus"].includes(lowerModel)) {
+    if (
+      lowerModel.startsWith('claude-') ||
+      ['haiku', 'sonnet', 'opus'].includes(lowerModel)
+    ) {
       return new ClaudeProvider();
     }
 
@@ -366,7 +376,9 @@ export class ProviderFactory {
   /**
    * Check installation status of all providers
    */
-  static async checkAllProviders(): Promise<Record<string, InstallationStatus>> {
+  static async checkAllProviders(): Promise<
+    Record<string, InstallationStatus>
+  > {
     const claude = new ClaudeProvider();
     const codex = new CodexProvider();
 
@@ -381,7 +393,7 @@ export class ProviderFactory {
 ### Usage in Services
 
 ```typescript
-import { ProviderFactory } from "../providers/provider-factory.js";
+import { ProviderFactory } from '../providers/provider-factory.js';
 
 // In AgentService or AutoModeService
 const provider = ProviderFactory.getProviderForModel(model);
@@ -401,20 +413,22 @@ for await (const msg of stream) {
 Create `apps/server/src/providers/[name]-provider.ts`:
 
 ```typescript
-import { BaseProvider } from "./base-provider.js";
+import { BaseProvider } from './base-provider.js';
 import type {
   ExecuteOptions,
   ProviderMessage,
   InstallationStatus,
   ModelDefinition,
-} from "./types.js";
+} from './types.js';
 
 export class CursorProvider extends BaseProvider {
   getName(): string {
-    return "cursor";
+    return 'cursor';
   }
 
-  async *executeQuery(options: ExecuteOptions): AsyncGenerator<ProviderMessage> {
+  async *executeQuery(
+    options: ExecuteOptions
+  ): AsyncGenerator<ProviderMessage> {
     // Implementation here
     // 1. Spawn cursor CLI or use SDK
     // 2. Convert output to ProviderMessage format
@@ -429,23 +443,23 @@ export class CursorProvider extends BaseProvider {
   getAvailableModels(): ModelDefinition[] {
     return [
       {
-        id: "cursor-premium",
-        name: "Cursor Premium",
-        modelString: "cursor-premium",
-        provider: "cursor",
+        id: 'cursor-premium',
+        name: 'Cursor Premium',
+        modelString: 'cursor-premium',
+        provider: 'cursor',
         description: "Cursor's premium model",
         contextWindow: 200000,
         maxOutputTokens: 8192,
         supportsVision: true,
         supportsTools: true,
-        tier: "premium",
+        tier: 'premium',
         default: true,
-      }
+      },
     ];
   }
 
   supportsFeature(feature: string): boolean {
-    const supportedFeatures = ["tools", "text", "vision"];
+    const supportedFeatures = ['tools', 'text', 'vision'];
     return supportedFeatures.includes(feature);
   }
 }
@@ -499,6 +513,7 @@ Update `apps/server/src/routes/models.ts`:
 ### Step 4: Done!
 
 No changes needed in:
+
 - ✅ AgentService
 - ✅ AutoModeService
 - ✅ Any business logic
@@ -512,6 +527,7 @@ The provider architecture handles everything automatically.
 ### SDK-Based Providers (like Claude)
 
 **Characteristics**:
+
 - Direct SDK/library integration
 - No subprocess spawning
 - Native multi-turn support
@@ -520,6 +536,7 @@ The provider architecture handles everything automatically.
 **Example**: ClaudeProvider using `@anthropic-ai/claude-agent-sdk`
 
 **Advantages**:
+
 - Lower latency
 - More control over options
 - Easier error handling
@@ -530,6 +547,7 @@ The provider architecture handles everything automatically.
 ### CLI-Based Providers (like Codex)
 
 **Characteristics**:
+
 - Subprocess spawning
 - JSONL stream parsing
 - Text-based conversation history
@@ -538,11 +556,13 @@ The provider architecture handles everything automatically.
 **Example**: CodexProvider using `codex exec --json`
 
 **Advantages**:
+
 - Access to CLI-only features
 - No SDK dependency
 - Can use any CLI tool
 
 **Implementation Pattern**:
+
 1. Use `spawnJSONLProcess()` from `subprocess-manager.ts`
 2. Convert JSONL events to `ProviderMessage` format
 3. Handle authentication (CLI login or API key)
@@ -626,6 +646,7 @@ console.error(`[${this.getName()}Provider] Error:`, error);
 ### 7. Installation Detection
 
 Implement thorough detection:
+
 - Check multiple installation methods
 - Verify authentication
 - Return detailed status
@@ -659,16 +680,16 @@ Provide accurate model metadata:
 Test each provider method independently:
 
 ```typescript
-describe("ClaudeProvider", () => {
-  it("should detect installation", async () => {
+describe('ClaudeProvider', () => {
+  it('should detect installation', async () => {
     const provider = new ClaudeProvider();
     const status = await provider.detectInstallation();
 
     expect(status.installed).toBe(true);
-    expect(status.method).toBe("sdk");
+    expect(status.method).toBe('sdk');
   });
 
-  it("should stream messages correctly", async () => {
+  it('should stream messages correctly', async () => {
     const provider = new ClaudeProvider();
     const messages = [];
 
@@ -677,7 +698,7 @@ describe("ClaudeProvider", () => {
     }
 
     expect(messages.length).toBeGreaterThan(0);
-    expect(messages[0].type).toBe("assistant");
+    expect(messages[0].type).toBe('assistant');
   });
 });
 ```
@@ -687,9 +708,11 @@ describe("ClaudeProvider", () => {
 Test provider interaction with services:
 
 ```typescript
-describe("Provider Integration", () => {
-  it("should work with AgentService", async () => {
-    const provider = ProviderFactory.getProviderForModel("claude-opus-4-5-20251101");
+describe('Provider Integration', () => {
+  it('should work with AgentService', async () => {
+    const provider = ProviderFactory.getProviderForModel(
+      'claude-opus-4-5-20251101'
+    );
 
     // Test full workflow
   });
@@ -733,6 +756,7 @@ CODEX_CLI_PATH=/custom/path/to/codex
 **Problem**: Provider fails with auth error
 
 **Solution**:
+
 1. Check environment variables
 2. For CLI providers, verify CLI login status
 3. Check `detectInstallation()` output
@@ -742,6 +766,7 @@ CODEX_CLI_PATH=/custom/path/to/codex
 **Problem**: Failed to parse JSONL line
 
 **Solution**:
+
 1. Check CLI output format
 2. Verify JSON is valid
 3. Add error handling for malformed lines
@@ -751,6 +776,7 @@ CODEX_CLI_PATH=/custom/path/to/codex
 **Problem**: Subprocess hangs
 
 **Solution**:
+
 1. Increase timeout in `spawnJSONLProcess` options
 2. Check CLI process for hangs
 3. Verify abort signal handling
@@ -778,6 +804,7 @@ Potential providers to add:
    - CLI or HTTP API
 
 Each would follow the same pattern:
+
 1. Create `[name]-provider.ts` implementing `BaseProvider`
 2. Add routing in `provider-factory.ts`
 3. Update models list

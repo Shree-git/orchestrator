@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -6,10 +5,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { Feature } from "@/store/app-store";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
+import { Feature } from '@/store/app-store';
 
 interface DeleteCompletedFeatureDialogProps {
   feature: Feature | null;
@@ -36,7 +35,7 @@ export function DeleteCompletedFeatureDialog({
             Are you sure you want to permanently delete this feature?
             <span className="block mt-2 font-medium text-foreground">
               &quot;{feature.description?.slice(0, 100)}
-              {(feature.description?.length ?? 0) > 100 ? "..." : ""}&quot;
+              {(feature.description?.length ?? 0) > 100 ? '...' : ''}&quot;
             </span>
             <span className="block mt-2 text-destructive font-medium">
               This action cannot be undone.

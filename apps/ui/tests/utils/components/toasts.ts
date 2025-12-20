@@ -1,5 +1,5 @@
-import { Page, Locator } from "@playwright/test";
-import { waitForElement } from "../core/waiting";
+import { Page, Locator } from '@playwright/test';
+import { waitForElement } from '../core/waiting';
 
 /**
  * Wait for a toast notification with specific text to appear
@@ -12,7 +12,7 @@ export async function waitForToast(
   const toast = page.locator(`[data-sonner-toast]:has-text("${text}")`).first();
   await toast.waitFor({
     timeout: options?.timeout ?? 5000,
-    state: "visible",
+    state: 'visible',
   });
   return toast;
 }
@@ -32,19 +32,23 @@ export async function waitForErrorToast(
 
   if (titleText) {
     // First try specific error type, then fallback to any toast with text
-    const errorToast = page.locator(
-      `[data-sonner-toast][data-type="error"]:has-text("${titleText}"), [data-sonner-toast]:has-text("${titleText}")`
-    ).first();
+    const errorToast = page
+      .locator(
+        `[data-sonner-toast][data-type="error"]:has-text("${titleText}"), [data-sonner-toast]:has-text("${titleText}")`
+      )
+      .first();
     await errorToast.waitFor({
       timeout,
-      state: "visible",
+      state: 'visible',
     });
     return errorToast;
   } else {
-    const errorToast = page.locator('[data-sonner-toast][data-type="error"]').first();
+    const errorToast = page
+      .locator('[data-sonner-toast][data-type="error"]')
+      .first();
     await errorToast.waitFor({
       timeout,
-      state: "visible",
+      state: 'visible',
     });
     return errorToast;
   }
@@ -81,7 +85,7 @@ export async function waitForSuccessToast(
   const toast = page.locator(toastSelector).first();
   await toast.waitFor({
     timeout: options?.timeout ?? 5000,
-    state: "visible",
+    state: 'visible',
   });
   return toast;
 }

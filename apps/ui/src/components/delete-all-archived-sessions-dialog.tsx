@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -6,9 +5,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 interface DeleteAllArchivedSessionsDialogProps {
   open: boolean;

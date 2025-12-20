@@ -2,13 +2,13 @@
  * Common utilities for templates routes
  */
 
-import { createLogger } from "../../lib/logger.js";
+import { createLogger } from '../../lib/logger.js';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
-export const logger = createLogger("Templates");
+export const logger = createLogger('Templates');
 
 // Re-export shared utilities
 export { getErrorMessageShared as getErrorMessage };

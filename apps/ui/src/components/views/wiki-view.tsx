@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import {
   ChevronDown,
   ChevronRight,
@@ -23,7 +23,7 @@ import {
   TestTube,
   Brain,
   Users,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface WikiSection {
   id: string;
@@ -121,7 +121,7 @@ function FeatureList({
 
 export function WikiView() {
   const [openSections, setOpenSections] = useState<Set<string>>(
-    new Set(["overview"])
+    new Set(['overview'])
   );
 
   const toggleSection = (id: string) => {
@@ -146,8 +146,8 @@ export function WikiView() {
 
   const sections: WikiSection[] = [
     {
-      id: "overview",
-      title: "Project Overview",
+      id: 'overview',
+      title: 'Project Overview',
       icon: Rocket,
       content: (
         <div className="space-y-3">
@@ -173,8 +173,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "architecture",
-      title: "Architecture",
+      id: 'architecture',
+      title: 'Architecture',
       icon: Layers,
       content: (
         <div className="space-y-3">
@@ -204,8 +204,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "features",
-      title: "Key Features",
+      id: 'features',
+      title: 'Key Features',
       icon: Sparkles,
       content: (
         <div>
@@ -213,73 +213,73 @@ export function WikiView() {
             items={[
               {
                 icon: LayoutGrid,
-                title: "Kanban Board",
+                title: 'Kanban Board',
                 description:
-                  "4 columns: Backlog, In Progress, Waiting Approval, Verified. Drag and drop to manage feature lifecycle.",
+                  '4 columns: Backlog, In Progress, Waiting Approval, Verified. Drag and drop to manage feature lifecycle.',
               },
               {
                 icon: Bot,
-                title: "AI Agent Integration",
+                title: 'AI Agent Integration',
                 description:
-                  "Powered by Claude via the Agent SDK with full file, bash, and git access.",
+                  'Powered by Claude via the Agent SDK with full file, bash, and git access.',
               },
               {
                 icon: Cpu,
-                title: "Multi-Model Support",
+                title: 'Multi-Model Support',
                 description:
-                  "Claude Haiku/Sonnet/Opus models. Choose the right model for each task.",
+                  'Claude Haiku/Sonnet/Opus models. Choose the right model for each task.',
               },
               {
                 icon: Brain,
-                title: "Extended Thinking",
+                title: 'Extended Thinking',
                 description:
-                  "Configurable thinking levels (none, low, medium, high, ultrathink) for complex tasks.",
+                  'Configurable thinking levels (none, low, medium, high, ultrathink) for complex tasks.',
               },
               {
                 icon: Zap,
-                title: "Real-time Streaming",
+                title: 'Real-time Streaming',
                 description:
-                  "Watch AI agents work in real-time with live output streaming.",
+                  'Watch AI agents work in real-time with live output streaming.',
               },
               {
                 icon: GitBranch,
-                title: "Git Worktree Isolation",
+                title: 'Git Worktree Isolation',
                 description:
-                  "Each feature runs in its own git worktree for safe parallel development.",
+                  'Each feature runs in its own git worktree for safe parallel development.',
               },
               {
                 icon: Users,
-                title: "AI Profiles",
+                title: 'AI Profiles',
                 description:
-                  "Pre-configured model + thinking level combinations for different task types.",
+                  'Pre-configured model + thinking level combinations for different task types.',
               },
               {
                 icon: Terminal,
-                title: "Integrated Terminal",
+                title: 'Integrated Terminal',
                 description:
-                  "Built-in terminal with tab support and split panes.",
+                  'Built-in terminal with tab support and split panes.',
               },
               {
                 icon: Keyboard,
-                title: "Keyboard Shortcuts",
-                description: "Fully customizable shortcuts for power users.",
+                title: 'Keyboard Shortcuts',
+                description: 'Fully customizable shortcuts for power users.',
               },
               {
                 icon: Palette,
-                title: "14 Themes",
+                title: '14 Themes',
                 description:
-                  "From light to dark, retro to synthwave - pick your style.",
+                  'From light to dark, retro to synthwave - pick your style.',
               },
               {
                 icon: Image,
-                title: "Image Support",
-                description: "Attach images to features for visual context.",
+                title: 'Image Support',
+                description: 'Attach images to features for visual context.',
               },
               {
                 icon: TestTube,
-                title: "Test Integration",
+                title: 'Test Integration',
                 description:
-                  "Automatic test running and TDD support for quality assurance.",
+                  'Automatic test running and TDD support for quality assurance.',
               },
             ]}
           />
@@ -287,8 +287,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "data-flow",
-      title: "How It Works (Data Flow)",
+      id: 'data-flow',
+      title: 'How It Works (Data Flow)',
       icon: GitBranch,
       content: (
         <div className="space-y-3">
@@ -306,7 +306,7 @@ export function WikiView() {
             <li className="text-foreground">
               <strong>Feature Saved</strong>
               <p className="text-muted-foreground ml-5 mt-1">
-                Feature saved to{" "}
+                Feature saved to{' '}
                 <code className="px-1 py-0.5 bg-muted rounded text-xs">
                   .automaker/features/&#123;id&#125;/feature.json
                 </code>
@@ -355,8 +355,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "structure",
-      title: "Project Structure",
+      id: 'structure',
+      title: 'Project Structure',
       icon: FolderTree,
       content: (
         <div>
@@ -385,8 +385,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "components",
-      title: "Key Components",
+      id: 'components',
+      title: 'Key Components',
       icon: Component,
       content: (
         <div className="space-y-3">
@@ -394,33 +394,33 @@ export function WikiView() {
           <div className="grid gap-2 mt-4">
             {[
               {
-                file: "sidebar.tsx",
-                desc: "Main navigation with project picker and view switching",
+                file: 'sidebar.tsx',
+                desc: 'Main navigation with project picker and view switching',
               },
               {
-                file: "board-view.tsx",
-                desc: "Kanban board with drag-and-drop cards",
+                file: 'board-view.tsx',
+                desc: 'Kanban board with drag-and-drop cards',
               },
               {
-                file: "agent-view.tsx",
-                desc: "AI chat interface for conversational development",
+                file: 'agent-view.tsx',
+                desc: 'AI chat interface for conversational development',
               },
-              { file: "spec-view.tsx", desc: "Project specification editor" },
+              { file: 'spec-view.tsx', desc: 'Project specification editor' },
               {
-                file: "context-view.tsx",
-                desc: "Context file manager for AI context",
-              },
-              {
-                file: "terminal-view.tsx",
-                desc: "Integrated terminal with splits and tabs",
+                file: 'context-view.tsx',
+                desc: 'Context file manager for AI context',
               },
               {
-                file: "profiles-view.tsx",
-                desc: "AI profile management (model + thinking presets)",
+                file: 'terminal-view.tsx',
+                desc: 'Integrated terminal with splits and tabs',
               },
               {
-                file: "app-store.ts",
-                desc: "Central Zustand state management",
+                file: 'profiles-view.tsx',
+                desc: 'AI profile management (model + thinking presets)',
+              },
+              {
+                file: 'app-store.ts',
+                desc: 'Central Zustand state management',
               },
             ].map((item) => (
               <div
@@ -440,31 +440,31 @@ export function WikiView() {
       ),
     },
     {
-      id: "configuration",
-      title: "Configuration",
+      id: 'configuration',
+      title: 'Configuration',
       icon: Settings,
       content: (
         <div className="space-y-3">
           <p>
-            Automaker stores project configuration in the{" "}
+            Automaker stores project configuration in the{' '}
             <code className="px-1 py-0.5 bg-muted rounded text-xs">
               .automaker/
-            </code>{" "}
+            </code>{' '}
             directory:
           </p>
           <div className="grid gap-2 mt-4">
             {[
               {
-                file: "app_spec.txt",
-                desc: "Project specification describing your app for AI context",
+                file: 'app_spec.txt',
+                desc: 'Project specification describing your app for AI context',
               },
               {
-                file: "context/",
-                desc: "Additional context files (docs, examples) for AI",
+                file: 'context/',
+                desc: 'Additional context files (docs, examples) for AI',
               },
               {
-                file: "features/",
-                desc: "Feature definitions with descriptions and steps",
+                file: 'features/',
+                desc: 'Feature definitions with descriptions and steps',
               },
             ].map((item) => (
               <div
@@ -495,8 +495,8 @@ export function WikiView() {
       ),
     },
     {
-      id: "getting-started",
-      title: "Getting Started",
+      id: 'getting-started',
+      title: 'Getting Started',
       icon: PlayCircle,
       content: (
         <div className="space-y-3">
@@ -555,8 +555,8 @@ export function WikiView() {
             <p className="text-brand-400 text-sm font-medium mb-2">Pro Tips:</p>
             <ul className="list-disc list-inside space-y-1 text-xs text-brand-400/80">
               <li>
-                Use keyboard shortcuts for faster navigation (press{" "}
-                <code className="px-1 py-0.5 bg-brand-500/20 rounded">?</code>{" "}
+                Use keyboard shortcuts for faster navigation (press{' '}
+                <code className="px-1 py-0.5 bg-brand-500/20 rounded">?</code>{' '}
                 to see all)
               </li>
               <li>

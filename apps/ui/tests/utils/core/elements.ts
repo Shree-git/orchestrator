@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Get an element by its data-testid attribute
@@ -25,7 +25,7 @@ export async function getButtonByText(
  */
 export async function getCategoryAutocompleteInput(
   page: Page,
-  testId: string = "feature-category-input"
+  testId: string = 'feature-category-input'
 ): Promise<Locator> {
   return page.locator(`[data-testid="${testId}"]`);
 }

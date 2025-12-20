@@ -8,16 +8,21 @@
  * - Supports both vision and non-vision models
  */
 
-import { convertImagesToContentBlocks, formatImagePathsForPrompt } from "./image-handler.js";
+import {
+  convertImagesToContentBlocks,
+  formatImagePathsForPrompt,
+} from './image-handler.js';
 
 /**
  * Content that can be either simple text or structured blocks
  */
-export type PromptContent = string | Array<{
-  type: string;
-  text?: string;
-  source?: object;
-}>;
+export type PromptContent =
+  | string
+  | Array<{
+      type: string;
+      text?: string;
+      source?: object;
+    }>;
 
 /**
  * Result of building a prompt with optional images
@@ -62,7 +67,7 @@ export async function buildPromptWithImages(
 
   // Add text block if we have text
   if (textContent.trim()) {
-    contentBlocks.push({ type: "text", text: textContent });
+    contentBlocks.push({ type: 'text', text: textContent });
   }
 
   // Add image blocks
@@ -71,7 +76,7 @@ export async function buildPromptWithImages(
 
   // Return appropriate format
   const content: PromptContent =
-    contentBlocks.length > 1 || contentBlocks[0]?.type === "image"
+    contentBlocks.length > 1 || contentBlocks[0]?.type === 'image'
       ? contentBlocks
       : textContent;
 

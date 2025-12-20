@@ -4,22 +4,22 @@
  * Stores project data inside the project directory at {projectPath}/.automaker/
  */
 
-import fs from "fs/promises";
-import path from "path";
+import fs from 'fs/promises';
+import path from 'path';
 
 /**
  * Get the automaker data directory for a project
  * This is stored inside the project at .automaker/
  */
 export function getAutomakerDir(projectPath: string): string {
-  return path.join(projectPath, ".automaker");
+  return path.join(projectPath, '.automaker');
 }
 
 /**
  * Get the features directory for a project
  */
 export function getFeaturesDir(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "features");
+  return path.join(getAutomakerDir(projectPath), 'features');
 }
 
 /**
@@ -36,49 +36,49 @@ export function getFeatureImagesDir(
   projectPath: string,
   featureId: string
 ): string {
-  return path.join(getFeatureDir(projectPath, featureId), "images");
+  return path.join(getFeatureDir(projectPath, featureId), 'images');
 }
 
 /**
  * Get the board directory for a project (board backgrounds, etc.)
  */
 export function getBoardDir(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "board");
+  return path.join(getAutomakerDir(projectPath), 'board');
 }
 
 /**
  * Get the images directory for a project (general images)
  */
 export function getImagesDir(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "images");
+  return path.join(getAutomakerDir(projectPath), 'images');
 }
 
 /**
  * Get the context files directory for a project (user-added context files)
  */
 export function getContextDir(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "context");
+  return path.join(getAutomakerDir(projectPath), 'context');
 }
 
 /**
  * Get the worktrees metadata directory for a project
  */
 export function getWorktreesDir(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "worktrees");
+  return path.join(getAutomakerDir(projectPath), 'worktrees');
 }
 
 /**
  * Get the app spec file path for a project
  */
 export function getAppSpecPath(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "app_spec.txt");
+  return path.join(getAutomakerDir(projectPath), 'app_spec.txt');
 }
 
 /**
  * Get the branch tracking file path for a project
  */
 export function getBranchTrackingPath(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "active-branches.json");
+  return path.join(getAutomakerDir(projectPath), 'active-branches.json');
 }
 
 /**
@@ -100,21 +100,21 @@ export async function ensureAutomakerDir(projectPath: string): Promise<string> {
  * or %APPDATA%\automaker (Windows) or ~/.config/automaker (Linux)
  */
 export function getGlobalSettingsPath(dataDir: string): string {
-  return path.join(dataDir, "settings.json");
+  return path.join(dataDir, 'settings.json');
 }
 
 /**
  * Get the credentials file path (separate from settings for security)
  */
 export function getCredentialsPath(dataDir: string): string {
-  return path.join(dataDir, "credentials.json");
+  return path.join(dataDir, 'credentials.json');
 }
 
 /**
  * Get the project settings file path within a project's .automaker directory
  */
 export function getProjectSettingsPath(projectPath: string): string {
-  return path.join(getAutomakerDir(projectPath), "settings.json");
+  return path.join(getAutomakerDir(projectPath), 'settings.json');
 }
 
 /**

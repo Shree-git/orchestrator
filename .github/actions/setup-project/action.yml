@@ -1,28 +1,28 @@
-name: "Setup Project"
-description: "Common setup steps for CI workflows - checkout, Node.js, dependencies, and native modules"
+name: 'Setup Project'
+description: 'Common setup steps for CI workflows - checkout, Node.js, dependencies, and native modules'
 
 inputs:
   node-version:
-    description: "Node.js version to use"
+    description: 'Node.js version to use'
     required: false
-    default: "22"
+    default: '22'
   check-lockfile:
-    description: "Run lockfile lint check for SSH URLs"
+    description: 'Run lockfile lint check for SSH URLs'
     required: false
-    default: "false"
+    default: 'false'
   rebuild-node-pty-path:
-    description: "Working directory for node-pty rebuild (empty = root)"
+    description: 'Working directory for node-pty rebuild (empty = root)'
     required: false
-    default: ""
+    default: ''
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-        cache: "npm"
+        cache: 'npm'
         cache-dependency-path: package-lock.json
 
     - name: Check for SSH URLs in lockfile

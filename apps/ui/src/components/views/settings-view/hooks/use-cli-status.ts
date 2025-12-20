@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
-import { useSetupStore } from "@/store/setup-store";
-import { getElectronAPI } from "@/lib/electron";
+import { useState, useEffect, useCallback } from 'react';
+import { useSetupStore } from '@/store/setup-store';
+import { getElectronAPI } from '@/lib/electron';
 
 interface CliStatusResult {
   success: boolean;
@@ -41,7 +41,7 @@ export function useCliStatus() {
           const status = await api.checkClaudeCli();
           setClaudeCliStatus(status);
         } catch (error) {
-          console.error("Failed to check Claude CLI status:", error);
+          console.error('Failed to check Claude CLI status:', error);
         }
       }
 
@@ -57,24 +57,40 @@ export function useCliStatus() {
             };
             // Map server method names to client method types
             // Server returns: oauth_token_env, oauth_token, api_key_env, api_key, credentials_file, cli_authenticated, none
-            const validMethods = ["oauth_token_env", "oauth_token", "api_key", "api_key_env", "credentials_file", "cli_authenticated", "none"] as const;
-            type AuthMethod = typeof validMethods[number];
-            const method: AuthMethod = validMethods.includes(auth.method as AuthMethod)
+            const validMethods = [
+              'oauth_token_env',
+              'oauth_token',
+              'api_key',
+              'api_key_env',
+              'credentials_file',
+              'cli_authenticated',
+              'none',
+            ] as const;
+            type AuthMethod = (typeof validMethods)[number];
+            const method: AuthMethod = validMethods.includes(
+              auth.method as AuthMethod
+            )
               ? (auth.method as AuthMethod)
-              : auth.authenticated ? "api_key" : "none"; // Default authenticated to api_key, not none
+              : auth.authenticated
+                ? 'api_key'
+                : 'none'; // Default authenticated to api_key, not none
             const authStatus = {
               authenticated: auth.authenticated,
               method,
               hasCredentialsFile: auth.hasCredentialsFile ?? false,
-              oauthTokenValid: auth.oauthTokenValid || auth.hasStoredOAuthToken || auth.hasEnvOAuthToken,
-              apiKeyValid: auth.apiKeyValid || auth.hasStoredApiKey || auth.hasEnvApiKey,
+              oauthTokenValid:
+                auth.oauthTokenValid ||
+                auth.hasStoredOAuthToken ||
+                auth.hasEnvOAuthToken,
+              apiKeyValid:
+                auth.apiKeyValid || auth.hasStoredApiKey || auth.hasEnvApiKey,
               hasEnvOAuthToken: auth.hasEnvOAuthToken,
               hasEnvApiKey: auth.hasEnvApiKey,
             };
             setClaudeAuthStatus(authStatus);
           }
         } catch (error) {
-          console.error("Failed to check Claude auth status:", error);
+          console.error('Failed to check Claude auth status:', error);
         }
       }
     };
@@ -92,7 +108,7 @@ export function useCliStatus() {
         setClaudeCliStatus(status);
       }
     } catch (error) {
-      console.error("Failed to refresh Claude CLI status:", error);
+      console.error('Failed to refresh Claude CLI status:', error);
     } finally {
       setIsCheckingClaudeCli(false);
     }

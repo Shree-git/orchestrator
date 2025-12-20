@@ -2,11 +2,11 @@
  * Common utilities and state for terminal routes
  */
 
-import { createLogger } from "../../lib/logger.js";
-import type { Request, Response, NextFunction } from "express";
-import { getTerminalService } from "../../services/terminal-service.js";
+import { createLogger } from '../../lib/logger.js';
+import type { Request, Response, NextFunction } from 'express';
+import { getTerminalService } from '../../services/terminal-service.js';
 
-const logger = createLogger("Terminal");
+const logger = createLogger('Terminal');
 
 // Read env variables lazily to ensure dotenv has loaded them
 function getTerminalPassword(): string | undefined {
@@ -14,7 +14,7 @@ function getTerminalPassword(): string | undefined {
 }
 
 function getTerminalEnabledConfig(): boolean {
-  return process.env.TERMINAL_ENABLED !== "false"; // Enabled by default
+  return process.env.TERMINAL_ENABLED !== 'false'; // Enabled by default
 }
 
 // In-memory session tokens (would use Redis in production) - private
@@ -116,7 +116,7 @@ export function terminalAuthMiddleware(
   if (!getTerminalEnabledConfig()) {
     res.status(403).json({
       success: false,
-      error: "Terminal access is disabled",
+      error: 'Terminal access is disabled',
     });
     return;
   }
@@ -129,12 +129,12 @@ export function terminalAuthMiddleware(
 
   // Check for session token
   const token =
-    (req.headers["x-terminal-token"] as string) || (req.query.token as string);
+    (req.headers['x-terminal-token'] as string) || (req.query.token as string);
 
   if (!validateTerminalToken(token)) {
     res.status(401).json({
       success: false,
-      error: "Terminal authentication required",
+      error: 'Terminal authentication required',
       passwordRequired: true,
     });
     return;
@@ -158,7 +158,7 @@ export function getTokenExpiryMs(): number {
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
 // Re-export shared utilities
 export { getErrorMessageShared as getErrorMessage };

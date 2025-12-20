@@ -2,13 +2,13 @@
  * Common utilities for workspace routes
  */
 
-import { createLogger } from "../../lib/logger.js";
+import { createLogger } from '../../lib/logger.js';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
-const logger = createLogger("Workspace");
+const logger = createLogger('Workspace');
 
 // Re-export shared utilities
 export { getErrorMessageShared as getErrorMessage };

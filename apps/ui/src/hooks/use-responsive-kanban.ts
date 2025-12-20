@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 export interface ResponsiveKanbanConfig {
   columnWidth: number;
@@ -44,13 +44,15 @@ export function useResponsiveKanban(
   };
 
   const calculateColumnWidth = useCallback(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return DEFAULT_CONFIG.columnWidth;
     }
 
     // Get the actual board container width
     // The flex layout already accounts for sidebar width, so we use the container's actual width
-    const boardContainer = document.querySelector('[data-testid="board-view"]')?.parentElement;
+    const boardContainer = document.querySelector(
+      '[data-testid="board-view"]'
+    )?.parentElement;
     const containerWidth = boardContainer
       ? boardContainer.clientWidth
       : window.innerWidth;
@@ -78,7 +80,7 @@ export function useResponsiveKanban(
   );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     const handleResize = () => {
       const newWidth = calculateColumnWidth();
@@ -89,7 +91,7 @@ export function useResponsiveKanban(
     handleResize();
 
     // Use ResizeObserver for more precise updates if available
-    if (typeof ResizeObserver !== "undefined") {
+    if (typeof ResizeObserver !== 'undefined') {
       const observer = new ResizeObserver(handleResize);
       observer.observe(document.body);
 
@@ -99,9 +101,9 @@ export function useResponsiveKanban(
     }
 
     // Fallback to window resize event
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [calculateColumnWidth]);
 
@@ -110,10 +112,10 @@ export function useResponsiveKanban(
 
   // Container style to center content and prevent overflow
   const containerStyle: React.CSSProperties = {
-    display: "flex",
+    display: 'flex',
     gap: `${gap}px`,
-    height: "100%",
-    justifyContent: "center",
+    height: '100%',
+    justifyContent: 'center',
   };
 
   return {

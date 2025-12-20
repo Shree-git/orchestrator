@@ -2,13 +2,13 @@
  * Common utilities and state for suggestions routes
  */
 
-import { createLogger } from "../../lib/logger.js";
+import { createLogger } from '../../lib/logger.js';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
-const logger = createLogger("Suggestions");
+const logger = createLogger('Suggestions');
 
 // Shared state for tracking generation status - private
 let isRunning = false;

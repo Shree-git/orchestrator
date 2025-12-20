@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { GitBranch, Loader2 } from "lucide-react";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { GitBranch, Loader2 } from 'lucide-react';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
 
 interface CreatedWorktreeInfo {
   path: string;
@@ -33,13 +32,13 @@ export function CreateWorktreeDialog({
   projectPath,
   onCreated,
 }: CreateWorktreeDialogProps) {
-  const [branchName, setBranchName] = useState("");
+  const [branchName, setBranchName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreate = async () => {
     if (!branchName.trim()) {
-      setError("Branch name is required");
+      setError('Branch name is required');
       return;
     }
 
@@ -47,7 +46,7 @@ export function CreateWorktreeDialog({
     const validBranchRegex = /^[a-zA-Z0-9._/-]+$/;
     if (!validBranchRegex.test(branchName)) {
       setError(
-        "Invalid branch name. Use only letters, numbers, dots, underscores, hyphens, and slashes."
+        'Invalid branch name. Use only letters, numbers, dots, underscores, hyphens, and slashes.'
       );
       return;
     }
@@ -58,7 +57,7 @@ export function CreateWorktreeDialog({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.create) {
-        setError("Worktree API not available");
+        setError('Worktree API not available');
         return;
       }
       const result = await api.worktree.create(projectPath, branchName);
@@ -68,25 +67,30 @@ export function CreateWorktreeDialog({
           `Worktree created for branch "${result.worktree.branch}"`,
           {
             description: result.worktree.isNew
-              ? "New branch created"
-              : "Using existing branch",
+              ? 'New branch created'
+              : 'Using existing branch',
           }
         );
-        onCreated({ path: result.worktree.path, branch: result.worktree.branch });
+        onCreated({
+          path: result.worktree.path,
+          branch: result.worktree.branch,
+        });
         onOpenChange(false);
-        setBranchName("");
+        setBranchName('');
       } else {
-        setError(result.error || "Failed to create worktree");
+        setError(result.error || 'Failed to create worktree');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create worktree");
+      setError(
+        err instanceof Error ? err.message : 'Failed to create worktree'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isLoading && branchName.trim()) {
+    if (e.key === 'Enter' && !isLoading && branchName.trim()) {
       handleCreate();
     }
   };
@@ -133,7 +137,9 @@ export function CreateWorktreeDialog({
                 <code className="bg-muted px-1 rounded">fix/login-bug</code>
               </li>
               <li>
-                <code className="bg-muted px-1 rounded">hotfix/security-patch</code>
+                <code className="bg-muted px-1 rounded">
+                  hotfix/security-patch
+                </code>
               </li>
             </ul>
           </div>

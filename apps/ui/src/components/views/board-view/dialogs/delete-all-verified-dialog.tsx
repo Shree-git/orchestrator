@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -6,9 +5,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 interface DeleteAllVerifiedDialogProps {
   open: boolean;
@@ -42,7 +41,11 @@ export function DeleteAllVerifiedDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} data-testid="confirm-delete-all-verified">
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            data-testid="confirm-delete-all-verified"
+          >
             <Trash2 className="w-4 h-4 mr-2" />
             Delete All
           </Button>

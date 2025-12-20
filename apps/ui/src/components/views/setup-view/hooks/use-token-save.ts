@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
-import { toast } from "sonner";
-import { getElectronAPI } from "@/lib/electron";
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
+import { getElectronAPI } from '@/lib/electron';
 
 interface UseTokenSaveOptions {
   provider: string; // e.g., "anthropic_oauth_token", "anthropic", "openai"
@@ -13,7 +13,7 @@ export function useTokenSave({ provider, onSuccess }: UseTokenSaveOptions) {
   const saveToken = useCallback(
     async (tokenValue: string) => {
       if (!tokenValue.trim()) {
-        toast.error("Please enter a valid token");
+        toast.error('Please enter a valid token');
         return false;
       }
 
@@ -27,25 +27,25 @@ export function useTokenSave({ provider, onSuccess }: UseTokenSaveOptions) {
           console.log(`[Token Save] Store result for ${provider}:`, result);
 
           if (result.success) {
-            const tokenType = provider.includes("oauth")
-              ? "subscription token"
-              : "API key";
+            const tokenType = provider.includes('oauth')
+              ? 'subscription token'
+              : 'API key';
             toast.success(`${tokenType} saved successfully`);
             onSuccess?.();
             return true;
           } else {
-            toast.error("Failed to save token", { description: result.error });
+            toast.error('Failed to save token', { description: result.error });
             return false;
           }
         } else {
           // Web mode fallback - just show success
-          toast.success("Token saved");
+          toast.success('Token saved');
           onSuccess?.();
           return true;
         }
       } catch (error) {
         console.error(`[Token Save] Failed to save ${provider}:`, error);
-        toast.error("Failed to save token");
+        toast.error('Failed to save token');
         return false;
       } finally {
         setIsSaving(false);

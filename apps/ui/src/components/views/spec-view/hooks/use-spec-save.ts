@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
+import { useState } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
 
 export function useSpecSave() {
   const { currentProject, appSpec, setAppSpec } = useAppStore();
@@ -19,7 +19,7 @@ export function useSpecSave() {
       );
       setHasChanges(false);
     } catch (error) {
-      console.error("Failed to save spec:", error);
+      console.error('Failed to save spec:', error);
     } finally {
       setIsSaving(false);
     }

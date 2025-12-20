@@ -3,12 +3,12 @@
  * POST /sessions endpoint - Create a new terminal session
  */
 
-import type { Request, Response } from "express";
-import { getTerminalService } from "../../../services/terminal-service.js";
-import { getErrorMessage, logError } from "../common.js";
-import { createLogger } from "../../../lib/logger.js";
+import type { Request, Response } from 'express';
+import { getTerminalService } from '../../../services/terminal-service.js';
+import { getErrorMessage, logError } from '../common.js';
+import { createLogger } from '../../../lib/logger.js';
 
-const logger = createLogger("Terminal");
+const logger = createLogger('Terminal');
 
 export function createSessionsListHandler() {
   return (_req: Request, res: Response): void => {
@@ -44,10 +44,10 @@ export function createSessionsCreateHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Create terminal session failed");
+      logError(error, 'Create terminal session failed');
       res.status(500).json({
         success: false,
-        error: "Failed to create terminal session",
+        error: 'Failed to create terminal session',
         details: getErrorMessage(error),
       });
     }

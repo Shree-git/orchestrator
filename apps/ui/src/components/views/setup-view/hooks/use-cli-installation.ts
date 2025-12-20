@@ -1,10 +1,12 @@
-import { useState, useCallback } from "react";
-import { toast } from "sonner";
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 
 interface UseCliInstallationOptions {
-  cliType: "claude";
+  cliType: 'claude';
   installApi: () => Promise<any>;
-  onProgressEvent?: (callback: (progress: any) => void) => (() => void) | undefined;
+  onProgressEvent?: (
+    callback: (progress: any) => void
+  ) => (() => void) | undefined;
   onSuccess?: () => void;
   getStoreState?: () => any;
 }
@@ -29,20 +31,22 @@ export function useCliInstallation({
       let unsubscribe: (() => void) | undefined;
 
       if (onProgressEvent) {
-        unsubscribe = onProgressEvent((progress: { cli?: string; data?: string; type?: string }) => {
-          if (progress.cli === cliType) {
-            setInstallProgress((prev) => ({
-              output: [...prev.output, progress.data || progress.type || ""],
-            }));
+        unsubscribe = onProgressEvent(
+          (progress: { cli?: string; data?: string; type?: string }) => {
+            if (progress.cli === cliType) {
+              setInstallProgress((prev) => ({
+                output: [...prev.output, progress.data || progress.type || ''],
+              }));
+            }
           }
-        });
+        );
       }
 
       const result = await installApi();
       unsubscribe?.();
 
       if (result.success) {
-        if (cliType === "claude" && onSuccess && getStoreState) {
+        if (cliType === 'claude' && onSuccess && getStoreState) {
           // Claude-specific: retry logic to detect installation
           let retries = 5;
           let detected = false;
@@ -56,19 +60,23 @@ export function useCliInstallation({
             const currentStatus = getStoreState();
             if (currentStatus?.installed) {
               detected = true;
-              toast.success(`${cliType} CLI installed and detected successfully`);
+              toast.success(
+                `${cliType} CLI installed and detected successfully`
+              );
               break;
             }
 
             if (i < retries - 1) {
-              await new Promise((resolve) => setTimeout(resolve, 2000 + i * 500));
+              await new Promise((resolve) =>
+                setTimeout(resolve, 2000 + i * 500)
+              );
             }
           }
 
           if (!detected) {
             toast.success(`${cliType} CLI installation completed`, {
               description:
-                "The CLI was installed but may need a terminal restart to be detected. You can continue with authentication if you have a token.",
+                'The CLI was installed but may need a terminal restart to be detected. You can continue with authentication if you have a token.',
               duration: 7000,
             });
           }
@@ -77,11 +85,11 @@ export function useCliInstallation({
           onSuccess?.();
         }
       } else {
-        toast.error("Installation failed", { description: result.error });
+        toast.error('Installation failed', { description: result.error });
       }
     } catch (error) {
       console.error(`Failed to install ${cliType}:`, error);
-      toast.error("Installation failed");
+      toast.error('Installation failed');
     } finally {
       setIsInstalling(false);
     }

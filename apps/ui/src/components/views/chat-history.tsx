@@ -1,8 +1,7 @@
-
-import { useState } from "react";
-import { useAppStore } from "@/store/app-store";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Plus,
   MessageSquare,
@@ -12,16 +11,16 @@ import {
   Search,
   ChevronLeft,
   ArchiveRestore,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 export function ChatHistory() {
   const {
@@ -37,7 +36,7 @@ export function ChatHistory() {
     setChatHistoryOpen,
   } = useAppStore();
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
 
   if (!currentProject) {
@@ -85,7 +84,7 @@ export function ChatHistory() {
 
   const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("Are you sure you want to delete this chat session?")) {
+    if (confirm('Are you sure you want to delete this chat session?')) {
       deleteChatSession(sessionId);
     }
   };
@@ -93,8 +92,8 @@ export function ChatHistory() {
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-zinc-950/50 backdrop-blur-md border-r border-white/10 transition-all duration-200",
-        chatHistoryOpen ? "w-80" : "w-0 overflow-hidden"
+        'flex flex-col h-full bg-zinc-950/50 backdrop-blur-md border-r border-white/10 transition-all duration-200',
+        chatHistoryOpen ? 'w-80' : 'w-0 overflow-hidden'
       )}
     >
       {chatHistoryOpen && (
@@ -152,7 +151,7 @@ export function ChatHistory() {
               ) : (
                 <Archive className="w-4 h-4" />
               )}
-              {showArchived ? "Show Active" : "Show Archived"}
+              {showArchived ? 'Show Active' : 'Show Archived'}
               {showArchived && (
                 <Badge variant="outline" className="ml-auto">
                   {projectSessions.filter((s) => s.archived).length}
@@ -179,8 +178,8 @@ export function ChatHistory() {
                   <div
                     key={session.id}
                     className={cn(
-                      "flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors group",
-                      currentChatSession?.id === session.id && "bg-accent"
+                      'flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors group',
+                      currentChatSession?.id === session.id && 'bg-accent'
                     )}
                     onClick={() => handleSelectSession(session)}
                   >

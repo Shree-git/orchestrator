@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { GripVertical, Lock, Pencil, Trash2, Brain } from "lucide-react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import type { AIProfile } from "@/store/app-store";
-import { PROFILE_ICONS } from "../constants";
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { GripVertical, Lock, Pencil, Trash2, Brain } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import type { AIProfile } from '@/store/app-store';
+import { PROFILE_ICONS } from '../constants';
 
 interface SortableProfileCardProps {
   profile: AIProfile;
@@ -39,11 +39,11 @@ export function SortableProfileCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex items-start gap-4 p-4 rounded-xl border bg-card transition-all",
-        isDragging && "shadow-lg",
+        'group relative flex items-start gap-4 p-4 rounded-xl border bg-card transition-all',
+        isDragging && 'shadow-lg',
         profile.isBuiltIn
-          ? "border-border/50"
-          : "border-border hover:border-primary/50 hover:shadow-sm"
+          ? 'border-border/50'
+          : 'border-border hover:border-primary/50 hover:shadow-sm'
       )}
       data-testid={`profile-card-${profile.id}`}
     >
@@ -60,12 +60,8 @@ export function SortableProfileCard({
       </button>
 
       {/* Icon */}
-      <div
-        className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10"
-      >
-        {IconComponent && (
-          <IconComponent className="w-5 h-5 text-primary" />
-        )}
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10">
+        {IconComponent && <IconComponent className="w-5 h-5 text-primary" />}
       </div>
 
       {/* Content */}
@@ -83,12 +79,10 @@ export function SortableProfileCard({
           {profile.description}
         </p>
         <div className="flex items-center gap-2 mt-2 flex-wrap">
-          <span
-            className="text-xs px-2 py-0.5 rounded-full border border-primary/30 text-primary bg-primary/10"
-          >
+          <span className="text-xs px-2 py-0.5 rounded-full border border-primary/30 text-primary bg-primary/10">
             {profile.model}
           </span>
-          {profile.thinkingLevel !== "none" && (
+          {profile.thinkingLevel !== 'none' && (
             <span className="text-xs px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10">
               {profile.thinkingLevel}
             </span>
@@ -124,4 +118,3 @@ export function SortableProfileCard({
     </div>
   );
 }
-

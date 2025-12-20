@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
-import { GitBranchPlus, Loader2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
+import { GitBranchPlus, Loader2 } from 'lucide-react';
 
 interface WorktreeInfo {
   path: string;
@@ -36,14 +35,14 @@ export function CreateBranchDialog({
   worktree,
   onCreated,
 }: CreateBranchDialogProps) {
-  const [branchName, setBranchName] = useState("");
+  const [branchName, setBranchName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Reset state when dialog opens/closes
   useEffect(() => {
     if (open) {
-      setBranchName("");
+      setBranchName('');
       setError(null);
     }
   }, [open]);
@@ -54,7 +53,7 @@ export function CreateBranchDialog({
     // Basic validation
     const invalidChars = /[\s~^:?*[\]\\]/;
     if (invalidChars.test(branchName)) {
-      setError("Branch name contains invalid characters");
+      setError('Branch name contains invalid characters');
       return;
     }
 
@@ -64,22 +63,25 @@ export function CreateBranchDialog({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.checkoutBranch) {
-        toast.error("Branch API not available");
+        toast.error('Branch API not available');
         return;
       }
 
-      const result = await api.worktree.checkoutBranch(worktree.path, branchName.trim());
+      const result = await api.worktree.checkoutBranch(
+        worktree.path,
+        branchName.trim()
+      );
 
       if (result.success && result.result) {
         toast.success(result.result.message);
         onCreated();
         onOpenChange(false);
       } else {
-        setError(result.error || "Failed to create branch");
+        setError(result.error || 'Failed to create branch');
       }
     } catch (err) {
-      console.error("Create branch failed:", err);
-      setError("Failed to create branch");
+      console.error('Create branch failed:', err);
+      setError('Failed to create branch');
     } finally {
       setIsCreating(false);
     }
@@ -94,7 +96,10 @@ export function CreateBranchDialog({
             Create New Branch
           </DialogTitle>
           <DialogDescription>
-            Create a new branch from <span className="font-mono text-foreground">{worktree?.branch || "current branch"}</span>
+            Create a new branch from{' '}
+            <span className="font-mono text-foreground">
+              {worktree?.branch || 'current branch'}
+            </span>
           </DialogDescription>
         </DialogHeader>
 
@@ -110,16 +115,14 @@ export function CreateBranchDialog({
                 setError(null);
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && branchName.trim() && !isCreating) {
+                if (e.key === 'Enter' && branchName.trim() && !isCreating) {
                   handleCreate();
                 }
               }}
               disabled={isCreating}
               autoFocus
             />
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
         </div>
 
@@ -141,7 +144,7 @@ export function CreateBranchDialog({
                 Creating...
               </>
             ) : (
-              "Create Branch"
+              'Create Branch'
             )}
           </Button>
         </DialogFooter>

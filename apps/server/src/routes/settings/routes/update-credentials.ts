@@ -2,10 +2,10 @@
  * PUT /api/settings/credentials - Update credentials
  */
 
-import type { Request, Response } from "express";
-import type { SettingsService } from "../../../services/settings-service.js";
-import type { Credentials } from "../../../types/settings.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import type { SettingsService } from '../../../services/settings-service.js';
+import type { Credentials } from '../../../types/settings.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createUpdateCredentialsHandler(
   settingsService: SettingsService
@@ -14,10 +14,10 @@ export function createUpdateCredentialsHandler(
     try {
       const updates = req.body as Partial<Credentials>;
 
-      if (!updates || typeof updates !== "object") {
+      if (!updates || typeof updates !== 'object') {
         res.status(400).json({
           success: false,
-          error: "Invalid request body - expected credentials object",
+          error: 'Invalid request body - expected credentials object',
         });
         return;
       }
@@ -32,7 +32,7 @@ export function createUpdateCredentialsHandler(
         credentials: masked,
       });
     } catch (error) {
-      logError(error, "Update credentials failed");
+      logError(error, 'Update credentials failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

@@ -1,9 +1,9 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import type { AgentModel } from "@/store/app-store"
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import type { AgentModel } from '@/store/app-store';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -19,9 +19,9 @@ export function modelSupportsThinking(model?: AgentModel | string): boolean {
  */
 export function getModelDisplayName(model: AgentModel | string): string {
   const displayNames: Record<string, string> = {
-    haiku: "Claude Haiku",
-    sonnet: "Claude Sonnet",
-    opus: "Claude Opus",
+    haiku: 'Claude Haiku',
+    sonnet: 'Claude Sonnet',
+    opus: 'Claude Opus',
   };
   return displayNames[model] || model;
 }
@@ -29,7 +29,10 @@ export function getModelDisplayName(model: AgentModel | string): string {
 /**
  * Truncate a description string with ellipsis
  */
-export function truncateDescription(description: string, maxLength = 50): string {
+export function truncateDescription(
+  description: string,
+  maxLength = 50
+): string {
   if (description.length <= maxLength) {
     return description;
   }
@@ -41,14 +44,17 @@ export function truncateDescription(description: string, maxLength = 50): string
  * This is important for cross-platform compatibility (Windows uses backslashes).
  */
 export function normalizePath(p: string): string {
-  return p.replace(/\\/g, "/");
+  return p.replace(/\\/g, '/');
 }
 
 /**
  * Compare two paths for equality, handling cross-platform differences.
  * Normalizes both paths to forward slashes before comparison.
  */
-export function pathsEqual(p1: string | undefined | null, p2: string | undefined | null): boolean {
+export function pathsEqual(
+  p1: string | undefined | null,
+  p2: string | undefined | null
+): boolean {
   if (!p1 || !p2) return p1 === p2;
   return normalizePath(p1) === normalizePath(p2);
 }

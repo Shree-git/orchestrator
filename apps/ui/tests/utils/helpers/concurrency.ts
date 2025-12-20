@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Get the concurrency slider container
@@ -37,7 +37,7 @@ export async function setConcurrencyValue(
   const sliderBounds = await slider.boundingBox();
 
   if (!sliderBounds) {
-    throw new Error("Concurrency slider not found or not visible");
+    throw new Error('Concurrency slider not found or not visible');
   }
 
   // Calculate position for target value

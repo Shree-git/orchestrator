@@ -1,9 +1,8 @@
-
-import { useState, useEffect, useCallback } from "react";
-import { getElectronAPI } from "@/lib/electron";
-import { normalizePath } from "@/lib/utils";
-import { toast } from "sonner";
-import type { DevServerInfo, WorktreeInfo } from "../types";
+import { useState, useEffect, useCallback } from 'react';
+import { getElectronAPI } from '@/lib/electron';
+import { normalizePath } from '@/lib/utils';
+import { toast } from 'sonner';
+import type { DevServerInfo, WorktreeInfo } from '../types';
 
 interface UseDevServersOptions {
   projectPath: string;
@@ -11,9 +10,9 @@ interface UseDevServersOptions {
 
 export function useDevServers({ projectPath }: UseDevServersOptions) {
   const [isStartingDevServer, setIsStartingDevServer] = useState(false);
-  const [runningDevServers, setRunningDevServers] = useState<Map<string, DevServerInfo>>(
-    new Map()
-  );
+  const [runningDevServers, setRunningDevServers] = useState<
+    Map<string, DevServerInfo>
+  >(new Map());
 
   const fetchDevServers = useCallback(async () => {
     try {
@@ -30,7 +29,7 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
         setRunningDevServers(serversMap);
       }
     } catch (error) {
-      console.error("Failed to fetch dev servers:", error);
+      console.error('Failed to fetch dev servers:', error);
     }
   }, []);
 
@@ -54,12 +53,15 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
       try {
         const api = getElectronAPI();
         if (!api?.worktree?.startDevServer) {
-          toast.error("Start dev server API not available");
+          toast.error('Start dev server API not available');
           return;
         }
 
         const targetPath = worktree.isMain ? projectPath : worktree.path;
-        const result = await api.worktree.startDevServer(projectPath, targetPath);
+        const result = await api.worktree.startDevServer(
+          projectPath,
+          targetPath
+        );
 
         if (result.success && result.result) {
           setRunningDevServers((prev) => {
@@ -73,11 +75,11 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
           });
           toast.success(`Dev server started on port ${result.result.port}`);
         } else {
-          toast.error(result.error || "Failed to start dev server");
+          toast.error(result.error || 'Failed to start dev server');
         }
       } catch (error) {
-        console.error("Start dev server failed:", error);
-        toast.error("Failed to start dev server");
+        console.error('Start dev server failed:', error);
+        toast.error('Failed to start dev server');
       } finally {
         setIsStartingDevServer(false);
       }
@@ -90,7 +92,7 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
       try {
         const api = getElectronAPI();
         if (!api?.worktree?.stopDevServer) {
-          toast.error("Stop dev server API not available");
+          toast.error('Stop dev server API not available');
           return;
         }
 
@@ -103,13 +105,13 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
             next.delete(normalizePath(targetPath));
             return next;
           });
-          toast.success(result.result?.message || "Dev server stopped");
+          toast.success(result.result?.message || 'Dev server stopped');
         } else {
-          toast.error(result.error || "Failed to stop dev server");
+          toast.error(result.error || 'Failed to stop dev server');
         }
       } catch (error) {
-        console.error("Stop dev server failed:", error);
-        toast.error("Failed to stop dev server");
+        console.error('Stop dev server failed:', error);
+        toast.error('Failed to stop dev server');
       }
     },
     [projectPath]
@@ -120,7 +122,7 @@ export function useDevServers({ projectPath }: UseDevServersOptions) {
       const targetPath = worktree.isMain ? projectPath : worktree.path;
       const serverInfo = runningDevServers.get(targetPath);
       if (serverInfo) {
-        window.open(serverInfo.url, "_blank");
+        window.open(serverInfo.url, '_blank');
       }
     },
     [projectPath, runningDevServers]

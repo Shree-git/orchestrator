@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from 'react';
 
 const TOTAL_DURATION = 2300; // Total animation duration in ms (tightened from 4000)
 const LOGO_ENTER_DURATION = 500; // Tightened from 1200
@@ -36,8 +36,8 @@ function generateParticles(count: number): Particle[] {
 }
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"enter" | "hold" | "exit" | "done">(
-    "enter"
+  const [phase, setPhase] = useState<'enter' | 'hold' | 'exit' | 'done'>(
+    'enter'
   );
 
   const particles = useMemo(() => generateParticles(50), []);
@@ -46,11 +46,11 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
     const timers: NodeJS.Timeout[] = [];
 
     // Phase transitions
-    timers.push(setTimeout(() => setPhase("hold"), LOGO_ENTER_DURATION));
-    timers.push(setTimeout(() => setPhase("exit"), EXIT_START));
+    timers.push(setTimeout(() => setPhase('hold'), LOGO_ENTER_DURATION));
+    timers.push(setTimeout(() => setPhase('exit'), EXIT_START));
     timers.push(
       setTimeout(() => {
-        setPhase("done");
+        setPhase('done');
         onComplete();
       }, TOTAL_DURATION)
     );
@@ -58,7 +58,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-  if (phase === "done") return null;
+  if (phase === 'done') return null;
 
   return (
     <div
@@ -66,10 +66,10 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         fixed inset-0 z-[9999] flex items-center justify-center
         bg-background
         transition-opacity duration-500 ease-out
-        ${phase === "exit" ? "opacity-0" : "opacity-100"}
+        ${phase === 'exit' ? 'opacity-0' : 'opacity-100'}
       `}
       style={{
-        pointerEvents: phase === "exit" ? "none" : "auto",
+        pointerEvents: phase === 'exit' ? 'none' : 'auto',
       }}
     >
       <style>{`
@@ -92,14 +92,14 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         className="absolute inset-0 opacity-30"
         style={{
           background:
-            "radial-gradient(circle at center, var(--brand-500) 0%, transparent 70%)",
+            'radial-gradient(circle at center, var(--brand-500) 0%, transparent 70%)',
         }}
       />
 
       {/* Particle container 1 - Clockwise */}
       <div
         className="absolute inset-0 flex items-center justify-center overflow-hidden"
-        style={{ animation: "spin-slow 60s linear infinite" }}
+        style={{ animation: 'spin-slow 60s linear infinite' }}
       >
         {particles.slice(0, 25).map((particle) => (
           <div
@@ -107,15 +107,15 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
             className="absolute"
             style={{
               transform:
-                phase === "exit"
+                phase === 'exit'
                   ? `translate(${Math.cos((particle.angle * Math.PI) / 180) * particle.distance}px, ${Math.sin((particle.angle * Math.PI) / 180) * particle.distance}px)`
                   : `translate(${particle.x}px, ${particle.y}px)`,
               transition:
-                phase === "enter"
+                phase === 'enter'
                   ? `all 600ms ease-out ${PARTICLES_ENTER_DELAY + particle.delay}ms`
-                  : phase === "exit"
+                  : phase === 'exit'
                     ? `all 800ms cubic-bezier(0.4, 0, 1, 1) ${particle.delay * 0.3}ms`
-                    : "all 300ms ease-out",
+                    : 'all 300ms ease-out',
             }}
           >
             <div
@@ -126,14 +126,14 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
                 background: `linear-gradient(135deg, var(--brand-400), var(--brand-600))`,
                 boxShadow: `0 0 ${particle.size * 2}px var(--brand-500)`,
                 opacity:
-                  phase === "enter"
+                  phase === 'enter'
                     ? 0
-                    : phase === "hold"
+                    : phase === 'hold'
                       ? particle.opacity
                       : 0,
-                transform: phase === "exit" ? "scale(0)" : "scale(1)",
+                transform: phase === 'exit' ? 'scale(0)' : 'scale(1)',
                 animation: `float ${particle.floatDuration}ms ease-in-out infinite`,
-                transition: "opacity 300ms ease-out, transform 300ms ease-out",
+                transition: 'opacity 300ms ease-out, transform 300ms ease-out',
               }}
             />
           </div>
@@ -143,7 +143,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
       {/* Particle container 2 - Counter-Clockwise */}
       <div
         className="absolute inset-0 flex items-center justify-center overflow-hidden"
-        style={{ animation: "spin-slow-reverse 75s linear infinite" }}
+        style={{ animation: 'spin-slow-reverse 75s linear infinite' }}
       >
         {particles.slice(25).map((particle) => (
           <div
@@ -151,15 +151,15 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
             className="absolute"
             style={{
               transform:
-                phase === "exit"
+                phase === 'exit'
                   ? `translate(${Math.cos((particle.angle * Math.PI) / 180) * particle.distance}px, ${Math.sin((particle.angle * Math.PI) / 180) * particle.distance}px)`
                   : `translate(${particle.x}px, ${particle.y}px)`,
               transition:
-                phase === "enter"
+                phase === 'enter'
                   ? `all 600ms ease-out ${PARTICLES_ENTER_DELAY + particle.delay}ms`
-                  : phase === "exit"
+                  : phase === 'exit'
                     ? `all 800ms cubic-bezier(0.4, 0, 1, 1) ${particle.delay * 0.3}ms`
-                    : "all 300ms ease-out",
+                    : 'all 300ms ease-out',
             }}
           >
             <div
@@ -170,15 +170,15 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
                 background: `linear-gradient(135deg, var(--brand-400), var(--brand-600))`,
                 boxShadow: `0 0 ${particle.size * 2}px var(--brand-500)`,
                 opacity:
-                  phase === "enter"
+                  phase === 'enter'
                     ? 0
-                    : phase === "hold"
+                    : phase === 'hold'
                       ? particle.opacity
                       : 0,
-                transform: phase === "exit" ? "scale(0)" : "scale(1)",
+                transform: phase === 'exit' ? 'scale(0)' : 'scale(1)',
                 animation: `float ${particle.floatDuration}ms ease-in-out infinite`,
                 animationDelay: `${particle.delay}ms`,
-                transition: "opacity 300ms ease-out, transform 300ms ease-out",
+                transition: 'opacity 300ms ease-out, transform 300ms ease-out',
               }}
             />
           </div>
@@ -189,19 +189,19 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
       <div
         className="relative z-10"
         style={{
-          opacity: phase === "enter" ? 0 : phase === "exit" ? 0 : 1,
+          opacity: phase === 'enter' ? 0 : phase === 'exit' ? 0 : 1,
           transform:
-            phase === "enter"
-              ? "scale(0.3) rotate(-20deg)"
-              : phase === "exit"
-                ? "scale(2.5) translateY(-100px)"
-                : "scale(1) rotate(0deg)",
+            phase === 'enter'
+              ? 'scale(0.3) rotate(-20deg)'
+              : phase === 'exit'
+                ? 'scale(2.5) translateY(-100px)'
+                : 'scale(1) rotate(0deg)',
           transition:
-            phase === "enter"
+            phase === 'enter'
               ? `all ${LOGO_ENTER_DURATION}ms cubic-bezier(0.34, 1.56, 0.64, 1)`
-              : phase === "exit"
-                ? "all 600ms cubic-bezier(0.4, 0, 1, 1)"
-                : "all 300ms ease-out",
+              : phase === 'exit'
+                ? 'all 600ms cubic-bezier(0.4, 0, 1, 1)'
+                : 'all 300ms ease-out',
         }}
       >
         {/* Glow effect behind logo */}
@@ -209,10 +209,10 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
           className="absolute inset-0 blur-3xl"
           style={{
             background:
-              "radial-gradient(circle, var(--brand-500) 0%, transparent 70%)",
-            transform: "scale(2.5)",
-            opacity: phase === "hold" ? 0.6 : 0,
-            transition: "opacity 500ms ease-out",
+              'radial-gradient(circle, var(--brand-500) 0%, transparent 70%)',
+            transform: 'scale(2.5)',
+            opacity: phase === 'hold' ? 0.6 : 0,
+            transition: 'opacity 500ms ease-out',
           }}
         />
 
@@ -226,7 +226,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
           style={{
             width: 120,
             height: 120,
-            filter: "drop-shadow(0 0 30px var(--brand-500))",
+            filter: 'drop-shadow(0 0 30px var(--brand-500))',
           }}
         >
           <defs>
@@ -238,8 +238,8 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
               y2="256"
               gradientUnits="userSpaceOnUse"
             >
-              <stop offset="0%" style={{ stopColor: "var(--brand-400)" }} />
-              <stop offset="100%" style={{ stopColor: "var(--brand-600)" }} />
+              <stop offset="0%" style={{ stopColor: 'var(--brand-400)' }} />
+              <stop offset="100%" style={{ stopColor: 'var(--brand-600)' }} />
             </linearGradient>
             <filter
               id="splash-shadow"
@@ -284,20 +284,20 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
       <div
         className="absolute flex items-center gap-1"
         style={{
-          top: "calc(50% + 80px)",
-          opacity: phase === "enter" ? 0 : phase === "exit" ? 0 : 1,
+          top: 'calc(50% + 80px)',
+          opacity: phase === 'enter' ? 0 : phase === 'exit' ? 0 : 1,
           transform:
-            phase === "enter"
-              ? "translateY(20px)"
-              : phase === "exit"
-                ? "translateY(-30px) scale(1.2)"
-                : "translateY(0)",
+            phase === 'enter'
+              ? 'translateY(20px)'
+              : phase === 'exit'
+                ? 'translateY(-30px) scale(1.2)'
+                : 'translateY(0)',
           transition:
-            phase === "enter"
+            phase === 'enter'
               ? `all 600ms ease-out ${LOGO_ENTER_DURATION - 200}ms`
-              : phase === "exit"
-                ? "all 500ms cubic-bezier(0.4, 0, 1, 1)"
-                : "all 300ms ease-out",
+              : phase === 'exit'
+                ? 'all 500ms cubic-bezier(0.4, 0, 1, 1)'
+                : 'all 300ms ease-out',
         }}
       >
         <span className="font-bold text-foreground text-4xl tracking-tight leading-none">

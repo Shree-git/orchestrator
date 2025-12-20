@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { EventEmitter } from "events";
-import path from "path";
-import os from "os";
-import fs from "fs/promises";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { EventEmitter } from 'events';
+import path from 'path';
+import os from 'os';
+import fs from 'fs/promises';
 
 // Mock child_process
-vi.mock("child_process", () => ({
+vi.mock('child_process', () => ({
   spawn: vi.fn(),
   execSync: vi.fn(),
 }));
 
 // Mock fs existsSync
-vi.mock("fs", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("fs")>();
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs')>();
   return {
     ...actual,
     existsSync: vi.fn(),
@@ -20,18 +20,18 @@ vi.mock("fs", async (importOriginal) => {
 });
 
 // Mock net
-vi.mock("net", () => ({
+vi.mock('net', () => ({
   default: {
     createServer: vi.fn(),
   },
   createServer: vi.fn(),
 }));
 
-import { spawn, execSync } from "child_process";
-import { existsSync } from "fs";
-import net from "net";
+import { spawn, execSync } from 'child_process';
+import { existsSync } from 'fs';
+import net from 'net';
 
-describe("dev-server-service.ts", () => {
+describe('dev-server-service.ts', () => {
   let testDir: string;
 
   beforeEach(async () => {
@@ -46,15 +46,17 @@ describe("dev-server-service.ts", () => {
 
     // Default mock for net.createServer - port available
     const mockServer = new EventEmitter() as any;
-    mockServer.listen = vi.fn().mockImplementation((port: number, host: string) => {
-      process.nextTick(() => mockServer.emit("listening"));
-    });
+    mockServer.listen = vi
+      .fn()
+      .mockImplementation((port: number, host: string) => {
+        process.nextTick(() => mockServer.emit('listening'));
+      });
     mockServer.close = vi.fn();
     vi.mocked(net.createServer).mockReturnValue(mockServer);
 
     // Default mock for execSync - no process on port
     vi.mocked(execSync).mockImplementation(() => {
-      throw new Error("No process found");
+      throw new Error('No process found');
     });
   });
 
@@ -66,11 +68,10 @@ describe("dev-server-service.ts", () => {
     }
   });
 
-  describe("getDevServerService", () => {
-    it("should return a singleton instance", async () => {
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+  describe('getDevServerService', () => {
+    it('should return a singleton instance', async () => {
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
 
       const instance1 = getDevServerService();
       const instance2 = getDevServerService();
@@ -79,148 +80,141 @@ describe("dev-server-service.ts", () => {
     });
   });
 
-  describe("startDevServer", () => {
-    it("should return error if worktree path does not exist", async () => {
+  describe('startDevServer', () => {
+    it('should return error if worktree path does not exist', async () => {
       vi.mocked(existsSync).mockReturnValue(false);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       const result = await service.startDevServer(
-        "/project",
-        "/nonexistent/worktree"
+        '/project',
+        '/nonexistent/worktree'
       );
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("does not exist");
+      expect(result.error).toContain('does not exist');
     });
 
-    it("should return error if no package.json found", async () => {
+    it('should return error if no package.json found', async () => {
       vi.mocked(existsSync).mockImplementation((p: any) => {
-        if (p.includes("package.json")) return false;
+        if (p.includes('package.json')) return false;
         return true;
       });
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       const result = await service.startDevServer(testDir, testDir);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("No package.json found");
+      expect(result.error).toContain('No package.json found');
     });
 
-    it("should detect npm as package manager with package-lock.json", async () => {
+    it('should detect npm as package manager with package-lock.json', async () => {
       vi.mocked(existsSync).mockImplementation((p: any) => {
-        if (p.includes("bun.lockb")) return false;
-        if (p.includes("pnpm-lock.yaml")) return false;
-        if (p.includes("yarn.lock")) return false;
-        if (p.includes("package-lock.json")) return true;
-        if (p.includes("package.json")) return true;
+        if (p.includes('bun.lockb')) return false;
+        if (p.includes('pnpm-lock.yaml')) return false;
+        if (p.includes('yarn.lock')) return false;
+        if (p.includes('package-lock.json')) return true;
+        if (p.includes('package.json')) return true;
         return true;
       });
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
 
       expect(spawn).toHaveBeenCalledWith(
-        "npm",
-        ["run", "dev"],
+        'npm',
+        ['run', 'dev'],
         expect.any(Object)
       );
     });
 
-    it("should detect yarn as package manager with yarn.lock", async () => {
+    it('should detect yarn as package manager with yarn.lock', async () => {
       vi.mocked(existsSync).mockImplementation((p: any) => {
-        if (p.includes("bun.lockb")) return false;
-        if (p.includes("pnpm-lock.yaml")) return false;
-        if (p.includes("yarn.lock")) return true;
-        if (p.includes("package.json")) return true;
+        if (p.includes('bun.lockb')) return false;
+        if (p.includes('pnpm-lock.yaml')) return false;
+        if (p.includes('yarn.lock')) return true;
+        if (p.includes('package.json')) return true;
         return true;
       });
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
 
-      expect(spawn).toHaveBeenCalledWith("yarn", ["dev"], expect.any(Object));
+      expect(spawn).toHaveBeenCalledWith('yarn', ['dev'], expect.any(Object));
     });
 
-    it("should detect pnpm as package manager with pnpm-lock.yaml", async () => {
+    it('should detect pnpm as package manager with pnpm-lock.yaml', async () => {
       vi.mocked(existsSync).mockImplementation((p: any) => {
-        if (p.includes("bun.lockb")) return false;
-        if (p.includes("pnpm-lock.yaml")) return true;
-        if (p.includes("package.json")) return true;
+        if (p.includes('bun.lockb')) return false;
+        if (p.includes('pnpm-lock.yaml')) return true;
+        if (p.includes('package.json')) return true;
         return true;
       });
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
-      const service = getDevServerService();
-
-      await service.startDevServer(testDir, testDir);
-
-      expect(spawn).toHaveBeenCalledWith(
-        "pnpm",
-        ["run", "dev"],
-        expect.any(Object)
-      );
-    });
-
-    it("should detect bun as package manager with bun.lockb", async () => {
-      vi.mocked(existsSync).mockImplementation((p: any) => {
-        if (p.includes("bun.lockb")) return true;
-        if (p.includes("package.json")) return true;
-        return true;
-      });
-
-      const mockProcess = createMockProcess();
-      vi.mocked(spawn).mockReturnValue(mockProcess as any);
-
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
 
       expect(spawn).toHaveBeenCalledWith(
-        "bun",
-        ["run", "dev"],
+        'pnpm',
+        ['run', 'dev'],
         expect.any(Object)
       );
     });
 
-    it("should return existing server info if already running", async () => {
+    it('should detect bun as package manager with bun.lockb', async () => {
+      vi.mocked(existsSync).mockImplementation((p: any) => {
+        if (p.includes('bun.lockb')) return true;
+        if (p.includes('package.json')) return true;
+        return true;
+      });
+
+      const mockProcess = createMockProcess();
+      vi.mocked(spawn).mockReturnValue(mockProcess as any);
+
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
+      const service = getDevServerService();
+
+      await service.startDevServer(testDir, testDir);
+
+      expect(spawn).toHaveBeenCalledWith(
+        'bun',
+        ['run', 'dev'],
+        expect.any(Object)
+      );
+    });
+
+    it('should return existing server info if already running', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       // Start first server
@@ -230,18 +224,17 @@ describe("dev-server-service.ts", () => {
       // Try to start again - should return existing
       const result2 = await service.startDevServer(testDir, testDir);
       expect(result2.success).toBe(true);
-      expect(result2.result?.message).toContain("already running");
+      expect(result2.result?.message).toContain('already running');
     });
 
-    it("should start dev server successfully", async () => {
+    it('should start dev server successfully', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       const result = await service.startDevServer(testDir, testDir);
@@ -249,32 +242,30 @@ describe("dev-server-service.ts", () => {
       expect(result.success).toBe(true);
       expect(result.result).toBeDefined();
       expect(result.result?.port).toBeGreaterThanOrEqual(3001);
-      expect(result.result?.url).toContain("http://localhost:");
+      expect(result.result?.url).toContain('http://localhost:');
     });
   });
 
-  describe("stopDevServer", () => {
-    it("should return success if server not found", async () => {
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+  describe('stopDevServer', () => {
+    it('should return success if server not found', async () => {
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
-      const result = await service.stopDevServer("/nonexistent/path");
+      const result = await service.stopDevServer('/nonexistent/path');
 
       expect(result.success).toBe(true);
-      expect(result.result?.message).toContain("already stopped");
+      expect(result.result?.message).toContain('already stopped');
     });
 
-    it("should stop a running server", async () => {
+    it('should stop a running server', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       // Start server
@@ -284,15 +275,14 @@ describe("dev-server-service.ts", () => {
       const result = await service.stopDevServer(testDir);
 
       expect(result.success).toBe(true);
-      expect(mockProcess.kill).toHaveBeenCalledWith("SIGTERM");
+      expect(mockProcess.kill).toHaveBeenCalledWith('SIGTERM');
     });
   });
 
-  describe("listDevServers", () => {
-    it("should return empty list when no servers running", async () => {
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+  describe('listDevServers', () => {
+    it('should return empty list when no servers running', async () => {
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       const result = service.listDevServers();
@@ -301,15 +291,14 @@ describe("dev-server-service.ts", () => {
       expect(result.result.servers).toEqual([]);
     });
 
-    it("should list running servers", async () => {
+    it('should list running servers', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
@@ -322,25 +311,23 @@ describe("dev-server-service.ts", () => {
     });
   });
 
-  describe("isRunning", () => {
-    it("should return false for non-running server", async () => {
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+  describe('isRunning', () => {
+    it('should return false for non-running server', async () => {
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
-      expect(service.isRunning("/some/path")).toBe(false);
+      expect(service.isRunning('/some/path')).toBe(false);
     });
 
-    it("should return true for running server", async () => {
+    it('should return true for running server', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
@@ -349,25 +336,23 @@ describe("dev-server-service.ts", () => {
     });
   });
 
-  describe("getServerInfo", () => {
-    it("should return undefined for non-running server", async () => {
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+  describe('getServerInfo', () => {
+    it('should return undefined for non-running server', async () => {
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
-      expect(service.getServerInfo("/some/path")).toBeUndefined();
+      expect(service.getServerInfo('/some/path')).toBeUndefined();
     });
 
-    it("should return info for running server", async () => {
+    it('should return info for running server', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
@@ -379,16 +364,15 @@ describe("dev-server-service.ts", () => {
     });
   });
 
-  describe("getAllocatedPorts", () => {
-    it("should return allocated ports", async () => {
+  describe('getAllocatedPorts', () => {
+    it('should return allocated ports', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);
@@ -399,16 +383,15 @@ describe("dev-server-service.ts", () => {
     });
   });
 
-  describe("stopAll", () => {
-    it("should stop all running servers", async () => {
+  describe('stopAll', () => {
+    it('should stop all running servers', async () => {
       vi.mocked(existsSync).mockReturnValue(true);
 
       const mockProcess = createMockProcess();
       vi.mocked(spawn).mockReturnValue(mockProcess as any);
 
-      const { getDevServerService } = await import(
-        "@/services/dev-server-service.js"
-      );
+      const { getDevServerService } =
+        await import('@/services/dev-server-service.js');
       const service = getDevServerService();
 
       await service.startDevServer(testDir, testDir);

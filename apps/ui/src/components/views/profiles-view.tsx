@@ -1,24 +1,20 @@
-
-import { useState, useMemo, useCallback } from "react";
-import {
-  useAppStore,
-  AIProfile,
-} from "@/store/app-store";
+import { useState, useMemo, useCallback } from 'react';
+import { useAppStore, AIProfile } from '@/store/app-store';
 import {
   useKeyboardShortcuts,
   useKeyboardShortcutsConfig,
   KeyboardShortcut,
-} from "@/hooks/use-keyboard-shortcuts";
+} from '@/hooks/use-keyboard-shortcuts';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Sparkles } from "lucide-react";
-import { toast } from "sonner";
-import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
+} from '@/components/ui/dialog';
+import { Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
 import {
   DndContext,
   DragEndEvent,
@@ -26,16 +22,16 @@ import {
   useSensor,
   useSensors,
   closestCenter,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+} from '@dnd-kit/sortable';
 import {
   SortableProfileCard,
   ProfileForm,
   ProfilesHeader,
-} from "./profiles-view/components";
+} from './profiles-view/components';
 
 export function ProfilesView() {
   const {
@@ -50,7 +46,9 @@ export function ProfilesView() {
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProfile, setEditingProfile] = useState<AIProfile | null>(null);
-  const [profileToDelete, setProfileToDelete] = useState<AIProfile | null>(null);
+  const [profileToDelete, setProfileToDelete] = useState<AIProfile | null>(
+    null
+  );
 
   // Sensors for drag-and-drop
   const sensors = useSensors(
@@ -87,19 +85,19 @@ export function ProfilesView() {
     [aiProfiles, reorderAIProfiles]
   );
 
-  const handleAddProfile = (profile: Omit<AIProfile, "id">) => {
+  const handleAddProfile = (profile: Omit<AIProfile, 'id'>) => {
     addAIProfile(profile);
     setShowAddDialog(false);
-    toast.success("Profile created", {
+    toast.success('Profile created', {
       description: `Created "${profile.name}" profile`,
     });
   };
 
-  const handleUpdateProfile = (profile: Omit<AIProfile, "id">) => {
+  const handleUpdateProfile = (profile: Omit<AIProfile, 'id'>) => {
     if (editingProfile) {
       updateAIProfile(editingProfile.id, profile);
       setEditingProfile(null);
-      toast.success("Profile updated", {
+      toast.success('Profile updated', {
         description: `Updated "${profile.name}" profile`,
       });
     }
@@ -109,7 +107,7 @@ export function ProfilesView() {
     if (!profileToDelete) return;
 
     removeAIProfile(profileToDelete.id);
-    toast.success("Profile deleted", {
+    toast.success('Profile deleted', {
       description: `Deleted "${profileToDelete.name}" profile`,
     });
     setProfileToDelete(null);
@@ -117,8 +115,8 @@ export function ProfilesView() {
 
   const handleResetProfiles = () => {
     resetAIProfiles();
-    toast.success("Profiles refreshed", {
-      description: "Default profiles have been updated to the latest version",
+    toast.success('Profiles refreshed', {
+      description: 'Default profiles have been updated to the latest version',
     });
   };
 
@@ -130,7 +128,7 @@ export function ProfilesView() {
     shortcutsList.push({
       key: shortcuts.addProfile,
       action: () => setShowAddDialog(true),
-      description: "Create new profile",
+      description: 'Create new profile',
     });
 
     return shortcutsList;
@@ -240,7 +238,10 @@ export function ProfilesView() {
 
       {/* Add Profile Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="add-profile-dialog" className="flex flex-col max-h-[calc(100vh-4rem)]">
+        <DialogContent
+          data-testid="add-profile-dialog"
+          className="flex flex-col max-h-[calc(100vh-4rem)]"
+        >
           <DialogHeader className="shrink-0">
             <DialogTitle>Create New Profile</DialogTitle>
             <DialogDescription>
@@ -262,7 +263,10 @@ export function ProfilesView() {
         open={!!editingProfile}
         onOpenChange={() => setEditingProfile(null)}
       >
-        <DialogContent data-testid="edit-profile-dialog" className="flex flex-col max-h-[calc(100vh-4rem)]">
+        <DialogContent
+          data-testid="edit-profile-dialog"
+          className="flex flex-col max-h-[calc(100vh-4rem)]"
+        >
           <DialogHeader className="shrink-0">
             <DialogTitle>Edit Profile</DialogTitle>
             <DialogDescription>Modify your profile settings.</DialogDescription>
@@ -288,7 +292,7 @@ export function ProfilesView() {
         description={
           profileToDelete
             ? `Are you sure you want to delete "${profileToDelete.name}"? This action cannot be undone.`
-            : ""
+            : ''
         }
         confirmText="Delete Profile"
         testId="delete-profile-confirm-dialog"

@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +6,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import type { ReactNode } from "react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import type { ReactNode } from 'react';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -34,9 +34,9 @@ export function DeleteConfirmDialog({
   title,
   description,
   children,
-  confirmText = "Delete",
-  testId = "delete-confirm-dialog",
-  confirmTestId = "confirm-delete-button",
+  confirmText = 'Delete',
+  testId = 'delete-confirm-dialog',
+  confirmTestId = 'confirm-delete-button',
 }: DeleteConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
@@ -74,7 +74,7 @@ export function DeleteConfirmDialog({
             variant="destructive"
             onClick={handleConfirm}
             data-testid={confirmTestId}
-            hotkey={{ key: "Enter", cmdCtrl: true }}
+            hotkey={{ key: 'Enter', cmdCtrl: true }}
             hotkeyActive={open}
             className="px-4"
           >

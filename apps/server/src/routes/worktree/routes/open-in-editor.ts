@@ -3,10 +3,10 @@
  * GET /default-editor endpoint - Get the name of the default code editor
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { getErrorMessage, logError } from '../common.js';
 
 const execAsync = promisify(exec);
 
@@ -29,8 +29,8 @@ async function detectDefaultEditor(): Promise<EditorInfo> {
 
   // Try Cursor first (if user has Cursor, they probably prefer it)
   try {
-    await execAsync("which cursor || where cursor");
-    cachedEditor = { name: "Cursor", command: "cursor" };
+    await execAsync('which cursor || where cursor');
+    cachedEditor = { name: 'Cursor', command: 'cursor' };
     return cachedEditor;
   } catch {
     // Cursor not found
@@ -38,8 +38,8 @@ async function detectDefaultEditor(): Promise<EditorInfo> {
 
   // Try VS Code
   try {
-    await execAsync("which code || where code");
-    cachedEditor = { name: "VS Code", command: "code" };
+    await execAsync('which code || where code');
+    cachedEditor = { name: 'VS Code', command: 'code' };
     return cachedEditor;
   } catch {
     // VS Code not found
@@ -47,8 +47,8 @@ async function detectDefaultEditor(): Promise<EditorInfo> {
 
   // Try Zed
   try {
-    await execAsync("which zed || where zed");
-    cachedEditor = { name: "Zed", command: "zed" };
+    await execAsync('which zed || where zed');
+    cachedEditor = { name: 'Zed', command: 'zed' };
     return cachedEditor;
   } catch {
     // Zed not found
@@ -56,8 +56,8 @@ async function detectDefaultEditor(): Promise<EditorInfo> {
 
   // Try Sublime Text
   try {
-    await execAsync("which subl || where subl");
-    cachedEditor = { name: "Sublime Text", command: "subl" };
+    await execAsync('which subl || where subl');
+    cachedEditor = { name: 'Sublime Text', command: 'subl' };
     return cachedEditor;
   } catch {
     // Sublime not found
@@ -65,12 +65,12 @@ async function detectDefaultEditor(): Promise<EditorInfo> {
 
   // Fallback to file manager
   const platform = process.platform;
-  if (platform === "darwin") {
-    cachedEditor = { name: "Finder", command: "open" };
-  } else if (platform === "win32") {
-    cachedEditor = { name: "Explorer", command: "explorer" };
+  if (platform === 'darwin') {
+    cachedEditor = { name: 'Finder', command: 'open' };
+  } else if (platform === 'win32') {
+    cachedEditor = { name: 'Explorer', command: 'explorer' };
   } else {
-    cachedEditor = { name: "File Manager", command: "xdg-open" };
+    cachedEditor = { name: 'File Manager', command: 'xdg-open' };
   }
   return cachedEditor;
 }
@@ -87,7 +87,7 @@ export function createGetDefaultEditorHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Get default editor failed");
+      logError(error, 'Get default editor failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };
@@ -103,7 +103,7 @@ export function createOpenInEditorHandler() {
       if (!worktreePath) {
         res.status(400).json({
           success: false,
-          error: "worktreePath required",
+          error: 'worktreePath required',
         });
         return;
       }
@@ -125,15 +125,15 @@ export function createOpenInEditorHandler() {
         let openCommand: string;
         let fallbackName: string;
 
-        if (platform === "darwin") {
+        if (platform === 'darwin') {
           openCommand = `open "${worktreePath}"`;
-          fallbackName = "Finder";
-        } else if (platform === "win32") {
+          fallbackName = 'Finder';
+        } else if (platform === 'win32') {
           openCommand = `explorer "${worktreePath}"`;
-          fallbackName = "Explorer";
+          fallbackName = 'Explorer';
         } else {
           openCommand = `xdg-open "${worktreePath}"`;
-          fallbackName = "File Manager";
+          fallbackName = 'File Manager';
         }
 
         await execAsync(openCommand);
@@ -146,7 +146,7 @@ export function createOpenInEditorHandler() {
         });
       }
     } catch (error) {
-      logError(error, "Open in editor failed");
+      logError(error, 'Open in editor failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

@@ -1,9 +1,8 @@
-
-import { Label } from "@/components/ui/label";
-import { Brain } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ThinkingLevel } from "@/store/app-store";
-import { THINKING_LEVELS, THINKING_LEVEL_LABELS } from "./model-constants";
+import { Label } from '@/components/ui/label';
+import { Brain } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ThinkingLevel } from '@/store/app-store';
+import { THINKING_LEVELS, THINKING_LEVEL_LABELS } from './model-constants';
 
 interface ThinkingLevelSelectorProps {
   selectedLevel: ThinkingLevel;
@@ -14,7 +13,7 @@ interface ThinkingLevelSelectorProps {
 export function ThinkingLevelSelector({
   selectedLevel,
   onLevelSelect,
-  testIdPrefix = "thinking-level",
+  testIdPrefix = 'thinking-level',
 }: ThinkingLevelSelectorProps) {
   return (
     <div className="space-y-2 pt-2 border-t border-border">
@@ -29,10 +28,10 @@ export function ThinkingLevelSelector({
             type="button"
             onClick={() => onLevelSelect(level)}
             className={cn(
-              "flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors min-w-[60px]",
+              'flex-1 px-3 py-2 rounded-md border text-sm font-medium transition-colors min-w-[60px]',
               selectedLevel === level
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background hover:bg-accent border-input"
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-background hover:bg-accent border-input'
             )}
             data-testid={`${testIdPrefix}-${level}`}
           >

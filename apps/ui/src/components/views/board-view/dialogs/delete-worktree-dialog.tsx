@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Loader2, Trash2, AlertTriangle, FileWarning } from "lucide-react";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Loader2, Trash2, AlertTriangle, FileWarning } from 'lucide-react';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
 
 interface WorktreeInfo {
   path: string;
@@ -51,7 +50,7 @@ export function DeleteWorktreeDialog({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.delete) {
-        toast.error("Worktree API not available");
+        toast.error('Worktree API not available');
         return;
       }
       const result = await api.worktree.delete(
@@ -70,13 +69,13 @@ export function DeleteWorktreeDialog({
         onOpenChange(false);
         setDeleteBranch(false);
       } else {
-        toast.error("Failed to delete worktree", {
+        toast.error('Failed to delete worktree', {
           description: result.error,
         });
       }
     } catch (err) {
-      toast.error("Failed to delete worktree", {
-        description: err instanceof Error ? err.message : "Unknown error",
+      toast.error('Failed to delete worktree', {
+        description: err instanceof Error ? err.message : 'Unknown error',
       });
     } finally {
       setIsLoading(false);
@@ -95,7 +94,7 @@ export function DeleteWorktreeDialog({
           </DialogTitle>
           <DialogDescription className="space-y-3">
             <span>
-              Are you sure you want to delete the worktree for branch{" "}
+              Are you sure you want to delete the worktree for branch{' '}
               <code className="font-mono bg-muted px-1 rounded">
                 {worktree.branch}
               </code>
@@ -106,9 +105,10 @@ export function DeleteWorktreeDialog({
               <div className="flex items-start gap-2 p-3 rounded-md bg-orange-500/10 border border-orange-500/20 mt-2">
                 <FileWarning className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
                 <span className="text-orange-500 text-sm">
-                  {affectedFeatureCount} feature{affectedFeatureCount !== 1 ? "s" : ""}{" "}
-                  {affectedFeatureCount !== 1 ? "are" : "is"} assigned to this
-                  branch. {affectedFeatureCount !== 1 ? "They" : "It"} will be
+                  {affectedFeatureCount} feature
+                  {affectedFeatureCount !== 1 ? 's' : ''}{' '}
+                  {affectedFeatureCount !== 1 ? 'are' : 'is'} assigned to this
+                  branch. {affectedFeatureCount !== 1 ? 'They' : 'It'} will be
                   unassigned and moved to the main worktree.
                 </span>
               </div>
@@ -133,7 +133,7 @@ export function DeleteWorktreeDialog({
             onCheckedChange={(checked) => setDeleteBranch(checked === true)}
           />
           <Label htmlFor="delete-branch" className="text-sm cursor-pointer">
-            Also delete the branch{" "}
+            Also delete the branch{' '}
             <code className="font-mono bg-muted px-1 rounded">
               {worktree.branch}
             </code>

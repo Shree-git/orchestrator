@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon } from 'lucide-react';
 import {
   Key,
   Terminal,
@@ -8,8 +8,8 @@ import {
   FlaskConical,
   Trash2,
   Sparkles,
-} from "lucide-react";
-import type { SettingsViewId } from "../hooks/use-settings-view";
+} from 'lucide-react';
+import type { SettingsViewId } from '../hooks/use-settings-view';
 
 export interface NavigationItem {
   id: SettingsViewId;
@@ -19,12 +19,12 @@ export interface NavigationItem {
 
 // Navigation items for the settings side panel
 export const NAV_ITEMS: NavigationItem[] = [
-  { id: "api-keys", label: "API Keys", icon: Key },
-  { id: "claude", label: "Claude", icon: Terminal },
-  { id: "ai-enhancement", label: "AI Enhancement", icon: Sparkles },
-  { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "keyboard", label: "Keyboard Shortcuts", icon: Settings2 },
-  { id: "audio", label: "Audio", icon: Volume2 },
-  { id: "defaults", label: "Feature Defaults", icon: FlaskConical },
-  { id: "danger", label: "Danger Zone", icon: Trash2 },
+  { id: 'api-keys', label: 'API Keys', icon: Key },
+  { id: 'claude', label: 'Claude', icon: Terminal },
+  { id: 'ai-enhancement', label: 'AI Enhancement', icon: Sparkles },
+  { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'keyboard', label: 'Keyboard Shortcuts', icon: Settings2 },
+  { id: 'audio', label: 'Audio', icon: Volume2 },
+  { id: 'defaults', label: 'Feature Defaults', icon: FlaskConical },
+  { id: 'danger', label: 'Danger Zone', icon: Trash2 },
 ];

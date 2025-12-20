@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Get the skip tests checkbox element in the add feature dialog
@@ -20,8 +20,8 @@ export async function toggleSkipTestsCheckbox(page: Page): Promise<void> {
  */
 export async function isSkipTestsChecked(page: Page): Promise<boolean> {
   const checkbox = page.locator('[data-testid="skip-tests-checkbox"]');
-  const state = await checkbox.getAttribute("data-state");
-  return state === "checked";
+  const state = await checkbox.getAttribute('data-state');
+  return state === 'checked';
 }
 
 /**
@@ -44,8 +44,8 @@ export async function toggleEditSkipTestsCheckbox(page: Page): Promise<void> {
  */
 export async function isEditSkipTestsChecked(page: Page): Promise<boolean> {
   const checkbox = page.locator('[data-testid="edit-skip-tests-checkbox"]');
-  const state = await checkbox.getAttribute("data-state");
-  return state === "checked";
+  const state = await checkbox.getAttribute('data-state');
+  return state === 'checked';
 }
 
 /**

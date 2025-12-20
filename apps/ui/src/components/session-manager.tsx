@@ -1,10 +1,9 @@
-
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Plus,
   MessageSquare,
@@ -15,66 +14,66 @@ import {
   X,
   ArchiveRestore,
   Loader2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { SessionListItem } from "@/types/electron";
-import { useKeyboardShortcutsConfig } from "@/hooks/use-keyboard-shortcuts";
-import { getElectronAPI } from "@/lib/electron";
-import { DeleteSessionDialog } from "@/components/delete-session-dialog";
-import { DeleteAllArchivedSessionsDialog } from "@/components/delete-all-archived-sessions-dialog";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { SessionListItem } from '@/types/electron';
+import { useKeyboardShortcutsConfig } from '@/hooks/use-keyboard-shortcuts';
+import { getElectronAPI } from '@/lib/electron';
+import { DeleteSessionDialog } from '@/components/delete-session-dialog';
+import { DeleteAllArchivedSessionsDialog } from '@/components/delete-all-archived-sessions-dialog';
 
 // Random session name generator
 const adjectives = [
-  "Swift",
-  "Bright",
-  "Clever",
-  "Dynamic",
-  "Eager",
-  "Focused",
-  "Gentle",
-  "Happy",
-  "Inventive",
-  "Jolly",
-  "Keen",
-  "Lively",
-  "Mighty",
-  "Noble",
-  "Optimal",
-  "Peaceful",
-  "Quick",
-  "Radiant",
-  "Smart",
-  "Tranquil",
-  "Unique",
-  "Vibrant",
-  "Wise",
-  "Zealous",
+  'Swift',
+  'Bright',
+  'Clever',
+  'Dynamic',
+  'Eager',
+  'Focused',
+  'Gentle',
+  'Happy',
+  'Inventive',
+  'Jolly',
+  'Keen',
+  'Lively',
+  'Mighty',
+  'Noble',
+  'Optimal',
+  'Peaceful',
+  'Quick',
+  'Radiant',
+  'Smart',
+  'Tranquil',
+  'Unique',
+  'Vibrant',
+  'Wise',
+  'Zealous',
 ];
 
 const nouns = [
-  "Agent",
-  "Builder",
-  "Coder",
-  "Developer",
-  "Explorer",
-  "Forge",
-  "Garden",
-  "Helper",
-  "Innovator",
-  "Journey",
-  "Kernel",
-  "Lighthouse",
-  "Mission",
-  "Navigator",
-  "Oracle",
-  "Project",
-  "Quest",
-  "Runner",
-  "Spark",
-  "Task",
-  "Unicorn",
-  "Voyage",
-  "Workshop",
+  'Agent',
+  'Builder',
+  'Coder',
+  'Developer',
+  'Explorer',
+  'Forge',
+  'Garden',
+  'Helper',
+  'Innovator',
+  'Journey',
+  'Kernel',
+  'Lighthouse',
+  'Mission',
+  'Navigator',
+  'Oracle',
+  'Project',
+  'Quest',
+  'Runner',
+  'Spark',
+  'Task',
+  'Unicorn',
+  'Voyage',
+  'Workshop',
 ];
 
 function generateRandomSessionName(): string {
@@ -101,11 +100,11 @@ export function SessionManager({
 }: SessionManagerProps) {
   const shortcuts = useKeyboardShortcutsConfig();
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
-  const [activeTab, setActiveTab] = useState<"active" | "archived">("active");
+  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState("");
+  const [editingName, setEditingName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [newSessionName, setNewSessionName] = useState("");
+  const [newSessionName, setNewSessionName] = useState('');
   const [runningSessions, setRunningSessions] = useState<Set<string>>(
     new Set()
   );
@@ -187,7 +186,7 @@ export function SessionManager({
     );
 
     if (result.success && result.session?.id) {
-      setNewSessionName("");
+      setNewSessionName('');
       setIsCreating(false);
       await loadSessions();
       onSelectSession(result.session.id);
@@ -234,7 +233,7 @@ export function SessionManager({
 
     if (result.success) {
       setEditingSessionId(null);
-      setEditingName("");
+      setEditingName('');
       await loadSessions();
     }
   };
@@ -243,7 +242,7 @@ export function SessionManager({
   const handleArchiveSession = async (sessionId: string) => {
     const api = getElectronAPI();
     if (!api?.sessions) {
-      console.error("[SessionManager] Sessions API not available");
+      console.error('[SessionManager] Sessions API not available');
       return;
     }
 
@@ -256,10 +255,10 @@ export function SessionManager({
         }
         await loadSessions();
       } else {
-        console.error("[SessionManager] Archive failed:", result.error);
+        console.error('[SessionManager] Archive failed:', result.error);
       }
     } catch (error) {
-      console.error("[SessionManager] Archive error:", error);
+      console.error('[SessionManager] Archive error:', error);
     }
   };
 
@@ -267,7 +266,7 @@ export function SessionManager({
   const handleUnarchiveSession = async (sessionId: string) => {
     const api = getElectronAPI();
     if (!api?.sessions) {
-      console.error("[SessionManager] Sessions API not available");
+      console.error('[SessionManager] Sessions API not available');
       return;
     }
 
@@ -276,10 +275,10 @@ export function SessionManager({
       if (result.success) {
         await loadSessions();
       } else {
-        console.error("[SessionManager] Unarchive failed:", result.error);
+        console.error('[SessionManager] Unarchive failed:', result.error);
       }
     } catch (error) {
-      console.error("[SessionManager] Unarchive error:", error);
+      console.error('[SessionManager] Unarchive error:', error);
     }
   };
 
@@ -325,7 +324,7 @@ export function SessionManager({
   const activeSessions = sessions.filter((s) => !s.isArchived);
   const archivedSessions = sessions.filter((s) => s.isArchived);
   const displayedSessions =
-    activeTab === "active" ? activeSessions : archivedSessions;
+    activeTab === 'active' ? activeSessions : archivedSessions;
 
   return (
     <Card className="h-full flex flex-col rounded-none">
@@ -337,8 +336,8 @@ export function SessionManager({
             size="sm"
             onClick={() => {
               // Switch to active tab if on archived tab
-              if (activeTab === "archived") {
-                setActiveTab("active");
+              if (activeTab === 'archived') {
+                setActiveTab('active');
               }
               handleQuickCreateSession();
             }}
@@ -355,7 +354,7 @@ export function SessionManager({
         <Tabs
           value={activeTab}
           onValueChange={(value) =>
-            setActiveTab(value as "active" | "archived")
+            setActiveTab(value as 'active' | 'archived')
           }
           className="w-full"
         >
@@ -385,10 +384,10 @@ export function SessionManager({
                 value={newSessionName}
                 onChange={(e) => setNewSessionName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleCreateSession();
-                  if (e.key === "Escape") {
+                  if (e.key === 'Enter') handleCreateSession();
+                  if (e.key === 'Escape') {
                     setIsCreating(false);
-                    setNewSessionName("");
+                    setNewSessionName('');
                   }
                 }}
                 autoFocus
@@ -401,7 +400,7 @@ export function SessionManager({
                 variant="ghost"
                 onClick={() => {
                   setIsCreating(false);
-                  setNewSessionName("");
+                  setNewSessionName('');
                 }}
               >
                 <X className="w-4 h-4" />
@@ -411,7 +410,7 @@ export function SessionManager({
         )}
 
         {/* Delete All Archived button - shown at the top of archived sessions */}
-        {activeTab === "archived" && archivedSessions.length > 0 && (
+        {activeTab === 'archived' && archivedSessions.length > 0 && (
           <div className="pb-2 border-b mb-2">
             <Button
               variant="destructive"
@@ -431,9 +430,9 @@ export function SessionManager({
           <div
             key={session.id}
             className={cn(
-              "p-3 border rounded-lg cursor-pointer transition-colors hover:bg-accent/50",
-              currentSessionId === session.id && "bg-primary/10 border-primary",
-              session.isArchived && "opacity-60"
+              'p-3 border rounded-lg cursor-pointer transition-colors hover:bg-accent/50',
+              currentSessionId === session.id && 'bg-primary/10 border-primary',
+              session.isArchived && 'opacity-60'
             )}
             onClick={() => !session.isArchived && onSelectSession(session.id)}
             data-testid={`session-item-${session.id}`}
@@ -446,10 +445,10 @@ export function SessionManager({
                       value={editingName}
                       onChange={(e) => setEditingName(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") handleRenameSession(session.id);
-                        if (e.key === "Escape") {
+                        if (e.key === 'Enter') handleRenameSession(session.id);
+                        if (e.key === 'Escape') {
                           setEditingSessionId(null);
-                          setEditingName("");
+                          setEditingName('');
                         }
                       }}
                       onClick={(e) => e.stopPropagation()}
@@ -472,7 +471,7 @@ export function SessionManager({
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingSessionId(null);
-                        setEditingName("");
+                        setEditingName('');
                       }}
                       className="h-7"
                     >
@@ -578,14 +577,14 @@ export function SessionManager({
           <div className="text-center py-8 text-muted-foreground">
             <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">
-              {activeTab === "active"
-                ? "No active sessions"
-                : "No archived sessions"}
+              {activeTab === 'active'
+                ? 'No active sessions'
+                : 'No archived sessions'}
             </p>
             <p className="text-xs">
-              {activeTab === "active"
-                ? "Create your first session to get started"
-                : "Archive sessions to see them here"}
+              {activeTab === 'active'
+                ? 'Create your first session to get started'
+                : 'Archive sessions to see them here'}
             </p>
           </div>
         )}

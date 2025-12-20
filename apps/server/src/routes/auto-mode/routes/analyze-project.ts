@@ -2,12 +2,12 @@
  * POST /analyze-project endpoint - Analyze project
  */
 
-import type { Request, Response } from "express";
-import type { AutoModeService } from "../../../services/auto-mode-service.js";
-import { createLogger } from "../../../lib/logger.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import type { AutoModeService } from '../../../services/auto-mode-service.js';
+import { createLogger } from '../../../lib/logger.js';
+import { getErrorMessage, logError } from '../common.js';
 
-const logger = createLogger("AutoMode");
+const logger = createLogger('AutoMode');
 
 export function createAnalyzeProjectHandler(autoModeService: AutoModeService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -17,7 +17,7 @@ export function createAnalyzeProjectHandler(autoModeService: AutoModeService) {
       if (!projectPath) {
         res
           .status(400)
-          .json({ success: false, error: "projectPath is required" });
+          .json({ success: false, error: 'projectPath is required' });
         return;
       }
 
@@ -26,9 +26,9 @@ export function createAnalyzeProjectHandler(autoModeService: AutoModeService) {
         logger.error(`[AutoMode] Project analysis error:`, error);
       });
 
-      res.json({ success: true, message: "Project analysis started" });
+      res.json({ success: true, message: 'Project analysis started' });
     } catch (error) {
-      logError(error, "Analyze project failed");
+      logError(error, 'Analyze project failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

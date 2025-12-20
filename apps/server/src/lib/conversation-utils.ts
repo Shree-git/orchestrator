@@ -8,7 +8,7 @@
  * - Convert history to Claude SDK message format
  */
 
-import type { ConversationMessage } from "../providers/types.js";
+import type { ConversationMessage } from '../providers/types.js';
 
 /**
  * Extract plain text from message content (handles both string and array formats)
@@ -19,15 +19,15 @@ import type { ConversationMessage } from "../providers/types.js";
 export function extractTextFromContent(
   content: string | Array<{ type: string; text?: string; source?: object }>
 ): string {
-  if (typeof content === "string") {
+  if (typeof content === 'string') {
     return content;
   }
 
   // Extract text blocks only
   return content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text || "")
-    .join("\n");
+    .filter((block) => block.type === 'text')
+    .map((block) => block.text || '')
+    .join('\n');
 }
 
 /**
@@ -42,7 +42,7 @@ export function normalizeContentBlocks(
   if (Array.isArray(content)) {
     return content;
   }
-  return [{ type: "text", text: content }];
+  return [{ type: 'text', text: content }];
 }
 
 /**
@@ -53,18 +53,18 @@ export function normalizeContentBlocks(
  */
 export function formatHistoryAsText(history: ConversationMessage[]): string {
   if (history.length === 0) {
-    return "";
+    return '';
   }
 
-  let historyText = "Previous conversation:\n\n";
+  let historyText = 'Previous conversation:\n\n';
 
   for (const msg of history) {
     const contentText = extractTextFromContent(msg.content);
-    const role = msg.role === "user" ? "User" : "Assistant";
+    const role = msg.role === 'user' ? 'User' : 'Assistant';
     historyText += `${role}: ${contentText}\n\n`;
   }
 
-  historyText += "---\n\n";
+  historyText += '---\n\n';
   return historyText;
 }
 
@@ -77,17 +77,17 @@ export function formatHistoryAsText(history: ConversationMessage[]): string {
 export function convertHistoryToMessages(
   history: ConversationMessage[]
 ): Array<{
-  type: "user" | "assistant";
+  type: 'user' | 'assistant';
   session_id: string;
   message: {
-    role: "user" | "assistant";
+    role: 'user' | 'assistant';
     content: Array<{ type: string; text?: string; source?: object }>;
   };
   parent_tool_use_id: null;
 }> {
   return history.map((historyMsg) => ({
     type: historyMsg.role,
-    session_id: "",
+    session_id: '',
     message: {
       role: historyMsg.role,
       content: normalizeContentBlocks(historyMsg.content),

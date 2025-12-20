@@ -4,7 +4,7 @@
  * Supports API key authentication via header or environment variable.
  */
 
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from 'express';
 
 // API key from environment (optional - if not set, auth is disabled)
 const API_KEY = process.env.AUTOMAKER_API_KEY;
@@ -15,7 +15,11 @@ const API_KEY = process.env.AUTOMAKER_API_KEY;
  * If AUTOMAKER_API_KEY is set, requires matching key in X-API-Key header.
  * If not set, allows all requests (development mode).
  */
-export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function authMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   // If no API key is configured, allow all requests
   if (!API_KEY) {
     next();
@@ -23,12 +27,12 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   // Check for API key in header
-  const providedKey = req.headers["x-api-key"] as string | undefined;
+  const providedKey = req.headers['x-api-key'] as string | undefined;
 
   if (!providedKey) {
     res.status(401).json({
       success: false,
-      error: "Authentication required. Provide X-API-Key header.",
+      error: 'Authentication required. Provide X-API-Key header.',
     });
     return;
   }
@@ -36,7 +40,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   if (providedKey !== API_KEY) {
     res.status(403).json({
       success: false,
-      error: "Invalid API key.",
+      error: 'Invalid API key.',
     });
     return;
   }
@@ -57,6 +61,6 @@ export function isAuthEnabled(): boolean {
 export function getAuthStatus(): { enabled: boolean; method: string } {
   return {
     enabled: !!API_KEY,
-    method: API_KEY ? "api_key" : "none",
+    method: API_KEY ? 'api_key' : 'none',
   };
 }

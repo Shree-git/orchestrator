@@ -2,11 +2,11 @@
  * POST /validate-path endpoint - Validate and add path to allowed list
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import path from "path";
-import { addAllowedPath, isPathAllowed } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { addAllowedPath, isPathAllowed } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createValidatePathHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -14,7 +14,7 @@ export function createValidatePathHandler() {
       const { filePath } = req.body as { filePath: string };
 
       if (!filePath) {
-        res.status(400).json({ success: false, error: "filePath is required" });
+        res.status(400).json({ success: false, error: 'filePath is required' });
         return;
       }
 
@@ -27,7 +27,7 @@ export function createValidatePathHandler() {
         if (!stats.isDirectory()) {
           res
             .status(400)
-            .json({ success: false, error: "Path is not a directory" });
+            .json({ success: false, error: 'Path is not a directory' });
           return;
         }
 
@@ -40,10 +40,10 @@ export function createValidatePathHandler() {
           isAllowed: isPathAllowed(resolvedPath),
         });
       } catch {
-        res.status(400).json({ success: false, error: "Path does not exist" });
+        res.status(400).json({ success: false, error: 'Path does not exist' });
       }
     } catch (error) {
-      logError(error, "Validate path failed");
+      logError(error, 'Validate path failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

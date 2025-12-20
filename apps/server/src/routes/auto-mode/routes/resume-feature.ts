@@ -2,12 +2,12 @@
  * POST /resume-feature endpoint - Resume a feature
  */
 
-import type { Request, Response } from "express";
-import type { AutoModeService } from "../../../services/auto-mode-service.js";
-import { createLogger } from "../../../lib/logger.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import type { AutoModeService } from '../../../services/auto-mode-service.js';
+import { createLogger } from '../../../lib/logger.js';
+import { getErrorMessage, logError } from '../common.js';
 
-const logger = createLogger("AutoMode");
+const logger = createLogger('AutoMode');
 
 export function createResumeFeatureHandler(autoModeService: AutoModeService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -21,7 +21,7 @@ export function createResumeFeatureHandler(autoModeService: AutoModeService) {
       if (!projectPath || !featureId) {
         res.status(400).json({
           success: false,
-          error: "projectPath and featureId are required",
+          error: 'projectPath and featureId are required',
         });
         return;
       }
@@ -36,7 +36,7 @@ export function createResumeFeatureHandler(autoModeService: AutoModeService) {
 
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Resume feature failed");
+      logError(error, 'Resume feature failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

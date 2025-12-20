@@ -10,7 +10,7 @@
 /**
  * Base URL for the API server
  */
-export const API_BASE_URL = "http://localhost:3008";
+export const API_BASE_URL = 'http://localhost:3008';
 
 /**
  * API endpoints for worktree operations
@@ -74,55 +74,55 @@ export const TIMEOUTS = {
  */
 export const TEST_IDS = {
   // Sidebar & Navigation
-  sidebar: "sidebar",
-  navBoard: "nav-board",
-  navSpec: "nav-spec",
-  navContext: "nav-context",
-  navAgent: "nav-agent",
-  navProfiles: "nav-profiles",
-  settingsButton: "settings-button",
-  openProjectButton: "open-project-button",
+  sidebar: 'sidebar',
+  navBoard: 'nav-board',
+  navSpec: 'nav-spec',
+  navContext: 'nav-context',
+  navAgent: 'nav-agent',
+  navProfiles: 'nav-profiles',
+  settingsButton: 'settings-button',
+  openProjectButton: 'open-project-button',
 
   // Views
-  boardView: "board-view",
-  specView: "spec-view",
-  contextView: "context-view",
-  agentView: "agent-view",
-  profilesView: "profiles-view",
-  settingsView: "settings-view",
-  welcomeView: "welcome-view",
-  setupView: "setup-view",
+  boardView: 'board-view',
+  specView: 'spec-view',
+  contextView: 'context-view',
+  agentView: 'agent-view',
+  profilesView: 'profiles-view',
+  settingsView: 'settings-view',
+  welcomeView: 'welcome-view',
+  setupView: 'setup-view',
 
   // Board View Components
-  addFeatureButton: "add-feature-button",
-  addFeatureDialog: "add-feature-dialog",
-  confirmAddFeature: "confirm-add-feature",
-  featureBranchInput: "feature-input",
-  featureCategoryInput: "feature-category-input",
-  worktreeSelector: "worktree-selector",
+  addFeatureButton: 'add-feature-button',
+  addFeatureDialog: 'add-feature-dialog',
+  confirmAddFeature: 'confirm-add-feature',
+  featureBranchInput: 'feature-input',
+  featureCategoryInput: 'feature-category-input',
+  worktreeSelector: 'worktree-selector',
 
   // Spec Editor
-  specEditor: "spec-editor",
+  specEditor: 'spec-editor',
 
   // File Browser Dialog
-  pathInput: "path-input",
-  goToPathButton: "go-to-path-button",
+  pathInput: 'path-input',
+  goToPathButton: 'go-to-path-button',
 
   // Profiles View
-  addProfileButton: "add-profile-button",
-  addProfileDialog: "add-profile-dialog",
-  editProfileDialog: "edit-profile-dialog",
-  deleteProfileConfirmDialog: "delete-profile-confirm-dialog",
-  saveProfileButton: "save-profile-button",
-  confirmDeleteProfileButton: "confirm-delete-profile-button",
-  cancelDeleteButton: "cancel-delete-button",
-  profileNameInput: "profile-name-input",
-  profileDescriptionInput: "profile-description-input",
-  refreshProfilesButton: "refresh-profiles-button",
+  addProfileButton: 'add-profile-button',
+  addProfileDialog: 'add-profile-dialog',
+  editProfileDialog: 'edit-profile-dialog',
+  deleteProfileConfirmDialog: 'delete-profile-confirm-dialog',
+  saveProfileButton: 'save-profile-button',
+  confirmDeleteProfileButton: 'confirm-delete-profile-button',
+  cancelDeleteButton: 'cancel-delete-button',
+  profileNameInput: 'profile-name-input',
+  profileDescriptionInput: 'profile-description-input',
+  refreshProfilesButton: 'refresh-profiles-button',
 
   // Context View
-  contextFileList: "context-file-list",
-  addContextButton: "add-context-button",
+  contextFileList: 'context-file-list',
+  addContextButton: 'add-context-button',
 } as const;
 
 // ============================================================================
@@ -134,17 +134,17 @@ export const TEST_IDS = {
  */
 export const CSS_SELECTORS = {
   /** CodeMirror editor content area */
-  codeMirrorContent: ".cm-content",
+  codeMirrorContent: '.cm-content',
   /** Dialog elements */
   dialog: '[role="dialog"]',
   /** Sonner toast notifications */
-  toast: "[data-sonner-toast]",
+  toast: '[data-sonner-toast]',
   toastError: '[data-sonner-toast][data-type="error"]',
   toastSuccess: '[data-sonner-toast][data-type="success"]',
   /** Command/combobox input (shadcn-ui cmdk) */
-  commandInput: "[cmdk-input]",
+  commandInput: '[cmdk-input]',
   /** Radix dialog overlay */
-  dialogOverlay: "[data-radix-dialog-overlay]",
+  dialogOverlay: '[data-radix-dialog-overlay]',
 } as const;
 
 // ============================================================================
@@ -155,8 +155,8 @@ export const CSS_SELECTORS = {
  * localStorage keys used by the application
  */
 export const STORAGE_KEYS = {
-  appStorage: "automaker-storage",
-  setupStorage: "automaker-setup",
+  appStorage: 'automaker-storage',
+  setupStorage: 'automaker-setup',
 } as const;
 
 // ============================================================================
@@ -169,7 +169,7 @@ export const STORAGE_KEYS = {
  * @returns Sanitized name suitable for directory paths
  */
 export function sanitizeBranchName(branchName: string): string {
-  return branchName.replace(/[^a-zA-Z0-9_-]/g, "-");
+  return branchName.replace(/[^a-zA-Z0-9_-]/g, '-');
 }
 
 // ============================================================================
@@ -180,8 +180,8 @@ export function sanitizeBranchName(branchName: string): string {
  * Default values used in test setup
  */
 export const DEFAULTS = {
-  projectName: "Test Project",
-  projectPath: "/mock/test-project",
-  theme: "dark" as const,
+  projectName: 'Test Project',
+  projectPath: '/mock/test-project',
+  theme: 'dark' as const,
   maxConcurrency: 3,
 } as const;

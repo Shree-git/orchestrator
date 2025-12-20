@@ -1,7 +1,6 @@
-
-import { useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Search, X, Loader2 } from "lucide-react";
+import { useRef, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
+import { Search, X, Loader2 } from 'lucide-react';
 
 interface BoardSearchBarProps {
   searchQuery: string;
@@ -25,7 +24,7 @@ export function BoardSearchBar({
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only focus if not typing in an input/textarea
       if (
-        e.key === "/" &&
+        e.key === '/' &&
         !(e.target instanceof HTMLInputElement) &&
         !(e.target instanceof HTMLTextAreaElement)
       ) {
@@ -34,8 +33,8 @@ export function BoardSearchBar({
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return (
@@ -53,7 +52,7 @@ export function BoardSearchBar({
         />
         {searchQuery ? (
           <button
-            onClick={() => onSearchChange("")}
+            onClick={() => onSearchChange('')}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
             data-testid="kanban-search-clear"
             aria-label="Clear search"
@@ -70,19 +69,18 @@ export function BoardSearchBar({
         )}
       </div>
       {/* Spec Creation Loading Badge */}
-      {isCreatingSpec &&
-        currentProjectPath === creatingSpecProjectPath && (
-          <div
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 shrink-0"
-            title="Creating App Specification"
-            data-testid="spec-creation-badge"
-          >
-            <Loader2 className="w-3 h-3 animate-spin text-brand-500 shrink-0" />
-            <span className="text-xs font-medium text-brand-500 whitespace-nowrap">
-              Creating spec
-            </span>
-          </div>
-        )}
+      {isCreatingSpec && currentProjectPath === creatingSpecProjectPath && (
+        <div
+          className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 shrink-0"
+          title="Creating App Specification"
+          data-testid="spec-creation-badge"
+        >
+          <Loader2 className="w-3 h-3 animate-spin text-brand-500 shrink-0" />
+          <span className="text-xs font-medium text-brand-500 whitespace-nowrap">
+            Creating spec
+          </span>
+        </div>
+      )}
     </div>
   );
 }

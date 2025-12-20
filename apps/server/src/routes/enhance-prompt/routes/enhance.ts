@@ -5,18 +5,21 @@
  * Supports modes: improve, technical, simplify, acceptance
  */
 
-import type { Request, Response } from "express";
-import { query } from "@anthropic-ai/claude-agent-sdk";
-import { createLogger } from "../../../lib/logger.js";
+import type { Request, Response } from 'express';
+import { query } from '@anthropic-ai/claude-agent-sdk';
+import { createLogger } from '../../../lib/logger.js';
 import {
   getSystemPrompt,
   buildUserPrompt,
   isValidEnhancementMode,
   type EnhancementMode,
-} from "../../../lib/enhancement-prompts.js";
-import { resolveModelString, CLAUDE_MODEL_MAP } from "../../../lib/model-resolver.js";
+} from '../../../lib/enhancement-prompts.js';
+import {
+  resolveModelString,
+  CLAUDE_MODEL_MAP,
+} from '../../../lib/model-resolver.js';
 
-const logger = createLogger("EnhancePrompt");
+const logger = createLogger('EnhancePrompt');
 
 /**
  * Request body for the enhance endpoint
@@ -62,16 +65,16 @@ async function extractTextFromStream(
     };
   }>
 ): Promise<string> {
-  let responseText = "";
+  let responseText = '';
 
   for await (const msg of stream) {
-    if (msg.type === "assistant" && msg.message?.content) {
+    if (msg.type === 'assistant' && msg.message?.content) {
       for (const block of msg.message.content) {
-        if (block.type === "text" && block.text) {
+        if (block.type === 'text' && block.text) {
           responseText += block.text;
         }
       }
-    } else if (msg.type === "result" && msg.subtype === "success") {
+    } else if (msg.type === 'result' && msg.subtype === 'success') {
       responseText = msg.result || responseText;
     }
   }
@@ -94,19 +97,19 @@ export function createEnhanceHandler(): (
         req.body as EnhanceRequestBody;
 
       // Validate required fields
-      if (!originalText || typeof originalText !== "string") {
+      if (!originalText || typeof originalText !== 'string') {
         const response: EnhanceErrorResponse = {
           success: false,
-          error: "originalText is required and must be a string",
+          error: 'originalText is required and must be a string',
         };
         res.status(400).json(response);
         return;
       }
 
-      if (!enhancementMode || typeof enhancementMode !== "string") {
+      if (!enhancementMode || typeof enhancementMode !== 'string') {
         const response: EnhanceErrorResponse = {
           success: false,
-          error: "enhancementMode is required and must be a string",
+          error: 'enhancementMode is required and must be a string',
         };
         res.status(400).json(response);
         return;
@@ -117,7 +120,7 @@ export function createEnhanceHandler(): (
       if (trimmedText.length === 0) {
         const response: EnhanceErrorResponse = {
           success: false,
-          error: "originalText cannot be empty",
+          error: 'originalText cannot be empty',
         };
         res.status(400).json(response);
         return;
@@ -127,7 +130,7 @@ export function createEnhanceHandler(): (
       const normalizedMode = enhancementMode.toLowerCase();
       const validMode: EnhancementMode = isValidEnhancementMode(normalizedMode)
         ? normalizedMode
-        : "improve";
+        : 'improve';
 
       logger.info(
         `Enhancing text with mode: ${validMode}, length: ${trimmedText.length} chars`
@@ -154,7 +157,7 @@ export function createEnhanceHandler(): (
           systemPrompt,
           maxTurns: 1,
           allowedTools: [],
-          permissionMode: "acceptEdits",
+          permissionMode: 'acceptEdits',
         },
       });
 
@@ -162,10 +165,10 @@ export function createEnhanceHandler(): (
       const enhancedText = await extractTextFromStream(stream);
 
       if (!enhancedText || enhancedText.trim().length === 0) {
-        logger.warn("Received empty response from Claude");
+        logger.warn('Received empty response from Claude');
         const response: EnhanceErrorResponse = {
           success: false,
-          error: "Failed to generate enhanced text - empty response",
+          error: 'Failed to generate enhanced text - empty response',
         };
         res.status(500).json(response);
         return;
@@ -182,8 +185,8 @@ export function createEnhanceHandler(): (
       res.json(response);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      logger.error("Enhancement failed:", errorMessage);
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.error('Enhancement failed:', errorMessage);
 
       const response: EnhanceErrorResponse = {
         success: false,

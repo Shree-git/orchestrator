@@ -76,30 +76,37 @@
 /* Theme-specific overrides */
 
 .nord .animated-outline-gradient {
-    background: conic-gradient(from 90deg at 50% 50%, #88c0d0 0%, #81a1c1 50%, #88c0d0 100%);
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    #88c0d0 0%,
+    #81a1c1 50%,
+    #88c0d0 100%
+  );
 }
 
 .nord .animated-outline-inner {
-    background: oklch(0.23 0.02 240) !important;
-    color: #88c0d0 !important;
+  background: oklch(0.23 0.02 240) !important;
+  color: #88c0d0 !important;
 }
 
-.nord [data-slot="button"][class*="animated-outline"]:hover .animated-outline-inner {
-    background: oklch(0.28 0.03 240) !important;
-    color: #8fbcbb !important;
+.nord
+  [data-slot='button'][class*='animated-outline']:hover
+  .animated-outline-inner {
+  background: oklch(0.28 0.03 240) !important;
+  color: #8fbcbb !important;
 }
 
 .nord .slider-track {
-    background: oklch(0.31 0.02 240);
+  background: oklch(0.31 0.02 240);
 }
 
 .nord .slider-range {
-    background: linear-gradient(to right, #88c0d0, #81a1c1);
+  background: linear-gradient(to right, #88c0d0, #81a1c1);
 }
 
 .nord .slider-thumb {
-    background: oklch(0.27 0.02 240);
-    border-color: #88c0d0;
+  background: oklch(0.27 0.02 240);
+  border-color: #88c0d0;
 }
 
 .nord .xml-highlight {

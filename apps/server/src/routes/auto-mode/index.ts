@@ -4,35 +4,35 @@
  * Uses the AutoModeService for real feature execution with Claude Agent SDK
  */
 
-import { Router } from "express";
-import type { AutoModeService } from "../../services/auto-mode-service.js";
-import { createStopFeatureHandler } from "./routes/stop-feature.js";
-import { createStatusHandler } from "./routes/status.js";
-import { createRunFeatureHandler } from "./routes/run-feature.js";
-import { createVerifyFeatureHandler } from "./routes/verify-feature.js";
-import { createResumeFeatureHandler } from "./routes/resume-feature.js";
-import { createContextExistsHandler } from "./routes/context-exists.js";
-import { createAnalyzeProjectHandler } from "./routes/analyze-project.js";
-import { createFollowUpFeatureHandler } from "./routes/follow-up-feature.js";
-import { createCommitFeatureHandler } from "./routes/commit-feature.js";
-import { createApprovePlanHandler } from "./routes/approve-plan.js";
+import { Router } from 'express';
+import type { AutoModeService } from '../../services/auto-mode-service.js';
+import { createStopFeatureHandler } from './routes/stop-feature.js';
+import { createStatusHandler } from './routes/status.js';
+import { createRunFeatureHandler } from './routes/run-feature.js';
+import { createVerifyFeatureHandler } from './routes/verify-feature.js';
+import { createResumeFeatureHandler } from './routes/resume-feature.js';
+import { createContextExistsHandler } from './routes/context-exists.js';
+import { createAnalyzeProjectHandler } from './routes/analyze-project.js';
+import { createFollowUpFeatureHandler } from './routes/follow-up-feature.js';
+import { createCommitFeatureHandler } from './routes/commit-feature.js';
+import { createApprovePlanHandler } from './routes/approve-plan.js';
 
 export function createAutoModeRoutes(autoModeService: AutoModeService): Router {
   const router = Router();
 
-  router.post("/stop-feature", createStopFeatureHandler(autoModeService));
-  router.post("/status", createStatusHandler(autoModeService));
-  router.post("/run-feature", createRunFeatureHandler(autoModeService));
-  router.post("/verify-feature", createVerifyFeatureHandler(autoModeService));
-  router.post("/resume-feature", createResumeFeatureHandler(autoModeService));
-  router.post("/context-exists", createContextExistsHandler(autoModeService));
-  router.post("/analyze-project", createAnalyzeProjectHandler(autoModeService));
+  router.post('/stop-feature', createStopFeatureHandler(autoModeService));
+  router.post('/status', createStatusHandler(autoModeService));
+  router.post('/run-feature', createRunFeatureHandler(autoModeService));
+  router.post('/verify-feature', createVerifyFeatureHandler(autoModeService));
+  router.post('/resume-feature', createResumeFeatureHandler(autoModeService));
+  router.post('/context-exists', createContextExistsHandler(autoModeService));
+  router.post('/analyze-project', createAnalyzeProjectHandler(autoModeService));
   router.post(
-    "/follow-up-feature",
+    '/follow-up-feature',
     createFollowUpFeatureHandler(autoModeService)
   );
-  router.post("/commit-feature", createCommitFeatureHandler(autoModeService));
-  router.post("/approve-plan", createApprovePlanHandler(autoModeService));
+  router.post('/commit-feature', createCommitFeatureHandler(autoModeService));
+  router.post('/approve-plan', createApprovePlanHandler(autoModeService));
 
   return router;
 }

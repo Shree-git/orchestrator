@@ -1,10 +1,9 @@
-
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Card } from "@/components/ui/card";
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Card } from '@/components/ui/card';
 import {
   Plus,
   RefreshCw,
@@ -19,12 +18,12 @@ import {
   EditIcon,
   Eye,
   Pencil,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   useKeyboardShortcuts,
   useKeyboardShortcutsConfig,
   KeyboardShortcut,
-} from "@/hooks/use-keyboard-shortcuts";
+} from '@/hooks/use-keyboard-shortcuts';
 import {
   Dialog,
   DialogContent,
@@ -32,15 +31,15 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Markdown } from "../ui/markdown";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { Markdown } from '../ui/markdown';
 
 interface ContextFile {
   name: string;
-  type: "text" | "image";
+  type: 'text' | 'image';
   content?: string;
   path: string;
 }
@@ -53,17 +52,17 @@ export function ContextView() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [editedContent, setEditedContent] = useState("");
+  const [editedContent, setEditedContent] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-  const [renameFileName, setRenameFileName] = useState("");
-  const [newFileName, setNewFileName] = useState("");
-  const [newFileType, setNewFileType] = useState<"text" | "image">("text");
+  const [renameFileName, setRenameFileName] = useState('');
+  const [newFileName, setNewFileName] = useState('');
+  const [newFileType, setNewFileType] = useState<'text' | 'image'>('text');
   const [uploadedImageData, setUploadedImageData] = useState<string | null>(
     null
   );
-  const [newFileContent, setNewFileContent] = useState("");
+  const [newFileContent, setNewFileContent] = useState('');
   const [isDropHovering, setIsDropHovering] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
@@ -73,7 +72,7 @@ export function ContextView() {
       {
         key: shortcuts.addContextFile,
         action: () => setIsAddDialogOpen(true),
-        description: "Add new context file",
+        description: 'Add new context file',
       },
     ],
     [shortcuts]
@@ -87,22 +86,22 @@ export function ContextView() {
   }, [currentProject]);
 
   const isMarkdownFile = (filename: string): boolean => {
-    const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
-    return ext === ".md" || ext === ".markdown";
+    const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+    return ext === '.md' || ext === '.markdown';
   };
 
   // Determine if a file is an image based on extension
   const isImageFile = (filename: string): boolean => {
     const imageExtensions = [
-      ".png",
-      ".jpg",
-      ".jpeg",
-      ".gif",
-      ".webp",
-      ".svg",
-      ".bmp",
+      '.png',
+      '.jpg',
+      '.jpeg',
+      '.gif',
+      '.webp',
+      '.svg',
+      '.bmp',
     ];
-    const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
+    const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
     return imageExtensions.includes(ext);
   };
 
@@ -125,13 +124,13 @@ export function ContextView() {
           .filter((entry) => entry.isFile)
           .map((entry) => ({
             name: entry.name,
-            type: isImageFile(entry.name) ? "image" : "text",
+            type: isImageFile(entry.name) ? 'image' : 'text',
             path: `${contextPath}/${entry.name}`,
           }));
         setContextFiles(files);
       }
     } catch (error) {
-      console.error("Failed to load context files:", error);
+      console.error('Failed to load context files:', error);
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +151,7 @@ export function ContextView() {
         setHasChanges(false);
       }
     } catch (error) {
-      console.error("Failed to load file content:", error);
+      console.error('Failed to load file content:', error);
     }
   }, []);
 
@@ -176,7 +175,7 @@ export function ContextView() {
       setSelectedFile({ ...selectedFile, content: editedContent });
       setHasChanges(false);
     } catch (error) {
-      console.error("Failed to save file:", error);
+      console.error('Failed to save file:', error);
     } finally {
       setIsSaving(false);
     }
@@ -198,32 +197,32 @@ export function ContextView() {
       let filename = newFileName.trim();
 
       // Add default extension if not provided
-      if (newFileType === "text" && !filename.includes(".")) {
-        filename += ".md";
+      if (newFileType === 'text' && !filename.includes('.')) {
+        filename += '.md';
       }
 
       const filePath = `${contextPath}/${filename}`;
 
-      if (newFileType === "image" && uploadedImageData) {
+      if (newFileType === 'image' && uploadedImageData) {
         // Write image data
         await api.writeFile(filePath, uploadedImageData);
       } else {
         // Write text file with content (or empty if no content)
         await api.writeFile(filePath, newFileContent);
       }
-      
+
       // Only reload files on success
       await loadContextFiles();
     } catch (error) {
-      console.error("Failed to add file:", error);
+      console.error('Failed to add file:', error);
       // Optionally show error toast to user here
     } finally {
       // Close dialog and reset state
       setIsAddDialogOpen(false);
-      setNewFileName("");
-      setNewFileType("text");
+      setNewFileName('');
+      setNewFileType('text');
       setUploadedImageData(null);
-      setNewFileContent("");
+      setNewFileContent('');
       setIsDropHovering(false);
     }
   };
@@ -238,11 +237,11 @@ export function ContextView() {
 
       setIsDeleteDialogOpen(false);
       setSelectedFile(null);
-      setEditedContent("");
+      setEditedContent('');
       setHasChanges(false);
       await loadContextFiles();
     } catch (error) {
-      console.error("Failed to delete file:", error);
+      console.error('Failed to delete file:', error);
     }
   };
 
@@ -264,14 +263,14 @@ export function ContextView() {
       // Check if file with new name already exists
       const exists = await api.exists(newPath);
       if (exists) {
-        console.error("A file with this name already exists");
+        console.error('A file with this name already exists');
         return;
       }
 
       // Read current file content
       const result = await api.readFile(selectedFile.path);
       if (!result.success || result.content === undefined) {
-        console.error("Failed to read file for rename");
+        console.error('Failed to read file for rename');
         return;
       }
 
@@ -282,7 +281,7 @@ export function ContextView() {
       await api.deleteFile(selectedFile.path);
 
       setIsRenameDialogOpen(false);
-      setRenameFileName("");
+      setRenameFileName('');
 
       // Reload files and select the renamed file
       await loadContextFiles();
@@ -290,13 +289,13 @@ export function ContextView() {
       // Update selected file with new name and path
       const renamedFile: ContextFile = {
         name: newName,
-        type: isImageFile(newName) ? "image" : "text",
+        type: isImageFile(newName) ? 'image' : 'text',
         path: newPath,
         content: result.content,
       };
       setSelectedFile(renamedFile);
     } catch (error) {
-      console.error("Failed to rename file:", error);
+      console.error('Failed to rename file:', error);
     }
   };
 
@@ -366,8 +365,8 @@ export function ContextView() {
     const fileName = file.name.toLowerCase();
 
     // Only accept .txt and .md files
-    if (!fileName.endsWith(".txt") && !fileName.endsWith(".md")) {
-      console.warn("Only .txt and .md files are supported for drag and drop");
+    if (!fileName.endsWith('.txt') && !fileName.endsWith('.md')) {
+      console.warn('Only .txt and .md files are supported for drag and drop');
       return;
     }
 
@@ -481,10 +480,10 @@ export function ContextView() {
                   <div
                     key={file.path}
                     className={cn(
-                      "group w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors",
+                      'group w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
                       selectedFile?.path === file.path
-                        ? "bg-primary/20 text-foreground border border-primary/30"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                        ? 'bg-primary/20 text-foreground border border-primary/30'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                     )}
                   >
                     <button
@@ -492,7 +491,7 @@ export function ContextView() {
                       className="flex-1 flex items-center gap-2 text-left min-w-0"
                       data-testid={`context-file-${file.name}`}
                     >
-                      {file.type === "image" ? (
+                      {file.type === 'image' ? (
                         <ImageIcon className="w-4 h-4 flex-shrink-0" />
                       ) : (
                         <FileText className="w-4 h-4 flex-shrink-0" />
@@ -525,7 +524,7 @@ export function ContextView() {
               {/* File toolbar */}
               <div className="flex items-center justify-between p-3 border-b border-border bg-card">
                 <div className="flex items-center gap-2">
-                  {selectedFile.type === "image" ? (
+                  {selectedFile.type === 'image' ? (
                     <ImageIcon className="w-4 h-4 text-muted-foreground" />
                   ) : (
                     <FileText className="w-4 h-4 text-muted-foreground" />
@@ -535,10 +534,10 @@ export function ContextView() {
                   </span>
                 </div>
                 <div className="flex gap-2">
-                  {selectedFile.type === "text" &&
+                  {selectedFile.type === 'text' &&
                     isMarkdownFile(selectedFile.name) && (
                       <Button
-                        variant={"outline"}
+                        variant={'outline'}
                         size="sm"
                         onClick={() => setIsPreviewMode(!isPreviewMode)}
                         data-testid="toggle-preview-mode"
@@ -556,7 +555,7 @@ export function ContextView() {
                         )}
                       </Button>
                     )}
-                  {selectedFile.type === "text" && (
+                  {selectedFile.type === 'text' && (
                     <Button
                       size="sm"
                       onClick={saveFile}
@@ -564,7 +563,7 @@ export function ContextView() {
                       data-testid="save-context-file"
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {isSaving ? "Saving..." : hasChanges ? "Save" : "Saved"}
+                      {isSaving ? 'Saving...' : hasChanges ? 'Save' : 'Saved'}
                     </Button>
                   )}
                   <Button
@@ -581,7 +580,7 @@ export function ContextView() {
 
               {/* Content area */}
               <div className="flex-1 overflow-hidden p-4">
-                {selectedFile.type === "image" ? (
+                {selectedFile.type === 'image' ? (
                   <div
                     className="h-full flex items-center justify-center bg-card rounded-lg"
                     data-testid="image-preview"
@@ -593,7 +592,10 @@ export function ContextView() {
                     />
                   </div>
                 ) : isPreviewMode ? (
-                  <Card className="h-full overflow-auto p-4" data-testid="markdown-preview">
+                  <Card
+                    className="h-full overflow-auto p-4"
+                    data-testid="markdown-preview"
+                  >
                     <Markdown>{editedContent}</Markdown>
                   </Card>
                 ) : (
@@ -641,18 +643,18 @@ export function ContextView() {
           <div className="space-y-4 py-4">
             <div className="flex gap-2">
               <Button
-                variant={newFileType === "text" ? "default" : "outline"}
+                variant={newFileType === 'text' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setNewFileType("text")}
+                onClick={() => setNewFileType('text')}
                 data-testid="add-text-type"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Text
               </Button>
               <Button
-                variant={newFileType === "image" ? "default" : "outline"}
+                variant={newFileType === 'image' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setNewFileType("image")}
+                onClick={() => setNewFileType('image')}
                 data-testid="add-image-type"
               >
                 <ImageIcon className="w-4 h-4 mr-2" />
@@ -667,19 +669,19 @@ export function ContextView() {
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
                 placeholder={
-                  newFileType === "text" ? "context.md" : "image.png"
+                  newFileType === 'text' ? 'context.md' : 'image.png'
                 }
                 data-testid="new-file-name"
               />
             </div>
 
-            {newFileType === "text" && (
+            {newFileType === 'text' && (
               <div className="space-y-2">
                 <Label htmlFor="context-content">Context Content</Label>
                 <div
                   className={cn(
-                    "relative rounded-lg transition-colors",
-                    isDropHovering && "ring-2 ring-primary"
+                    'relative rounded-lg transition-colors',
+                    isDropHovering && 'ring-2 ring-primary'
                   )}
                 >
                   <textarea
@@ -691,8 +693,8 @@ export function ContextView() {
                     onDragLeave={handleTextAreaDragLeave}
                     placeholder="Enter context content here or drag & drop a .txt or .md file..."
                     className={cn(
-                      "w-full h-40 p-3 font-mono text-sm bg-background border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent",
-                      isDropHovering && "border-primary bg-primary/10"
+                      'w-full h-40 p-3 font-mono text-sm bg-background border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
+                      isDropHovering && 'border-primary bg-primary/10'
                     )}
                     spellCheck={false}
                     data-testid="new-file-content"
@@ -714,7 +716,7 @@ export function ContextView() {
               </div>
             )}
 
-            {newFileType === "image" && (
+            {newFileType === 'image' && (
               <div className="space-y-2">
                 <Label>Upload Image</Label>
                 <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
@@ -741,8 +743,8 @@ export function ContextView() {
                     )}
                     <span className="text-sm text-muted-foreground">
                       {uploadedImageData
-                        ? "Click to change"
-                        : "Click to upload"}
+                        ? 'Click to change'
+                        : 'Click to upload'}
                     </span>
                   </label>
                 </div>
@@ -754,9 +756,9 @@ export function ContextView() {
               variant="outline"
               onClick={() => {
                 setIsAddDialogOpen(false);
-                setNewFileName("");
+                setNewFileName('');
                 setUploadedImageData(null);
-                setNewFileContent("");
+                setNewFileContent('');
                 setIsDropHovering(false);
               }}
             >
@@ -766,9 +768,9 @@ export function ContextView() {
               onClick={handleAddFile}
               disabled={
                 !newFileName.trim() ||
-                (newFileType === "image" && !uploadedImageData)
+                (newFileType === 'image' && !uploadedImageData)
               }
-              hotkey={{ key: "Enter", cmdCtrl: true }}
+              hotkey={{ key: 'Enter', cmdCtrl: true }}
               hotkeyActive={isAddDialogOpen}
               data-testid="confirm-add-file"
             >
@@ -826,7 +828,7 @@ export function ContextView() {
                 placeholder="Enter new filename"
                 data-testid="rename-file-input"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && renameFileName.trim()) {
+                  if (e.key === 'Enter' && renameFileName.trim()) {
                     handleRenameFile();
                   }
                 }}
@@ -838,14 +840,16 @@ export function ContextView() {
               variant="outline"
               onClick={() => {
                 setIsRenameDialogOpen(false);
-                setRenameFileName("");
+                setRenameFileName('');
               }}
             >
               Cancel
             </Button>
             <Button
               onClick={handleRenameFile}
-              disabled={!renameFileName.trim() || renameFileName === selectedFile?.name}
+              disabled={
+                !renameFileName.trim() || renameFileName === selectedFile?.name
+              }
               data-testid="confirm-rename-file"
             >
               Rename

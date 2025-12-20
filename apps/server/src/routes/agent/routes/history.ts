@@ -2,9 +2,9 @@
  * POST /history endpoint - Get conversation history
  */
 
-import type { Request, Response } from "express";
-import { AgentService } from "../../../services/agent-service.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { AgentService } from '../../../services/agent-service.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createHistoryHandler(agentService: AgentService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -14,14 +14,14 @@ export function createHistoryHandler(agentService: AgentService) {
       if (!sessionId) {
         res
           .status(400)
-          .json({ success: false, error: "sessionId is required" });
+          .json({ success: false, error: 'sessionId is required' });
         return;
       }
 
       const result = agentService.getHistory(sessionId);
       res.json(result);
     } catch (error) {
-      logError(error, "Get history failed");
+      logError(error, 'Get history failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

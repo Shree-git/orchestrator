@@ -1,11 +1,10 @@
-
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Plus, Bot } from "lucide-react";
-import { KeyboardShortcut } from "@/hooks/use-keyboard-shortcuts";
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Plus, Bot } from 'lucide-react';
+import { KeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 
 interface BoardHeaderProps {
   projectName: string;

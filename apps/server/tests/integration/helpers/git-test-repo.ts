@@ -1,11 +1,11 @@
 /**
  * Helper for creating test git repositories for integration tests
  */
-import { exec } from "child_process";
-import { promisify } from "util";
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as os from "os";
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as os from 'os';
 
 const execAsync = promisify(exec);
 
@@ -18,36 +18,38 @@ export interface TestRepo {
  * Create a temporary git repository for testing
  */
 export async function createTestGitRepo(): Promise<TestRepo> {
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "automaker-test-"));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'automaker-test-'));
 
   // Initialize git repo
-  await execAsync("git init", { cwd: tmpDir });
+  await execAsync('git init', { cwd: tmpDir });
   await execAsync('git config user.email "test@example.com"', { cwd: tmpDir });
   await execAsync('git config user.name "Test User"', { cwd: tmpDir });
 
   // Create initial commit
-  await fs.writeFile(path.join(tmpDir, "README.md"), "# Test Project\n");
-  await execAsync("git add .", { cwd: tmpDir });
+  await fs.writeFile(path.join(tmpDir, 'README.md'), '# Test Project\n');
+  await execAsync('git add .', { cwd: tmpDir });
   await execAsync('git commit -m "Initial commit"', { cwd: tmpDir });
 
   // Create main branch explicitly
-  await execAsync("git branch -M main", { cwd: tmpDir });
+  await execAsync('git branch -M main', { cwd: tmpDir });
 
   return {
     path: tmpDir,
     cleanup: async () => {
       try {
         // Remove all worktrees first
-        const { stdout } = await execAsync("git worktree list --porcelain", {
+        const { stdout } = await execAsync('git worktree list --porcelain', {
           cwd: tmpDir,
-        }).catch(() => ({ stdout: "" }));
+        }).catch(() => ({ stdout: '' }));
 
         const worktrees = stdout
-          .split("\n\n")
+          .split('\n\n')
           .slice(1) // Skip main worktree
           .map((block) => {
-            const pathLine = block.split("\n").find((line) => line.startsWith("worktree "));
-            return pathLine ? pathLine.replace("worktree ", "") : null;
+            const pathLine = block
+              .split('\n')
+              .find((line) => line.startsWith('worktree '));
+            return pathLine ? pathLine.replace('worktree ', '') : null;
           })
           .filter(Boolean);
 
@@ -64,7 +66,7 @@ export async function createTestGitRepo(): Promise<TestRepo> {
         // Remove the repository
         await fs.rm(tmpDir, { recursive: true, force: true });
       } catch (error) {
-        console.error("Failed to cleanup test repo:", error);
+        console.error('Failed to cleanup test repo:', error);
       }
     },
   };
@@ -78,12 +80,12 @@ export async function createTestFeature(
   featureId: string,
   featureData: any
 ): Promise<void> {
-  const featuresDir = path.join(repoPath, ".automaker", "features");
+  const featuresDir = path.join(repoPath, '.automaker', 'features');
   const featureDir = path.join(featuresDir, featureId);
 
   await fs.mkdir(featureDir, { recursive: true });
   await fs.writeFile(
-    path.join(featureDir, "feature.json"),
+    path.join(featureDir, 'feature.json'),
     JSON.stringify(featureData, null, 2)
   );
 }
@@ -92,10 +94,10 @@ export async function createTestFeature(
  * Get list of git branches
  */
 export async function listBranches(repoPath: string): Promise<string[]> {
-  const { stdout } = await execAsync("git branch --list", { cwd: repoPath });
+  const { stdout } = await execAsync('git branch --list', { cwd: repoPath });
   return stdout
-    .split("\n")
-    .map((line) => line.trim().replace(/^[*+]\s*/, ""))
+    .split('\n')
+    .map((line) => line.trim().replace(/^[*+]\s*/, ''))
     .filter(Boolean);
 }
 
@@ -104,16 +106,18 @@ export async function listBranches(repoPath: string): Promise<string[]> {
  */
 export async function listWorktrees(repoPath: string): Promise<string[]> {
   try {
-    const { stdout } = await execAsync("git worktree list --porcelain", {
+    const { stdout } = await execAsync('git worktree list --porcelain', {
       cwd: repoPath,
     });
 
     return stdout
-      .split("\n\n")
+      .split('\n\n')
       .slice(1) // Skip main worktree
       .map((block) => {
-        const pathLine = block.split("\n").find((line) => line.startsWith("worktree "));
-        return pathLine ? pathLine.replace("worktree ", "") : null;
+        const pathLine = block
+          .split('\n')
+          .find((line) => line.startsWith('worktree '));
+        return pathLine ? pathLine.replace('worktree ', '') : null;
       })
       .filter(Boolean) as string[];
   } catch {

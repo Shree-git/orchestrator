@@ -1,16 +1,15 @@
-
-import { useState, useCallback } from "react";
-import { useAppStore } from "@/store/app-store";
+import { useState, useCallback } from 'react';
+import { useAppStore } from '@/store/app-store';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   FileText,
   FolderOpen,
@@ -22,9 +21,9 @@ import {
   File,
   Pencil,
   Wrench,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { getElectronAPI } from "@/lib/electron";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { getElectronAPI } from '@/lib/electron';
 
 interface ToolResult {
   success: boolean;
@@ -45,20 +44,20 @@ export function AgentToolsView() {
   const api = getElectronAPI();
 
   // Read File Tool State
-  const [readFilePath, setReadFilePath] = useState("");
+  const [readFilePath, setReadFilePath] = useState('');
   const [readFileResult, setReadFileResult] = useState<ToolResult | null>(null);
   const [isReadingFile, setIsReadingFile] = useState(false);
 
   // Write File Tool State
-  const [writeFilePath, setWriteFilePath] = useState("");
-  const [writeFileContent, setWriteFileContent] = useState("");
+  const [writeFilePath, setWriteFilePath] = useState('');
+  const [writeFileContent, setWriteFileContent] = useState('');
   const [writeFileResult, setWriteFileResult] = useState<ToolResult | null>(
     null
   );
   const [isWritingFile, setIsWritingFile] = useState(false);
 
   // Terminal Tool State
-  const [terminalCommand, setTerminalCommand] = useState("ls");
+  const [terminalCommand, setTerminalCommand] = useState('ls');
   const [terminalResult, setTerminalResult] = useState<ToolResult | null>(null);
   const [isRunningCommand, setIsRunningCommand] = useState(false);
 
@@ -85,7 +84,7 @@ export function AgentToolsView() {
       } else {
         setReadFileResult({
           success: false,
-          error: result.error || "Failed to read file",
+          error: result.error || 'Failed to read file',
           timestamp: new Date(),
         });
         console.log(`[Agent Tool] File read failed: ${result.error}`);
@@ -93,7 +92,7 @@ export function AgentToolsView() {
     } catch (error) {
       setReadFileResult({
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
       });
     } finally {
@@ -124,7 +123,7 @@ export function AgentToolsView() {
       } else {
         setWriteFileResult({
           success: false,
-          error: result.error || "Failed to write file",
+          error: result.error || 'Failed to write file',
           timestamp: new Date(),
         });
         console.log(`[Agent Tool] File write failed: ${result.error}`);
@@ -132,7 +131,7 @@ export function AgentToolsView() {
     } catch (error) {
       setWriteFileResult({
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
       });
     } finally {
@@ -154,12 +153,12 @@ export function AgentToolsView() {
       // Simulated outputs for common commands (preview mode)
       // In production, the agent executes commands via Claude SDK
       const simulatedOutputs: Record<string, string> = {
-        ls: "app_spec.txt\nfeatures\nnode_modules\npackage.json\nsrc\ntests\ntsconfig.json",
-        pwd: currentProject?.path || "/Users/demo/project",
-        "echo hello": "hello",
-        whoami: "automaker-agent",
+        ls: 'app_spec.txt\nfeatures\nnode_modules\npackage.json\nsrc\ntests\ntsconfig.json',
+        pwd: currentProject?.path || '/Users/demo/project',
+        'echo hello': 'hello',
+        whoami: 'automaker-agent',
         date: new Date().toString(),
-        "cat package.json":
+        'cat package.json':
           '{\n  "name": "demo-project",\n  "version": "1.0.0"\n}',
       };
 
@@ -181,7 +180,7 @@ export function AgentToolsView() {
     } catch (error) {
       setTerminalResult({
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
       });
     } finally {
@@ -270,10 +269,10 @@ export function AgentToolsView() {
               {readFileResult && (
                 <div
                   className={cn(
-                    "p-3 rounded-md border",
+                    'p-3 rounded-md border',
                     readFileResult.success
-                      ? "bg-green-500/10 border-green-500/20"
-                      : "bg-red-500/10 border-red-500/20"
+                      ? 'bg-green-500/10 border-green-500/20'
+                      : 'bg-red-500/10 border-red-500/20'
                   )}
                   data-testid="read-file-result"
                 >
@@ -284,7 +283,7 @@ export function AgentToolsView() {
                       <XCircle className="w-4 h-4 text-red-500" />
                     )}
                     <span className="text-sm font-medium">
-                      {readFileResult.success ? "Success" : "Failed"}
+                      {readFileResult.success ? 'Success' : 'Failed'}
                     </span>
                   </div>
                   <pre className="text-xs overflow-auto max-h-40 whitespace-pre-wrap">
@@ -357,10 +356,10 @@ export function AgentToolsView() {
               {writeFileResult && (
                 <div
                   className={cn(
-                    "p-3 rounded-md border",
+                    'p-3 rounded-md border',
                     writeFileResult.success
-                      ? "bg-green-500/10 border-green-500/20"
-                      : "bg-red-500/10 border-red-500/20"
+                      ? 'bg-green-500/10 border-green-500/20'
+                      : 'bg-red-500/10 border-red-500/20'
                   )}
                   data-testid="write-file-result"
                 >
@@ -371,7 +370,7 @@ export function AgentToolsView() {
                       <XCircle className="w-4 h-4 text-red-500" />
                     )}
                     <span className="text-sm font-medium">
-                      {writeFileResult.success ? "Success" : "Failed"}
+                      {writeFileResult.success ? 'Success' : 'Failed'}
                     </span>
                   </div>
                   <pre className="text-xs overflow-auto max-h-40 whitespace-pre-wrap">
@@ -429,10 +428,10 @@ export function AgentToolsView() {
               {terminalResult && (
                 <div
                   className={cn(
-                    "p-3 rounded-md border",
+                    'p-3 rounded-md border',
                     terminalResult.success
-                      ? "bg-green-500/10 border-green-500/20"
-                      : "bg-red-500/10 border-red-500/20"
+                      ? 'bg-green-500/10 border-green-500/20'
+                      : 'bg-red-500/10 border-red-500/20'
                   )}
                   data-testid="terminal-result"
                 >
@@ -443,12 +442,12 @@ export function AgentToolsView() {
                       <XCircle className="w-4 h-4 text-red-500" />
                     )}
                     <span className="text-sm font-medium">
-                      {terminalResult.success ? "Success" : "Failed"}
+                      {terminalResult.success ? 'Success' : 'Failed'}
                     </span>
                   </div>
                   <pre className="text-xs overflow-auto max-h-40 whitespace-pre-wrap font-mono bg-black/50 text-green-400 p-2 rounded">
                     $ {terminalCommand}
-                    {"\n"}
+                    {'\n'}
                     {terminalResult.success
                       ? terminalResult.output
                       : terminalResult.error}

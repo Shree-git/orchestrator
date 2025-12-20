@@ -2,44 +2,79 @@
  * Common utilities shared across all route modules
  */
 
-import { createLogger } from "../lib/logger.js";
-import fs from "fs/promises";
-import path from "path";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { createLogger } from '../lib/logger.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 type Logger = ReturnType<typeof createLogger>;
 
 const execAsync = promisify(exec);
-const logger = createLogger("Common");
+const logger = createLogger('Common');
 
 // Max file size for generating synthetic diffs (1MB)
 const MAX_SYNTHETIC_DIFF_SIZE = 1024 * 1024;
 
 // Binary file extensions to skip
 const BINARY_EXTENSIONS = new Set([
-  ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".svg",
-  ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
-  ".zip", ".tar", ".gz", ".rar", ".7z",
-  ".exe", ".dll", ".so", ".dylib",
-  ".mp3", ".mp4", ".wav", ".avi", ".mov", ".mkv",
-  ".ttf", ".otf", ".woff", ".woff2", ".eot",
-  ".db", ".sqlite", ".sqlite3",
-  ".pyc", ".pyo", ".class", ".o", ".obj",
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.bmp',
+  '.ico',
+  '.webp',
+  '.svg',
+  '.pdf',
+  '.doc',
+  '.docx',
+  '.xls',
+  '.xlsx',
+  '.ppt',
+  '.pptx',
+  '.zip',
+  '.tar',
+  '.gz',
+  '.rar',
+  '.7z',
+  '.exe',
+  '.dll',
+  '.so',
+  '.dylib',
+  '.mp3',
+  '.mp4',
+  '.wav',
+  '.avi',
+  '.mov',
+  '.mkv',
+  '.ttf',
+  '.otf',
+  '.woff',
+  '.woff2',
+  '.eot',
+  '.db',
+  '.sqlite',
+  '.sqlite3',
+  '.pyc',
+  '.pyo',
+  '.class',
+  '.o',
+  '.obj',
 ]);
 
 // Status map for git status codes
 // Git porcelain format uses XY where X=staging area, Y=working tree
 const GIT_STATUS_MAP: Record<string, string> = {
-  M: "Modified",
-  A: "Added",
-  D: "Deleted",
-  R: "Renamed",
-  C: "Copied",
-  U: "Updated",
-  "?": "Untracked",
-  "!": "Ignored",
-  " ": "Unmodified",
+  M: 'Modified',
+  A: 'Added',
+  D: 'Deleted',
+  R: 'Renamed',
+  C: 'Copied',
+  U: 'Updated',
+  '?': 'Untracked',
+  '!': 'Ignored',
+  ' ': 'Unmodified',
 };
 
 /**
@@ -48,30 +83,36 @@ const GIT_STATUS_MAP: Record<string, string> = {
  */
 function getStatusText(indexStatus: string, workTreeStatus: string): string {
   // Untracked files
-  if (indexStatus === "?" && workTreeStatus === "?") {
-    return "Untracked";
+  if (indexStatus === '?' && workTreeStatus === '?') {
+    return 'Untracked';
   }
 
   // Ignored files
-  if (indexStatus === "!" && workTreeStatus === "!") {
-    return "Ignored";
+  if (indexStatus === '!' && workTreeStatus === '!') {
+    return 'Ignored';
   }
 
   // Prioritize staging area status, then working tree
-  const primaryStatus = indexStatus !== " " && indexStatus !== "?" ? indexStatus : workTreeStatus;
+  const primaryStatus =
+    indexStatus !== ' ' && indexStatus !== '?' ? indexStatus : workTreeStatus;
 
   // Handle combined statuses
-  if (indexStatus !== " " && indexStatus !== "?" && workTreeStatus !== " " && workTreeStatus !== "?") {
+  if (
+    indexStatus !== ' ' &&
+    indexStatus !== '?' &&
+    workTreeStatus !== ' ' &&
+    workTreeStatus !== '?'
+  ) {
     // Both staging and working tree have changes
-    const indexText = GIT_STATUS_MAP[indexStatus] || "Changed";
-    const workText = GIT_STATUS_MAP[workTreeStatus] || "Changed";
+    const indexText = GIT_STATUS_MAP[indexStatus] || 'Changed';
+    const workText = GIT_STATUS_MAP[workTreeStatus] || 'Changed';
     if (indexText === workText) {
       return indexText;
     }
     return `${indexText} (staged), ${workText} (unstaged)`;
   }
 
-  return GIT_STATUS_MAP[primaryStatus] || "Changed";
+  return GIT_STATUS_MAP[primaryStatus] || 'Changed';
 }
 
 /**
@@ -96,7 +137,7 @@ function isBinaryFile(filePath: string): boolean {
  */
 export async function isGitRepo(repoPath: string): Promise<boolean> {
   try {
-    await execAsync("git rev-parse --is-inside-work-tree", { cwd: repoPath });
+    await execAsync('git rev-parse --is-inside-work-tree', { cwd: repoPath });
     return true;
   } catch {
     return false;
@@ -110,21 +151,21 @@ export async function isGitRepo(repoPath: string): Promise<boolean> {
  */
 export function parseGitStatus(statusOutput: string): FileStatus[] {
   return statusOutput
-    .split("\n")
+    .split('\n')
     .filter(Boolean)
     .map((line) => {
       // Git porcelain format uses two status characters: XY
       // X = status in staging area (index)
       // Y = status in working tree
-      const indexStatus = line[0] || " ";
-      const workTreeStatus = line[1] || " ";
+      const indexStatus = line[0] || ' ';
+      const workTreeStatus = line[1] || ' ';
 
       // File path starts at position 3 (after "XY ")
       let filePath = line.slice(3);
 
       // Handle renamed files (format: "R  old_path -> new_path")
-      if (indexStatus === "R" || workTreeStatus === "R") {
-        const arrowIndex = filePath.indexOf(" -> ");
+      if (indexStatus === 'R' || workTreeStatus === 'R') {
+        const arrowIndex = filePath.indexOf(' -> ');
         if (arrowIndex !== -1) {
           filePath = filePath.slice(arrowIndex + 4); // Use new path
         }
@@ -133,9 +174,9 @@ export function parseGitStatus(statusOutput: string): FileStatus[] {
       // Determine the primary status character for backwards compatibility
       // Prioritize staging area status, then working tree
       let primaryStatus: string;
-      if (indexStatus === "?" && workTreeStatus === "?") {
-        primaryStatus = "?"; // Untracked
-      } else if (indexStatus !== " " && indexStatus !== "?") {
+      if (indexStatus === '?' && workTreeStatus === '?') {
+        primaryStatus = '?'; // Untracked
+      } else if (indexStatus !== ' ' && indexStatus !== '?') {
         primaryStatus = indexStatus; // Staged change
       } else {
         primaryStatus = workTreeStatus; // Working tree change
@@ -184,18 +225,18 @@ index 0000000..0000000
     }
 
     // Read file content
-    const content = await fs.readFile(fullPath, "utf-8");
-    const hasTrailingNewline = content.endsWith("\n");
-    const lines = content.split("\n");
+    const content = await fs.readFile(fullPath, 'utf-8');
+    const hasTrailingNewline = content.endsWith('\n');
+    const lines = content.split('\n');
 
     // Remove trailing empty line if the file ends with newline
-    if (lines.length > 0 && lines.at(-1) === "") {
+    if (lines.length > 0 && lines.at(-1) === '') {
       lines.pop();
     }
 
     // Generate diff format
     const lineCount = lines.length;
-    const addedLines = lines.map(line => `+${line}`).join("\n");
+    const addedLines = lines.map((line) => `+${line}`).join('\n');
 
     let diff = `diff --git a/${relativePath} b/${relativePath}
 new file mode 100644
@@ -207,10 +248,10 @@ ${addedLines}`;
 
     // Add "No newline at end of file" indicator if needed
     if (!hasTrailingNewline && content.length > 0) {
-      diff += "\n\\ No newline at end of file";
+      diff += '\n\\ No newline at end of file';
     }
 
-    return diff + "\n";
+    return diff + '\n';
   } catch (error) {
     // Log the error for debugging
     logger.error(`Failed to generate synthetic diff for ${fullPath}:`, error);
@@ -235,7 +276,7 @@ export async function appendUntrackedFileDiffs(
   files: Array<{ status: string; path: string }>
 ): Promise<string> {
   // Find untracked files (status "?")
-  const untrackedFiles = files.filter(f => f.status === "?");
+  const untrackedFiles = files.filter((f) => f.status === '?');
 
   if (untrackedFiles.length === 0) {
     return existingDiff;
@@ -243,11 +284,11 @@ export async function appendUntrackedFileDiffs(
 
   // Generate synthetic diffs for each untracked file
   const syntheticDiffs = await Promise.all(
-    untrackedFiles.map(f => generateSyntheticDiffForNewFile(basePath, f.path))
+    untrackedFiles.map((f) => generateSyntheticDiffForNewFile(basePath, f.path))
   );
 
   // Combine existing diff with synthetic diffs
-  const combinedDiff = existingDiff + syntheticDiffs.join("");
+  const combinedDiff = existingDiff + syntheticDiffs.join('');
 
   return combinedDiff;
 }
@@ -258,15 +299,23 @@ export async function appendUntrackedFileDiffs(
  */
 export async function listAllFilesInDirectory(
   basePath: string,
-  relativePath: string = ""
+  relativePath: string = ''
 ): Promise<string[]> {
   const files: string[] = [];
   const fullPath = path.join(basePath, relativePath);
 
   // Directories to skip
   const skipDirs = new Set([
-    "node_modules", ".git", ".automaker", "dist", "build",
-    ".next", ".nuxt", "__pycache__", ".cache", "coverage"
+    'node_modules',
+    '.git',
+    '.automaker',
+    'dist',
+    'build',
+    '.next',
+    '.nuxt',
+    '__pycache__',
+    '.cache',
+    'coverage',
   ]);
 
   try {
@@ -274,15 +323,20 @@ export async function listAllFilesInDirectory(
 
     for (const entry of entries) {
       // Skip hidden files/folders (except we want to allow some)
-      if (entry.name.startsWith(".") && entry.name !== ".env") {
+      if (entry.name.startsWith('.') && entry.name !== '.env') {
         continue;
       }
 
-      const entryRelPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+      const entryRelPath = relativePath
+        ? `${relativePath}/${entry.name}`
+        : entry.name;
 
       if (entry.isDirectory()) {
         if (!skipDirs.has(entry.name)) {
-          const subFiles = await listAllFilesInDirectory(basePath, entryRelPath);
+          const subFiles = await listAllFilesInDirectory(
+            basePath,
+            entryRelPath
+          );
           files.push(...subFiles);
         }
       } else if (entry.isFile()) {
@@ -306,19 +360,19 @@ export async function generateDiffsForNonGitDirectory(
 ): Promise<{ diff: string; files: FileStatus[] }> {
   const allFiles = await listAllFilesInDirectory(basePath);
 
-  const files: FileStatus[] = allFiles.map(filePath => ({
-    status: "?",
+  const files: FileStatus[] = allFiles.map((filePath) => ({
+    status: '?',
     path: filePath,
-    statusText: "New",
+    statusText: 'New',
   }));
 
   // Generate synthetic diffs for all files
   const syntheticDiffs = await Promise.all(
-    files.map(f => generateSyntheticDiffForNewFile(basePath, f.path))
+    files.map((f) => generateSyntheticDiffForNewFile(basePath, f.path))
   );
 
   return {
-    diff: syntheticDiffs.join(""),
+    diff: syntheticDiffs.join(''),
     files,
   };
 }
@@ -344,11 +398,11 @@ export async function getGitRepositoryDiffs(
   }
 
   // Get git diff and status
-  const { stdout: diff } = await execAsync("git diff HEAD", {
+  const { stdout: diff } = await execAsync('git diff HEAD', {
     cwd: repoPath,
     maxBuffer: 10 * 1024 * 1024,
   });
-  const { stdout: status } = await execAsync("git status --porcelain", {
+  const { stdout: status } = await execAsync('git status --porcelain', {
     cwd: repoPath,
   });
 
@@ -368,7 +422,7 @@ export async function getGitRepositoryDiffs(
  * Get error message from error object
  */
 export function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Unknown error";
+  return error instanceof Error ? error.message : 'Unknown error';
 }
 
 /**

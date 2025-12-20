@@ -1,7 +1,6 @@
-
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { getElectronAPI } from "@/lib/electron";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { getElectronAPI } from '@/lib/electron';
+import { cn } from '@/lib/utils';
 import {
   File,
   FileText,
@@ -14,9 +13,9 @@ import {
   RefreshCw,
   GitBranch,
   AlertCircle,
-} from "lucide-react";
-import { Button } from "./button";
-import type { FileStatus } from "@/types/electron";
+} from 'lucide-react';
+import { Button } from './button';
+import type { FileStatus } from '@/types/electron';
 
 interface GitDiffPanelProps {
   projectPath: string;
@@ -31,7 +30,7 @@ interface GitDiffPanelProps {
 interface ParsedDiffHunk {
   header: string;
   lines: {
-    type: "context" | "addition" | "deletion" | "header";
+    type: 'context' | 'addition' | 'deletion' | 'header';
     content: string;
     lineNumber?: { old?: number; new?: number };
   }[];
@@ -47,16 +46,16 @@ interface ParsedFileDiff {
 
 const getFileIcon = (status: string) => {
   switch (status) {
-    case "A":
-    case "?":
+    case 'A':
+    case '?':
       return <FilePlus className="w-4 h-4 text-green-500" />;
-    case "D":
+    case 'D':
       return <FileX className="w-4 h-4 text-red-500" />;
-    case "M":
-    case "U":
+    case 'M':
+    case 'U':
       return <FilePen className="w-4 h-4 text-amber-500" />;
-    case "R":
-    case "C":
+    case 'R':
+    case 'C':
       return <File className="w-4 h-4 text-blue-500" />;
     default:
       return <FileText className="w-4 h-4 text-muted-foreground" />;
@@ -65,40 +64,40 @@ const getFileIcon = (status: string) => {
 
 const getStatusBadgeColor = (status: string) => {
   switch (status) {
-    case "A":
-    case "?":
-      return "bg-green-500/20 text-green-400 border-green-500/30";
-    case "D":
-      return "bg-red-500/20 text-red-400 border-red-500/30";
-    case "M":
-    case "U":
-      return "bg-amber-500/20 text-amber-400 border-amber-500/30";
-    case "R":
-    case "C":
-      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+    case 'A':
+    case '?':
+      return 'bg-green-500/20 text-green-400 border-green-500/30';
+    case 'D':
+      return 'bg-red-500/20 text-red-400 border-red-500/30';
+    case 'M':
+    case 'U':
+      return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+    case 'R':
+    case 'C':
+      return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
     default:
-      return "bg-muted text-muted-foreground border-border";
+      return 'bg-muted text-muted-foreground border-border';
   }
 };
 
 const getStatusDisplayName = (status: string) => {
   switch (status) {
-    case "A":
-      return "Added";
-    case "?":
-      return "Untracked";
-    case "D":
-      return "Deleted";
-    case "M":
-      return "Modified";
-    case "U":
-      return "Updated";
-    case "R":
-      return "Renamed";
-    case "C":
-      return "Copied";
+    case 'A':
+      return 'Added';
+    case '?':
+      return 'Untracked';
+    case 'D':
+      return 'Deleted';
+    case 'M':
+      return 'Modified';
+    case 'U':
+      return 'Updated';
+    case 'R':
+      return 'Renamed';
+    case 'C':
+      return 'Copied';
     default:
-      return "Changed";
+      return 'Changed';
   }
 };
 
@@ -109,7 +108,7 @@ function parseDiff(diffText: string): ParsedFileDiff[] {
   if (!diffText) return [];
 
   const files: ParsedFileDiff[] = [];
-  const lines = diffText.split("\n");
+  const lines = diffText.split('\n');
   let currentFile: ParsedFileDiff | null = null;
   let currentHunk: ParsedDiffHunk | null = null;
   let oldLineNum = 0;
@@ -119,7 +118,7 @@ function parseDiff(diffText: string): ParsedFileDiff[] {
     const line = lines[i];
 
     // New file diff
-    if (line.startsWith("diff --git")) {
+    if (line.startsWith('diff --git')) {
       if (currentFile) {
         if (currentHunk) {
           currentFile.hunks.push(currentHunk);
@@ -129,7 +128,7 @@ function parseDiff(diffText: string): ParsedFileDiff[] {
       // Extract file path from diff header
       const match = line.match(/diff --git a\/(.*?) b\/(.*)/);
       currentFile = {
-        filePath: match ? match[2] : "unknown",
+        filePath: match ? match[2] : 'unknown',
         hunks: [],
       };
       currentHunk = null;
@@ -137,34 +136,34 @@ function parseDiff(diffText: string): ParsedFileDiff[] {
     }
 
     // New file indicator
-    if (line.startsWith("new file mode")) {
+    if (line.startsWith('new file mode')) {
       if (currentFile) currentFile.isNew = true;
       continue;
     }
 
     // Deleted file indicator
-    if (line.startsWith("deleted file mode")) {
+    if (line.startsWith('deleted file mode')) {
       if (currentFile) currentFile.isDeleted = true;
       continue;
     }
 
     // Renamed file indicator
-    if (line.startsWith("rename from") || line.startsWith("rename to")) {
+    if (line.startsWith('rename from') || line.startsWith('rename to')) {
       if (currentFile) currentFile.isRenamed = true;
       continue;
     }
 
     // Skip index, ---/+++ lines
     if (
-      line.startsWith("index ") ||
-      line.startsWith("--- ") ||
-      line.startsWith("+++ ")
+      line.startsWith('index ') ||
+      line.startsWith('--- ') ||
+      line.startsWith('+++ ')
     ) {
       continue;
     }
 
     // Hunk header
-    if (line.startsWith("@@")) {
+    if (line.startsWith('@@')) {
       if (currentHunk && currentFile) {
         currentFile.hunks.push(currentHunk);
       }
@@ -174,31 +173,31 @@ function parseDiff(diffText: string): ParsedFileDiff[] {
       newLineNum = hunkMatch ? parseInt(hunkMatch[2], 10) : 1;
       currentHunk = {
         header: line,
-        lines: [{ type: "header", content: line }],
+        lines: [{ type: 'header', content: line }],
       };
       continue;
     }
 
     // Diff content lines
     if (currentHunk) {
-      if (line.startsWith("+")) {
+      if (line.startsWith('+')) {
         currentHunk.lines.push({
-          type: "addition",
+          type: 'addition',
           content: line.substring(1),
           lineNumber: { new: newLineNum },
         });
         newLineNum++;
-      } else if (line.startsWith("-")) {
+      } else if (line.startsWith('-')) {
         currentHunk.lines.push({
-          type: "deletion",
+          type: 'deletion',
           content: line.substring(1),
           lineNumber: { old: oldLineNum },
         });
         oldLineNum++;
-      } else if (line.startsWith(" ") || line === "") {
+      } else if (line.startsWith(' ') || line === '') {
         currentHunk.lines.push({
-          type: "context",
-          content: line.substring(1) || "",
+          type: 'context',
+          content: line.substring(1) || '',
           lineNumber: { old: oldLineNum, new: newLineNum },
         });
         oldLineNum++;
@@ -223,52 +222,68 @@ function DiffLine({
   content,
   lineNumber,
 }: {
-  type: "context" | "addition" | "deletion" | "header";
+  type: 'context' | 'addition' | 'deletion' | 'header';
   content: string;
   lineNumber?: { old?: number; new?: number };
 }) {
   const bgClass = {
-    context: "bg-transparent",
-    addition: "bg-green-500/10",
-    deletion: "bg-red-500/10",
-    header: "bg-blue-500/10",
+    context: 'bg-transparent',
+    addition: 'bg-green-500/10',
+    deletion: 'bg-red-500/10',
+    header: 'bg-blue-500/10',
   };
 
   const textClass = {
-    context: "text-foreground-secondary",
-    addition: "text-green-400",
-    deletion: "text-red-400",
-    header: "text-blue-400",
+    context: 'text-foreground-secondary',
+    addition: 'text-green-400',
+    deletion: 'text-red-400',
+    header: 'text-blue-400',
   };
 
   const prefix = {
-    context: " ",
-    addition: "+",
-    deletion: "-",
-    header: "",
+    context: ' ',
+    addition: '+',
+    deletion: '-',
+    header: '',
   };
 
-  if (type === "header") {
+  if (type === 'header') {
     return (
-      <div className={cn("px-2 py-1 font-mono text-xs", bgClass[type], textClass[type])}>
+      <div
+        className={cn(
+          'px-2 py-1 font-mono text-xs',
+          bgClass[type],
+          textClass[type]
+        )}
+      >
         {content}
       </div>
     );
   }
 
   return (
-    <div className={cn("flex font-mono text-xs", bgClass[type])}>
+    <div className={cn('flex font-mono text-xs', bgClass[type])}>
       <span className="w-12 flex-shrink-0 text-right pr-2 text-muted-foreground select-none border-r border-border-glass">
-        {lineNumber?.old ?? ""}
+        {lineNumber?.old ?? ''}
       </span>
       <span className="w-12 flex-shrink-0 text-right pr-2 text-muted-foreground select-none border-r border-border-glass">
-        {lineNumber?.new ?? ""}
+        {lineNumber?.new ?? ''}
       </span>
-      <span className={cn("w-4 flex-shrink-0 text-center select-none", textClass[type])}>
+      <span
+        className={cn(
+          'w-4 flex-shrink-0 text-center select-none',
+          textClass[type]
+        )}
+      >
         {prefix[type]}
       </span>
-      <span className={cn("flex-1 px-2 whitespace-pre-wrap break-all", textClass[type])}>
-        {content || "\u00A0"}
+      <span
+        className={cn(
+          'flex-1 px-2 whitespace-pre-wrap break-all',
+          textClass[type]
+        )}
+      >
+        {content || '\u00A0'}
       </span>
     </div>
   );
@@ -284,11 +299,11 @@ function FileDiffSection({
   onToggle: () => void;
 }) {
   const additions = fileDiff.hunks.reduce(
-    (acc, hunk) => acc + hunk.lines.filter((l) => l.type === "addition").length,
+    (acc, hunk) => acc + hunk.lines.filter((l) => l.type === 'addition').length,
     0
   );
   const deletions = fileDiff.hunks.reduce(
-    (acc, hunk) => acc + hunk.lines.filter((l) => l.type === "deletion").length,
+    (acc, hunk) => acc + hunk.lines.filter((l) => l.type === 'deletion').length,
     0
   );
 
@@ -334,7 +349,10 @@ function FileDiffSection({
       {isExpanded && (
         <div className="bg-background border-t border-border max-h-[400px] overflow-y-auto scrollbar-visible">
           {fileDiff.hunks.map((hunk, hunkIndex) => (
-            <div key={hunkIndex} className="border-b border-border-glass last:border-b-0">
+            <div
+              key={hunkIndex}
+              className="border-b border-border-glass last:border-b-0"
+            >
               {hunk.lines.map((line, lineIndex) => (
                 <DiffLine
                   key={lineIndex}
@@ -362,7 +380,7 @@ export function GitDiffPanel({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<FileStatus[]>([]);
-  const [diffContent, setDiffContent] = useState<string>("");
+  const [diffContent, setDiffContent] = useState<string>('');
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
 
   const loadDiffs = useCallback(async () => {
@@ -374,30 +392,30 @@ export function GitDiffPanel({
       // Use worktree API if worktrees are enabled, otherwise use git API for main project
       if (useWorktrees) {
         if (!api?.worktree?.getDiffs) {
-          throw new Error("Worktree API not available");
+          throw new Error('Worktree API not available');
         }
         const result = await api.worktree.getDiffs(projectPath, featureId);
         if (result.success) {
           setFiles(result.files || []);
-          setDiffContent(result.diff || "");
+          setDiffContent(result.diff || '');
         } else {
-          setError(result.error || "Failed to load diffs");
+          setError(result.error || 'Failed to load diffs');
         }
       } else {
         // Use git API for main project diffs
         if (!api?.git?.getDiffs) {
-          throw new Error("Git API not available");
+          throw new Error('Git API not available');
         }
         const result = await api.git.getDiffs(projectPath);
         if (result.success) {
           setFiles(result.files || []);
-          setDiffContent(result.diff || "");
+          setDiffContent(result.diff || '');
         } else {
-          setError(result.error || "Failed to load diffs");
+          setError(result.error || 'Failed to load diffs');
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load diffs");
+      setError(err instanceof Error ? err.message : 'Failed to load diffs');
     } finally {
       setIsLoading(false);
     }
@@ -438,7 +456,7 @@ export function GitDiffPanel({
       acc +
       file.hunks.reduce(
         (hAcc, hunk) =>
-          hAcc + hunk.lines.filter((l) => l.type === "addition").length,
+          hAcc + hunk.lines.filter((l) => l.type === 'addition').length,
         0
       ),
     0
@@ -448,7 +466,7 @@ export function GitDiffPanel({
       acc +
       file.hunks.reduce(
         (hAcc, hunk) =>
-          hAcc + hunk.lines.filter((l) => l.type === "deletion").length,
+          hAcc + hunk.lines.filter((l) => l.type === 'deletion').length,
         0
       ),
     0
@@ -457,7 +475,7 @@ export function GitDiffPanel({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border bg-card backdrop-blur-sm overflow-hidden",
+        'rounded-xl border border-border bg-card backdrop-blur-sm overflow-hidden',
         className
       )}
       data-testid="git-diff-panel"
@@ -475,13 +493,15 @@ export function GitDiffPanel({
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           )}
           <GitBranch className="w-4 h-4 text-brand-500" />
-          <span className="font-medium text-sm text-foreground">Git Changes</span>
+          <span className="font-medium text-sm text-foreground">
+            Git Changes
+          </span>
         </div>
         <div className="flex items-center gap-3 text-xs">
           {!isExpanded && files.length > 0 && (
             <>
               <span className="text-muted-foreground">
-                {files.length} {files.length === 1 ? "file" : "files"}
+                {files.length} {files.length === 1 ? 'file' : 'files'}
               </span>
               {totalAdditions > 0 && (
                 <span className="text-green-400">+{totalAdditions}</span>
@@ -528,38 +548,46 @@ export function GitDiffPanel({
                   <div className="flex items-center gap-4 flex-wrap">
                     {(() => {
                       // Group files by status
-                      const statusGroups = files.reduce((acc, file) => {
-                        const status = file.status;
-                        if (!acc[status]) {
-                          acc[status] = {
-                            count: 0,
-                            statusText: getStatusDisplayName(status),
-                            files: []
-                          };
-                        }
-                        acc[status].count += 1;
-                        acc[status].files.push(file.path);
-                        return acc;
-                      }, {} as Record<string, {count: number, statusText: string, files: string[]}>);
-
-                      return Object.entries(statusGroups).map(([status, group]) => (
-                        <div
-                          key={status}
-                          className="flex items-center gap-1.5"
-                          title={group.files.join('\n')}
-                          data-testid={`git-status-group-${status.toLowerCase()}`}
+                      const statusGroups = files.reduce(
+                        (acc, file) => {
+                          const status = file.status;
+                          if (!acc[status]) {
+                            acc[status] = {
+                              count: 0,
+                              statusText: getStatusDisplayName(status),
+                              files: [],
+                            };
+                          }
+                          acc[status].count += 1;
+                          acc[status].files.push(file.path);
+                          return acc;
+                        },
+                        {} as Record<
+                          string,
+                          { count: number; statusText: string; files: string[] }
                         >
-                          {getFileIcon(status)}
-                          <span
-                            className={cn(
-                              "text-xs px-1.5 py-0.5 rounded border font-medium",
-                              getStatusBadgeColor(status)
-                            )}
+                      );
+
+                      return Object.entries(statusGroups).map(
+                        ([status, group]) => (
+                          <div
+                            key={status}
+                            className="flex items-center gap-1.5"
+                            title={group.files.join('\n')}
+                            data-testid={`git-status-group-${status.toLowerCase()}`}
                           >
-                            {group.count} {group.statusText}
-                          </span>
-                        </div>
-                      ));
+                            {getFileIcon(status)}
+                            <span
+                              className={cn(
+                                'text-xs px-1.5 py-0.5 rounded border font-medium',
+                                getStatusBadgeColor(status)
+                              )}
+                            >
+                              {group.count} {group.statusText}
+                            </span>
+                          </div>
+                        )
+                      );
                     })()}
                   </div>
                   <div className="flex items-center gap-2">
@@ -594,7 +622,8 @@ export function GitDiffPanel({
                 {/* Stats */}
                 <div className="flex items-center gap-4 text-sm mt-2">
                   <span className="text-muted-foreground">
-                    {files.length} {files.length === 1 ? "file" : "files"} changed
+                    {files.length} {files.length === 1 ? 'file' : 'files'}{' '}
+                    changed
                   </span>
                   {totalAdditions > 0 && (
                     <span className="text-green-400">
@@ -634,7 +663,7 @@ export function GitDiffPanel({
                           </span>
                           <span
                             className={cn(
-                              "text-xs px-1.5 py-0.5 rounded border font-medium",
+                              'text-xs px-1.5 py-0.5 rounded border font-medium',
                               getStatusBadgeColor(file.status)
                             )}
                           >
@@ -642,9 +671,11 @@ export function GitDiffPanel({
                           </span>
                         </div>
                         <div className="px-4 py-3 text-sm text-muted-foreground bg-background border-t border-border">
-                          {file.status === "?" ? (
-                            <span>New file - content preview not available</span>
-                          ) : file.status === "D" ? (
+                          {file.status === '?' ? (
+                            <span>
+                              New file - content preview not available
+                            </span>
+                          ) : file.status === 'D' ? (
                             <span>File deleted</span>
                           ) : (
                             <span>Diff content not available</span>

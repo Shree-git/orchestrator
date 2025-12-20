@@ -1,10 +1,10 @@
-import * as path from "path";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
-import electron from "vite-plugin-electron/simple";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-import { fileURLToPath } from "url";
+import * as path from 'path';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite';
+import electron from 'vite-plugin-electron/simple';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,8 +12,8 @@ export default defineConfig(({ command }) => {
   // Only skip electron plugin during dev server in CI (no display available for Electron)
   // Always include it during build - we need dist-electron/main.js for electron-builder
   const skipElectron =
-    command === "serve" &&
-    (process.env.CI === "true" || process.env.VITE_SKIP_ELECTRON === "true");
+    command === 'serve' &&
+    (process.env.CI === 'true' || process.env.VITE_SKIP_ELECTRON === 'true');
 
   return {
     plugins: [
@@ -23,23 +23,23 @@ export default defineConfig(({ command }) => {
         : [
             electron({
               main: {
-                entry: "src/main.ts",
+                entry: 'src/main.ts',
                 vite: {
                   build: {
-                    outDir: "dist-electron",
+                    outDir: 'dist-electron',
                     rollupOptions: {
-                      external: ["electron"],
+                      external: ['electron'],
                     },
                   },
                 },
               },
               preload: {
-                input: "src/preload.ts",
+                input: 'src/preload.ts',
                 vite: {
                   build: {
-                    outDir: "dist-electron",
+                    outDir: 'dist-electron',
                     rollupOptions: {
-                      external: ["electron"],
+                      external: ['electron'],
                     },
                   },
                 },
@@ -47,24 +47,24 @@ export default defineConfig(({ command }) => {
             }),
           ]),
       TanStackRouterVite({
-        target: "react",
+        target: 'react',
         autoCodeSplitting: true,
-        routesDirectory: "./src/routes",
-        generatedRouteTree: "./src/routeTree.gen.ts",
+        routesDirectory: './src/routes',
+        generatedRouteTree: './src/routeTree.gen.ts',
       }),
       tailwindcss(),
       react(),
     ],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"),
+        '@': path.resolve(__dirname, './src'),
       },
     },
     server: {
-      port: parseInt(process.env.TEST_PORT || "3007", 10),
+      port: parseInt(process.env.TEST_PORT || '3007', 10),
     },
     build: {
-      outDir: "dist",
+      outDir: 'dist',
     },
   };
 });

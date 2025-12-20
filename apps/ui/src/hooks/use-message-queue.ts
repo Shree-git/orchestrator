@@ -27,23 +27,28 @@ interface UseMessageQueueResult {
  * This allows users to queue up multiple messages while one is being processed,
  * improving the chat experience by removing blocking behavior.
  */
-export function useMessageQueue({ onProcessNext }: UseMessageQueueOptions): UseMessageQueueResult {
+export function useMessageQueue({
+  onProcessNext,
+}: UseMessageQueueOptions): UseMessageQueueResult {
   const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
 
-  const addToQueue = useCallback((content: string, images?: ImageAttachment[]) => {
-    const queuedMessage: QueuedMessage = {
-      id: `queued-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      content: content.trim(),
-      images,
-      timestamp: new Date(),
-    };
+  const addToQueue = useCallback(
+    (content: string, images?: ImageAttachment[]) => {
+      const queuedMessage: QueuedMessage = {
+        id: `queued-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        content: content.trim(),
+        images,
+        timestamp: new Date(),
+      };
 
-    setQueuedMessages(prev => [...prev, queuedMessage]);
-  }, []);
+      setQueuedMessages((prev) => [...prev, queuedMessage]);
+    },
+    []
+  );
 
   const removeFromQueue = useCallback((messageId: string) => {
-    setQueuedMessages(prev => prev.filter(msg => msg.id !== messageId));
+    setQueuedMessages((prev) => prev.filter((msg) => msg.id !== messageId));
   }, []);
 
   const clearQueue = useCallback(() => {
@@ -61,7 +66,7 @@ export function useMessageQueue({ onProcessNext }: UseMessageQueueOptions): UseM
     try {
       await onProcessNext(nextMessage);
       // Remove the processed message from queue
-      setQueuedMessages(prev => prev.slice(1));
+      setQueuedMessages((prev) => prev.slice(1));
     } catch (error) {
       console.error('Error processing queued message:', error);
       // Keep the message in queue for retry or manual removal

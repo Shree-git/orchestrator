@@ -1,5 +1,5 @@
-import { Page, Locator } from "@playwright/test";
-import { clickElement } from "../core/interactions";
+import { Page, Locator } from '@playwright/test';
+import { clickElement } from '../core/interactions';
 
 /**
  * Get the log viewer header element (contains type counts and expand/collapse buttons)
@@ -79,14 +79,14 @@ export async function isLogTypeCountBadgeVisible(
  * Click the expand all button in the log viewer
  */
 export async function clickLogExpandAll(page: Page): Promise<void> {
-  await clickElement(page, "log-expand-all");
+  await clickElement(page, 'log-expand-all');
 }
 
 /**
  * Click the collapse all button in the log viewer
  */
 export async function clickLogCollapseAll(page: Page): Promise<void> {
-  await clickElement(page, "log-collapse-all");
+  await clickElement(page, 'log-collapse-all');
 }
 
 /**
@@ -109,7 +109,7 @@ export async function isLogEntryBadgeVisible(page: Page): Promise<boolean> {
  */
 export async function getViewModeButton(
   page: Page,
-  mode: "parsed" | "raw"
+  mode: 'parsed' | 'raw'
 ): Promise<Locator> {
   return page.locator(`[data-testid="view-mode-${mode}"]`);
 }
@@ -119,7 +119,7 @@ export async function getViewModeButton(
  */
 export async function clickViewModeButton(
   page: Page,
-  mode: "parsed" | "raw"
+  mode: 'parsed' | 'raw'
 ): Promise<void> {
   await clickElement(page, `view-mode-${mode}`);
 }
@@ -129,9 +129,9 @@ export async function clickViewModeButton(
  */
 export async function isViewModeActive(
   page: Page,
-  mode: "parsed" | "raw"
+  mode: 'parsed' | 'raw'
 ): Promise<boolean> {
   const button = page.locator(`[data-testid="view-mode-${mode}"]`);
-  const classes = await button.getAttribute("class");
-  return classes?.includes("text-purple-300") ?? false;
+  const classes = await button.getAttribute('class');
+  return classes?.includes('text-purple-300') ?? false;
 }

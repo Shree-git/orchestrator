@@ -1,9 +1,8 @@
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FlaskConical, Plus } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { FlaskConical, Plus } from 'lucide-react';
 
 interface TestingTabContentProps {
   skipTests: boolean;
@@ -18,9 +17,9 @@ export function TestingTabContent({
   onSkipTestsChange,
   steps,
   onStepsChange,
-  testIdPrefix = "",
+  testIdPrefix = '',
 }: TestingTabContentProps) {
-  const checkboxId = testIdPrefix ? `${testIdPrefix}-skip-tests` : "skip-tests";
+  const checkboxId = testIdPrefix ? `${testIdPrefix}-skip-tests` : 'skip-tests';
 
   const handleStepChange = (index: number, value: string) => {
     const newSteps = [...steps];
@@ -29,7 +28,7 @@ export function TestingTabContent({
   };
 
   const handleAddStep = () => {
-    onStepsChange([...steps, ""]);
+    onStepsChange([...steps, '']);
   };
 
   return (
@@ -39,7 +38,7 @@ export function TestingTabContent({
           id={checkboxId}
           checked={!skipTests}
           onCheckedChange={(checked) => onSkipTestsChange(checked !== true)}
-          data-testid={`${testIdPrefix ? testIdPrefix + "-" : ""}skip-tests-checkbox`}
+          data-testid={`${testIdPrefix ? testIdPrefix + '-' : ''}skip-tests-checkbox`}
         />
         <div className="flex items-center gap-2">
           <Label htmlFor={checkboxId} className="text-sm cursor-pointer">
@@ -66,14 +65,14 @@ export function TestingTabContent({
               value={step}
               placeholder={`Verification step ${index + 1}`}
               onChange={(e) => handleStepChange(index, e.target.value)}
-              data-testid={`${testIdPrefix ? testIdPrefix + "-" : ""}feature-step-${index}${testIdPrefix ? "" : "-input"}`}
+              data-testid={`${testIdPrefix ? testIdPrefix + '-' : ''}feature-step-${index}${testIdPrefix ? '' : '-input'}`}
             />
           ))}
           <Button
             variant="outline"
             size="sm"
             onClick={handleAddStep}
-            data-testid={`${testIdPrefix ? testIdPrefix + "-" : ""}add-step-button`}
+            data-testid={`${testIdPrefix ? testIdPrefix + '-' : ''}add-step-button`}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Verification Step

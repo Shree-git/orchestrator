@@ -15,11 +15,11 @@
  * so it doesn't make real API calls during CI/CD runs.
  */
 
-import { test, expect } from "@playwright/test";
-import * as fs from "fs";
-import * as path from "path";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 import {
   waitForNetworkIdle,
@@ -32,12 +32,12 @@ import {
   fillAddFeatureDialog,
   confirmAddFeature,
   dragAndDropWithDndKit,
-} from "./utils";
+} from './utils';
 
 const execAsync = promisify(exec);
 
 // Create unique temp dir for this test run
-const TEST_TEMP_DIR = createTempDirPath("feature-lifecycle-tests");
+const TEST_TEMP_DIR = createTempDirPath('feature-lifecycle-tests');
 
 interface TestRepo {
   path: string;
@@ -45,9 +45,9 @@ interface TestRepo {
 }
 
 // Configure all tests to run serially
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: 'serial' });
 
-test.describe("Feature Lifecycle Tests", () => {
+test.describe('Feature Lifecycle Tests', () => {
   let testRepo: TestRepo;
   let featureId: string;
 
@@ -76,7 +76,7 @@ test.describe("Feature Lifecycle Tests", () => {
   });
 
   // this one fails in github actions for some reason
-  test.skip("complete feature lifecycle: create -> in_progress -> waiting_approval -> commit -> verified -> archive -> restore -> delete", async ({
+  test.skip('complete feature lifecycle: create -> in_progress -> waiting_approval -> commit -> verified -> archive -> restore -> delete', async ({
     page,
   }) => {
     // Increase timeout for this comprehensive test
@@ -87,7 +87,7 @@ test.describe("Feature Lifecycle Tests", () => {
     // ==========================================================================
     // Use no-worktrees setup to avoid worktree-related filtering/initialization issues
     await setupProjectWithPathNoWorktrees(page, testRepo.path);
-    await page.goto("/");
+    await page.goto('/');
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
@@ -99,7 +99,7 @@ test.describe("Feature Lifecycle Tests", () => {
 
     // Fill in the feature details - requesting a file with "yellow" content
     const featureDescription =
-      "Create a file named yellow.txt that contains the text yellow";
+      'Create a file named yellow.txt that contains the text yellow';
     const descriptionInput = page
       .locator('[data-testid="add-feature-dialog"] textarea')
       .first();
@@ -109,7 +109,7 @@ test.describe("Feature Lifecycle Tests", () => {
     await confirmAddFeature(page);
 
     // Debug: Check the filesystem to see if feature was created
-    const featuresDir = path.join(testRepo.path, ".automaker", "features");
+    const featuresDir = path.join(testRepo.path, '.automaker', 'features');
 
     // Wait for the feature to be created in the filesystem
     await expect(async () => {
@@ -152,12 +152,12 @@ test.describe("Feature Lifecycle Tests", () => {
     await expect(async () => {
       const featureData = JSON.parse(
         fs.readFileSync(
-          path.join(featuresDir, featureId, "feature.json"),
-          "utf-8"
+          path.join(featuresDir, featureId, 'feature.json'),
+          'utf-8'
         )
       );
       // Feature should be either in_progress (agent running) or waiting_approval (agent done)
-      expect(["in_progress", "waiting_approval"]).toContain(featureData.status);
+      expect(['in_progress', 'waiting_approval']).toContain(featureData.status);
     }).toPass({ timeout: 15000 });
 
     // The mock agent should complete quickly (about 1.3 seconds based on the sleep times)
@@ -166,11 +166,11 @@ test.describe("Feature Lifecycle Tests", () => {
     await expect(async () => {
       const featureData = JSON.parse(
         fs.readFileSync(
-          path.join(featuresDir, featureId, "feature.json"),
-          "utf-8"
+          path.join(featuresDir, featureId, 'feature.json'),
+          'utf-8'
         )
       );
-      expect(featureData.status).toBe("waiting_approval");
+      expect(featureData.status).toBe('waiting_approval');
     }).toPass({ timeout: 30000 });
 
     // Refresh page to ensure UI reflects the status change
@@ -190,10 +190,10 @@ test.describe("Feature Lifecycle Tests", () => {
     await expect(cardInWaitingApproval).toBeVisible({ timeout: 10000 });
 
     // Verify the mock agent created the yellow.txt file
-    const yellowFilePath = path.join(testRepo.path, "yellow.txt");
+    const yellowFilePath = path.join(testRepo.path, 'yellow.txt');
     expect(fs.existsSync(yellowFilePath)).toBe(true);
-    const yellowContent = fs.readFileSync(yellowFilePath, "utf-8");
-    expect(yellowContent).toBe("yellow");
+    const yellowContent = fs.readFileSync(yellowFilePath, 'utf-8');
+    expect(yellowContent).toBe('yellow');
 
     // ==========================================================================
     // Step 4: Click commit and verify git status shows committed changes
@@ -207,18 +207,18 @@ test.describe("Feature Lifecycle Tests", () => {
     await page.waitForTimeout(2000);
 
     // Verify git status shows clean (changes committed)
-    const { stdout: gitStatus } = await execAsync("git status --porcelain", {
+    const { stdout: gitStatus } = await execAsync('git status --porcelain', {
       cwd: testRepo.path,
     });
     // After commit, the yellow.txt file should be committed, so git status should be clean
     // (only .automaker directory might have changes)
-    expect(gitStatus.includes("yellow.txt")).toBe(false);
+    expect(gitStatus.includes('yellow.txt')).toBe(false);
 
     // Verify the commit exists in git log
-    const { stdout: gitLog } = await execAsync("git log --oneline -1", {
+    const { stdout: gitLog } = await execAsync('git log --oneline -1', {
       cwd: testRepo.path,
     });
-    expect(gitLog.toLowerCase()).toContain("yellow");
+    expect(gitLog.toLowerCase()).toContain('yellow');
 
     // ==========================================================================
     // Step 5: Verify feature moved to verified column after commit
@@ -255,11 +255,11 @@ test.describe("Feature Lifecycle Tests", () => {
     // Verify feature status is completed in filesystem
     const featureData = JSON.parse(
       fs.readFileSync(
-        path.join(featuresDir, featureId, "feature.json"),
-        "utf-8"
+        path.join(featuresDir, featureId, 'feature.json'),
+        'utf-8'
       )
     );
-    expect(featureData.status).toBe("completed");
+    expect(featureData.status).toBe('completed');
 
     // ==========================================================================
     // Step 7: Open archive modal and restore the feature
@@ -309,11 +309,11 @@ test.describe("Feature Lifecycle Tests", () => {
     // Verify feature status is verified in filesystem
     const restoredFeatureData = JSON.parse(
       fs.readFileSync(
-        path.join(featuresDir, featureId, "feature.json"),
-        "utf-8"
+        path.join(featuresDir, featureId, 'feature.json'),
+        'utf-8'
       )
     );
-    expect(restoredFeatureData.status).toBe("verified");
+    expect(restoredFeatureData.status).toBe('verified');
 
     // ==========================================================================
     // Step 8: Delete the feature and verify it's removed
@@ -361,7 +361,7 @@ test.describe("Feature Lifecycle Tests", () => {
     // Step 1: Setup and create a feature in backlog
     // ==========================================================================
     await setupProjectWithPathNoWorktrees(page, testRepo.path);
-    await page.goto("/");
+    await page.goto('/');
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
     await page.waitForTimeout(1000);
@@ -370,7 +370,7 @@ test.describe("Feature Lifecycle Tests", () => {
     await clickAddFeature(page);
 
     // Fill in the feature details
-    const featureDescription = "Create a file named test-restart.txt";
+    const featureDescription = 'Create a file named test-restart.txt';
     const descriptionInput = page
       .locator('[data-testid="add-feature-dialog"] textarea')
       .first();
@@ -380,7 +380,7 @@ test.describe("Feature Lifecycle Tests", () => {
     await confirmAddFeature(page);
 
     // Wait for the feature to be created in the filesystem
-    const featuresDir = path.join(testRepo.path, ".automaker", "features");
+    const featuresDir = path.join(testRepo.path, '.automaker', 'features');
     await expect(async () => {
       const dirs = fs.readdirSync(featuresDir);
       expect(dirs.length).toBeGreaterThan(0);
@@ -417,15 +417,15 @@ test.describe("Feature Lifecycle Tests", () => {
     const featureFilePath = path.join(
       featuresDir,
       testFeatureId,
-      "feature.json"
+      'feature.json'
     );
     expect(fs.existsSync(featureFilePath)).toBe(true);
 
     // First verify that the drag succeeded by checking for in_progress status
     await expect(async () => {
-      const featureData = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
+      const featureData = JSON.parse(fs.readFileSync(featureFilePath, 'utf-8'));
       // Feature should be either in_progress (agent running) or waiting_approval (agent done)
-      expect(["in_progress", "waiting_approval"]).toContain(featureData.status);
+      expect(['in_progress', 'waiting_approval']).toContain(featureData.status);
     }).toPass({ timeout: 15000 });
 
     // ==========================================================================
@@ -433,17 +433,17 @@ test.describe("Feature Lifecycle Tests", () => {
     // ==========================================================================
     // The mock agent completes quickly, so we wait for it to finish
     await expect(async () => {
-      const featureData = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
-      expect(featureData.status).toBe("waiting_approval");
+      const featureData = JSON.parse(fs.readFileSync(featureFilePath, 'utf-8'));
+      expect(featureData.status).toBe('waiting_approval');
     }).toPass({ timeout: 30000 });
 
     // Verify feature file still exists after completion
     expect(fs.existsSync(featureFilePath)).toBe(true);
     const featureDataAfterComplete = JSON.parse(
-      fs.readFileSync(featureFilePath, "utf-8")
+      fs.readFileSync(featureFilePath, 'utf-8')
     );
     console.log(
-      "Feature status after first run:",
+      'Feature status after first run:',
       featureDataAfterComplete.status
     );
 
@@ -470,8 +470,8 @@ test.describe("Feature Lifecycle Tests", () => {
 
     // Verify feature is in backlog
     await expect(async () => {
-      const data = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
-      expect(data.status).toBe("backlog");
+      const data = JSON.parse(fs.readFileSync(featureFilePath, 'utf-8'));
+      expect(data.status).toBe('backlog');
     }).toPass({ timeout: 10000 });
 
     // Reload to ensure clean state
@@ -496,8 +496,8 @@ test.describe("Feature Lifecycle Tests", () => {
 
     // Listen for console errors to catch "Feature not found"
     const consoleErrors: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "error") {
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
         consoleErrors.push(msg.text());
       }
     });
@@ -514,23 +514,23 @@ test.describe("Feature Lifecycle Tests", () => {
 
     // First verify that the restart drag succeeded by checking for in_progress status
     await expect(async () => {
-      const data = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
+      const data = JSON.parse(fs.readFileSync(featureFilePath, 'utf-8'));
       // Feature should be either in_progress (agent running) or waiting_approval (agent done)
-      expect(["in_progress", "waiting_approval"]).toContain(data.status);
+      expect(['in_progress', 'waiting_approval']).toContain(data.status);
     }).toPass({ timeout: 15000 });
 
     // Verify no "Feature not found" errors in console
     const featureNotFoundErrors = consoleErrors.filter(
-      (err) => err.includes("not found") || err.includes("Feature")
+      (err) => err.includes('not found') || err.includes('Feature')
     );
     expect(featureNotFoundErrors).toEqual([]);
 
     // Wait for the mock agent to complete and move to waiting_approval
     await expect(async () => {
-      const data = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
-      expect(data.status).toBe("waiting_approval");
+      const data = JSON.parse(fs.readFileSync(featureFilePath, 'utf-8'));
+      expect(data.status).toBe('waiting_approval');
     }).toPass({ timeout: 30000 });
 
-    console.log("Feature successfully restarted after stop!");
+    console.log('Feature successfully restarted after stop!');
   });
 });

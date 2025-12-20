@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { useNavigate, useLocation } from "@tanstack/react-router";
-import { cn } from "@/lib/utils";
-import { useAppStore, formatShortcut, type ThemeMode } from "@/store/app-store";
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
+import { useAppStore, formatShortcut, type ThemeMode } from '@/store/app-store';
 import {
   FolderOpen,
   Plus,
@@ -36,7 +36,7 @@ import {
   Zap,
   CheckCircle2,
   ArrowRight,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +49,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -57,31 +57,31 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   useKeyboardShortcuts,
   useKeyboardShortcutsConfig,
   KeyboardShortcut,
-} from "@/hooks/use-keyboard-shortcuts";
+} from '@/hooks/use-keyboard-shortcuts';
 import {
   getElectronAPI,
   Project,
   TrashedProject,
   RunningAgent,
-} from "@/lib/electron";
+} from '@/lib/electron';
 import {
   initializeProject,
   hasAppSpec,
   hasAutomakerDir,
-} from "@/lib/project-init";
-import { toast } from "sonner";
-import { themeOptions } from "@/config/theme-options";
-import type { SpecRegenerationEvent } from "@/types/electron";
-import { DeleteProjectDialog } from "@/components/views/settings-view/components/delete-project-dialog";
-import { NewProjectModal } from "@/components/new-project-modal";
-import { CreateSpecDialog } from "@/components/views/spec-view/dialogs";
-import type { FeatureCount } from "@/components/views/spec-view/types";
+} from '@/lib/project-init';
+import { toast } from 'sonner';
+import { themeOptions } from '@/config/theme-options';
+import type { SpecRegenerationEvent } from '@/types/electron';
+import { DeleteProjectDialog } from '@/components/views/settings-view/components/delete-project-dialog';
+import { NewProjectModal } from '@/components/new-project-modal';
+import { CreateSpecDialog } from '@/components/views/spec-view/dialogs';
+import type { FeatureCount } from '@/components/views/spec-view/types';
 import {
   DndContext,
   DragEndEvent,
@@ -89,15 +89,15 @@ import {
   useSensor,
   useSensors,
   closestCenter,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { getHttpApiClient } from "@/lib/http-api-client";
-import type { StarterTemplate } from "@/lib/templates";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { getHttpApiClient } from '@/lib/http-api-client';
+import type { StarterTemplate } from '@/lib/templates';
 
 interface NavSection {
   label?: string;
@@ -145,11 +145,11 @@ function SortableProjectItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200",
-        "text-muted-foreground hover:text-foreground hover:bg-accent/80",
-        isDragging && "bg-accent shadow-lg scale-[1.02]",
+        'flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-200',
+        'text-muted-foreground hover:text-foreground hover:bg-accent/80',
+        isDragging && 'bg-accent shadow-lg scale-[1.02]',
         isHighlighted &&
-          "bg-brand-500/10 text-foreground ring-1 ring-brand-500/20"
+          'bg-brand-500/10 text-foreground ring-1 ring-brand-500/20'
       )}
       data-testid={`project-option-${project.id}`}
     >
@@ -183,7 +183,7 @@ function SortableProjectItem({
 
 // Theme options for project theme selector - derived from the shared config
 const PROJECT_THEME_OPTIONS = [
-  { value: "", label: "Use Global", icon: Monitor },
+  { value: '', label: 'Use Global', icon: Monitor },
   ...themeOptions.map((opt) => ({
     value: opt.value,
     label: opt.label,
@@ -194,7 +194,7 @@ const PROJECT_THEME_OPTIONS = [
 // Reusable Bug Report Button Component
 const BugReportButton = ({
   sidebarExpanded,
-  onClick
+  onClick,
 }: {
   sidebarExpanded: boolean;
   onClick: () => void;
@@ -203,15 +203,17 @@ const BugReportButton = ({
     <button
       onClick={onClick}
       className={cn(
-        "titlebar-no-drag px-3 py-2.5 rounded-xl",
-        "text-muted-foreground hover:text-foreground hover:bg-accent/80",
-        "border border-transparent hover:border-border/40",
-        "transition-all duration-200 ease-out",
-        "hover:scale-[1.02] active:scale-[0.97]",
-        sidebarExpanded && "absolute right-3"
+        'titlebar-no-drag px-3 py-2.5 rounded-xl',
+        'text-muted-foreground hover:text-foreground hover:bg-accent/80',
+        'border border-transparent hover:border-border/40',
+        'transition-all duration-200 ease-out',
+        'hover:scale-[1.02] active:scale-[0.97]',
+        sidebarExpanded && 'absolute right-3'
       )}
       title="Report Bug / Feature Request"
-      data-testid={sidebarExpanded ? "bug-report-link" : "bug-report-link-collapsed"}
+      data-testid={
+        sidebarExpanded ? 'bug-report-link' : 'bug-report-link-collapsed'
+      }
     >
       <Bug className="w-4 h-4" />
     </button>
@@ -248,20 +250,19 @@ export function Sidebar() {
   } = useAppStore();
 
   // Environment variable flags for hiding sidebar items
-  const hideTerminal = import.meta.env.VITE_HIDE_TERMINAL === "true";
-  const hideWiki = import.meta.env.VITE_HIDE_WIKI === "true";
-  const hideRunningAgents =
-    import.meta.env.VITE_HIDE_RUNNING_AGENTS === "true";
-  const hideContext = import.meta.env.VITE_HIDE_CONTEXT === "true";
-  const hideSpecEditor = import.meta.env.VITE_HIDE_SPEC_EDITOR === "true";
-  const hideAiProfiles = import.meta.env.VITE_HIDE_AI_PROFILES === "true";
+  const hideTerminal = import.meta.env.VITE_HIDE_TERMINAL === 'true';
+  const hideWiki = import.meta.env.VITE_HIDE_WIKI === 'true';
+  const hideRunningAgents = import.meta.env.VITE_HIDE_RUNNING_AGENTS === 'true';
+  const hideContext = import.meta.env.VITE_HIDE_CONTEXT === 'true';
+  const hideSpecEditor = import.meta.env.VITE_HIDE_SPEC_EDITOR === 'true';
+  const hideAiProfiles = import.meta.env.VITE_HIDE_AI_PROFILES === 'true';
 
   // Get customizable keyboard shortcuts
   const shortcuts = useKeyboardShortcutsConfig();
 
   // State for project picker dropdown
   const [isProjectPickerOpen, setIsProjectPickerOpen] = useState(false);
-  const [projectSearchQuery, setProjectSearchQuery] = useState("");
+  const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
   const [showTrashDialog, setShowTrashDialog] = useState(false);
   const [activeTrashId, setActiveTrashId] = useState<string | null>(null);
@@ -279,13 +280,13 @@ export function Sidebar() {
 
   // State for new project onboarding dialog
   const [showOnboardingDialog, setShowOnboardingDialog] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
-  const [newProjectPath, setNewProjectPath] = useState("");
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectPath, setNewProjectPath] = useState('');
 
   // State for new project setup dialog
   const [showSetupDialog, setShowSetupDialog] = useState(false);
-  const [setupProjectPath, setSetupProjectPath] = useState("");
-  const [projectOverview, setProjectOverview] = useState("");
+  const [setupProjectPath, setSetupProjectPath] = useState('');
+  const [projectOverview, setProjectOverview] = useState('');
   const [generateFeatures, setGenerateFeatures] = useState(true);
   const [analyzeProject, setAnalyzeProject] = useState(true);
   const [featureCount, setFeatureCount] = useState<FeatureCount>(50);
@@ -300,7 +301,7 @@ export function Sidebar() {
 
   // Auto-collapse sidebar on small screens
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1024px)"); // lg breakpoint
+    const mediaQuery = window.matchMedia('(max-width: 1024px)'); // lg breakpoint
 
     const handleResize = () => {
       if (mediaQuery.matches && sidebarOpen) {
@@ -313,8 +314,8 @@ export function Sidebar() {
     handleResize();
 
     // Listen for changes
-    mediaQuery.addEventListener("change", handleResize);
-    return () => mediaQuery.removeEventListener("change", handleResize);
+    mediaQuery.addEventListener('change', handleResize);
+    return () => mediaQuery.removeEventListener('change', handleResize);
   }, [sidebarOpen, toggleSidebar]);
 
   // Filtered projects based on search query
@@ -336,7 +337,7 @@ export function Sidebar() {
   // Reset search query when dropdown closes
   useEffect(() => {
     if (!isProjectPickerOpen) {
-      setProjectSearchQuery("");
+      setProjectSearchQuery('');
       setSelectedProjectIndex(0);
     }
   }, [isProjectPickerOpen]);
@@ -385,9 +386,9 @@ export function Sidebar() {
     const unsubscribe = api.specRegeneration.onEvent(
       (event: SpecRegenerationEvent) => {
         console.log(
-          "[Sidebar] Spec regeneration event:",
+          '[Sidebar] Spec regeneration event:',
           event.type,
-          "for project:",
+          'for project:',
           event.projectPath
         );
 
@@ -397,25 +398,25 @@ export function Sidebar() {
           event.projectPath !== setupProjectPath
         ) {
           console.log(
-            "[Sidebar] Ignoring event - not for project being set up"
+            '[Sidebar] Ignoring event - not for project being set up'
           );
           return;
         }
 
-        if (event.type === "spec_regeneration_complete") {
+        if (event.type === 'spec_regeneration_complete') {
           setSpecCreatingForProject(null);
           setShowSetupDialog(false);
-          setProjectOverview("");
-          setSetupProjectPath("");
+          setProjectOverview('');
+          setSetupProjectPath('');
           // Clear onboarding state if we came from onboarding
-          setNewProjectName("");
-          setNewProjectPath("");
-          toast.success("App specification created", {
-            description: "Your project is now set up and ready to go!",
+          setNewProjectName('');
+          setNewProjectPath('');
+          toast.success('App specification created', {
+            description: 'Your project is now set up and ready to go!',
           });
-        } else if (event.type === "spec_regeneration_error") {
+        } else if (event.type === 'spec_regeneration_error') {
           setSpecCreatingForProject(null);
-          toast.error("Failed to create specification", {
+          toast.error('Failed to create specification', {
             description: event.error,
           });
         }
@@ -425,11 +426,7 @@ export function Sidebar() {
     return () => {
       unsubscribe();
     };
-  }, [
-    creatingSpecProjectPath,
-    setupProjectPath,
-    setSpecCreatingForProject,
-  ]);
+  }, [creatingSpecProjectPath, setupProjectPath, setSpecCreatingForProject]);
 
   // Fetch running agents count function - used for initial load and event-driven updates
   const fetchRunningAgentsCount = useCallback(async () => {
@@ -442,7 +439,7 @@ export function Sidebar() {
         }
       }
     } catch (error) {
-      console.error("[Sidebar] Error fetching running agents count:", error);
+      console.error('[Sidebar] Error fetching running agents count:', error);
     }
   }, []);
 
@@ -461,9 +458,9 @@ export function Sidebar() {
     const unsubscribe = api.autoMode.onEvent((event) => {
       // When a feature starts, completes, or errors, refresh the count
       if (
-        event.type === "auto_mode_feature_complete" ||
-        event.type === "auto_mode_error" ||
-        event.type === "auto_mode_feature_start"
+        event.type === 'auto_mode_feature_complete' ||
+        event.type === 'auto_mode_error' ||
+        event.type === 'auto_mode_feature_start'
       ) {
         fetchRunningAgentsCount();
       }
@@ -486,7 +483,7 @@ export function Sidebar() {
     try {
       const api = getElectronAPI();
       if (!api.specRegeneration) {
-        toast.error("Spec regeneration not available");
+        toast.error('Spec regeneration not available');
         setSpecCreatingForProject(null);
         return;
       }
@@ -499,24 +496,24 @@ export function Sidebar() {
       );
 
       if (!result.success) {
-        console.error("[Sidebar] Failed to start spec creation:", result.error);
+        console.error('[Sidebar] Failed to start spec creation:', result.error);
         setSpecCreatingForProject(null);
-        toast.error("Failed to create specification", {
+        toast.error('Failed to create specification', {
           description: result.error,
         });
       } else {
         // Show processing toast to inform user
-        toast.info("Generating app specification...", {
+        toast.info('Generating app specification...', {
           description:
             "This may take a minute. You'll be notified when complete.",
         });
       }
       // If successful, we'll wait for the events to update the state
     } catch (error) {
-      console.error("[Sidebar] Failed to create spec:", error);
+      console.error('[Sidebar] Failed to create spec:', error);
       setSpecCreatingForProject(null);
-      toast.error("Failed to create specification", {
-        description: error instanceof Error ? error.message : "Unknown error",
+      toast.error('Failed to create specification', {
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }, [
@@ -531,15 +528,15 @@ export function Sidebar() {
   // Handle skipping setup
   const handleSkipSetup = useCallback(() => {
     setShowSetupDialog(false);
-    setProjectOverview("");
-    setSetupProjectPath("");
+    setProjectOverview('');
+    setSetupProjectPath('');
     // Clear onboarding state if we came from onboarding
     if (newProjectPath) {
-      setNewProjectName("");
-      setNewProjectPath("");
+      setNewProjectName('');
+      setNewProjectPath('');
     }
-    toast.info("Setup skipped", {
-      description: "You can set up your app_spec.txt later from the Spec view.",
+    toast.info('Setup skipped', {
+      description: 'You can set up your app_spec.txt later from the Spec view.',
     });
   }, [newProjectPath]);
 
@@ -548,19 +545,19 @@ export function Sidebar() {
     setShowOnboardingDialog(false);
     // Navigate to the setup dialog flow
     setSetupProjectPath(newProjectPath);
-    setProjectOverview("");
+    setProjectOverview('');
     setShowSetupDialog(true);
   }, [newProjectPath]);
 
   // Handle onboarding dialog - skip
   const handleOnboardingSkip = useCallback(() => {
     setShowOnboardingDialog(false);
-    setNewProjectName("");
-    setNewProjectPath("");
+    setNewProjectName('');
+    setNewProjectPath('');
     toast.info(
-      "You can generate your app_spec.txt anytime from the Spec view",
+      'You can generate your app_spec.txt anytime from the Spec view',
       {
-        description: "Your project is ready to use!",
+        description: 'Your project is ready to use!',
       }
     );
   }, []);
@@ -578,8 +575,8 @@ export function Sidebar() {
         // Create project directory
         const mkdirResult = await api.mkdir(projectPath);
         if (!mkdirResult.success) {
-          toast.error("Failed to create project directory", {
-            description: mkdirResult.error || "Unknown error occurred",
+          toast.error('Failed to create project directory', {
+            description: mkdirResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -588,8 +585,8 @@ export function Sidebar() {
         const initResult = await initializeProject(projectPath);
 
         if (!initResult.success) {
-          toast.error("Failed to initialize project", {
-            description: initResult.error || "Unknown error occurred",
+          toast.error('Failed to initialize project', {
+            description: initResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -640,13 +637,13 @@ export function Sidebar() {
         setNewProjectPath(projectPath);
         setShowOnboardingDialog(true);
 
-        toast.success("Project created", {
+        toast.success('Project created', {
           description: `Created ${projectName} with .automaker directory`,
         });
       } catch (error) {
-        console.error("[Sidebar] Failed to create project:", error);
-        toast.error("Failed to create project", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        console.error('[Sidebar] Failed to create project:', error);
+        toast.error('Failed to create project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       } finally {
         setIsCreatingProject(false);
@@ -677,8 +674,8 @@ export function Sidebar() {
         );
 
         if (!cloneResult.success || !cloneResult.projectPath) {
-          toast.error("Failed to clone template", {
-            description: cloneResult.error || "Unknown error occurred",
+          toast.error('Failed to clone template', {
+            description: cloneResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -689,8 +686,8 @@ export function Sidebar() {
         const initResult = await initializeProject(projectPath);
 
         if (!initResult.success) {
-          toast.error("Failed to initialize project", {
-            description: initResult.error || "Unknown error occurred",
+          toast.error('Failed to initialize project', {
+            description: initResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -710,13 +707,13 @@ export function Sidebar() {
   <technology_stack>
     ${template.techStack
       .map((tech) => `<technology>${tech}</technology>`)
-      .join("\n    ")}
+      .join('\n    ')}
   </technology_stack>
 
   <core_capabilities>
     ${template.features
       .map((feature) => `<capability>${feature}</capability>`)
-      .join("\n    ")}
+      .join('\n    ')}
   </core_capabilities>
 
   <implemented_features>
@@ -745,16 +742,16 @@ export function Sidebar() {
         setNewProjectPath(projectPath);
         setShowOnboardingDialog(true);
 
-        toast.success("Project created from template", {
+        toast.success('Project created from template', {
           description: `Created ${projectName} from ${template.name}`,
         });
       } catch (error) {
         console.error(
-          "[Sidebar] Failed to create project from template:",
+          '[Sidebar] Failed to create project from template:',
           error
         );
-        toast.error("Failed to create project", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        toast.error('Failed to create project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       } finally {
         setIsCreatingProject(false);
@@ -781,8 +778,8 @@ export function Sidebar() {
         );
 
         if (!cloneResult.success || !cloneResult.projectPath) {
-          toast.error("Failed to clone repository", {
-            description: cloneResult.error || "Unknown error occurred",
+          toast.error('Failed to clone repository', {
+            description: cloneResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -793,8 +790,8 @@ export function Sidebar() {
         const initResult = await initializeProject(projectPath);
 
         if (!initResult.success) {
-          toast.error("Failed to initialize project", {
-            description: initResult.error || "Unknown error occurred",
+          toast.error('Failed to initialize project', {
+            description: initResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -845,13 +842,13 @@ export function Sidebar() {
         setNewProjectPath(projectPath);
         setShowOnboardingDialog(true);
 
-        toast.success("Project created from repository", {
+        toast.success('Project created from repository', {
           description: `Created ${projectName} from ${repoUrl}`,
         });
       } catch (error) {
-        console.error("[Sidebar] Failed to create project from URL:", error);
-        toast.error("Failed to create project", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        console.error('[Sidebar] Failed to create project from URL:', error);
+        toast.error('Failed to create project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       } finally {
         setIsCreatingProject(false);
@@ -863,7 +860,7 @@ export function Sidebar() {
   // Handle bug report button click
   const handleBugReportClick = useCallback(() => {
     const api = getElectronAPI();
-    api.openExternalLink("https://github.com/AutoMaker-Org/automaker/issues");
+    api.openExternalLink('https://github.com/AutoMaker-Org/automaker/issues');
   }, []);
 
   /**
@@ -878,7 +875,7 @@ export function Sidebar() {
       const path = result.filePaths[0];
       // Extract folder name from path (works on both Windows and Mac/Linux)
       const name =
-        path.split(/[/\\]/).filter(Boolean).pop() || "Untitled Project";
+        path.split(/[/\\]/).filter(Boolean).pop() || 'Untitled Project';
 
       try {
         // Check if this is a brand new project (no .automaker directory)
@@ -888,8 +885,8 @@ export function Sidebar() {
         const initResult = await initializeProject(path);
 
         if (!initResult.success) {
-          toast.error("Failed to initialize project", {
-            description: initResult.error || "Unknown error occurred",
+          toast.error('Failed to initialize project', {
+            description: initResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -910,7 +907,7 @@ export function Sidebar() {
           // This is a brand new project - show setup dialog
           setSetupProjectPath(path);
           setShowSetupDialog(true);
-          toast.success("Project opened", {
+          toast.success('Project opened', {
             description: `Opened ${name}. Let's set up your app specification!`,
           });
         } else if (
@@ -918,20 +915,20 @@ export function Sidebar() {
           initResult.createdFiles.length > 0
         ) {
           toast.success(
-            initResult.isNewProject ? "Project initialized" : "Project updated",
+            initResult.isNewProject ? 'Project initialized' : 'Project updated',
             {
               description: `Set up ${initResult.createdFiles.length} file(s) in .automaker`,
             }
           );
         } else {
-          toast.success("Project opened", {
+          toast.success('Project opened', {
             description: `Opened ${name}`,
           });
         }
       } catch (error) {
-        console.error("[Sidebar] Failed to open project:", error);
-        toast.error("Failed to open project", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        console.error('[Sidebar] Failed to open project:', error);
+        toast.error('Failed to open project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -945,8 +942,8 @@ export function Sidebar() {
   const handleRestoreProject = useCallback(
     (projectId: string) => {
       restoreTrashedProject(projectId);
-      toast.success("Project restored", {
-        description: "Added back to your project list.",
+      toast.success('Project restored', {
+        description: 'Added back to your project list.',
       });
       setShowTrashDialog(false);
     },
@@ -964,22 +961,22 @@ export function Sidebar() {
       try {
         const api = getElectronAPI();
         if (!api.trashItem) {
-          throw new Error("System Trash is not available in this build.");
+          throw new Error('System Trash is not available in this build.');
         }
 
         const result = await api.trashItem(trashedProject.path);
         if (!result.success) {
-          throw new Error(result.error || "Failed to delete project folder");
+          throw new Error(result.error || 'Failed to delete project folder');
         }
 
         deleteTrashedProject(trashedProject.id);
-        toast.success("Project folder sent to system Trash", {
+        toast.success('Project folder sent to system Trash', {
           description: trashedProject.path,
         });
       } catch (error) {
-        console.error("[Sidebar] Failed to delete project from disk:", error);
-        toast.error("Failed to delete project folder", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        console.error('[Sidebar] Failed to delete project from disk:', error);
+        toast.error('Failed to delete project folder', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       } finally {
         setActiveTrashId(null);
@@ -995,14 +992,14 @@ export function Sidebar() {
     }
 
     const confirmed = window.confirm(
-      "Clear all projects from recycle bin? This does not delete folders from disk."
+      'Clear all projects from recycle bin? This does not delete folders from disk.'
     );
     if (!confirmed) return;
 
     setIsEmptyingTrash(true);
     try {
       emptyTrash();
-      toast.success("Recycle bin cleared");
+      toast.success('Recycle bin cleared');
       setShowTrashDialog(false);
     } finally {
       setIsEmptyingTrash(false);
@@ -1012,20 +1009,20 @@ export function Sidebar() {
   const navSections: NavSection[] = useMemo(() => {
     const allToolsItems: NavItem[] = [
       {
-        id: "spec",
-        label: "Spec Editor",
+        id: 'spec',
+        label: 'Spec Editor',
         icon: FileText,
         shortcut: shortcuts.spec,
       },
       {
-        id: "context",
-        label: "Context",
+        id: 'context',
+        label: 'Context',
         icon: BookOpen,
         shortcut: shortcuts.context,
       },
       {
-        id: "profiles",
-        label: "AI Profiles",
+        id: 'profiles',
+        label: 'AI Profiles',
         icon: UserCircle,
         shortcut: shortcuts.profiles,
       },
@@ -1033,13 +1030,13 @@ export function Sidebar() {
 
     // Filter out hidden items
     const visibleToolsItems = allToolsItems.filter((item) => {
-      if (item.id === "spec" && hideSpecEditor) {
+      if (item.id === 'spec' && hideSpecEditor) {
         return false;
       }
-      if (item.id === "context" && hideContext) {
+      if (item.id === 'context' && hideContext) {
         return false;
       }
-      if (item.id === "profiles" && hideAiProfiles) {
+      if (item.id === 'profiles' && hideAiProfiles) {
         return false;
       }
       return true;
@@ -1048,14 +1045,14 @@ export function Sidebar() {
     // Build project items - Terminal is conditionally included
     const projectItems: NavItem[] = [
       {
-        id: "board",
-        label: "Kanban Board",
+        id: 'board',
+        label: 'Kanban Board',
         icon: LayoutGrid,
         shortcut: shortcuts.board,
       },
       {
-        id: "agent",
-        label: "Agent Runner",
+        id: 'agent',
+        label: 'Agent Runner',
         icon: Bot,
         shortcut: shortcuts.agent,
       },
@@ -1064,8 +1061,8 @@ export function Sidebar() {
     // Add Terminal to Project section if not hidden
     if (!hideTerminal) {
       projectItems.push({
-        id: "terminal",
-        label: "Terminal",
+        id: 'terminal',
+        label: 'Terminal',
         icon: Terminal,
         shortcut: shortcuts.terminal,
       });
@@ -1073,11 +1070,11 @@ export function Sidebar() {
 
     return [
       {
-        label: "Project",
+        label: 'Project',
         items: projectItems,
       },
       {
-        label: "Tools",
+        label: 'Tools',
         items: visibleToolsItems,
       },
     ];
@@ -1099,21 +1096,21 @@ export function Sidebar() {
     if (!isProjectPickerOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsProjectPickerOpen(false);
-      } else if (event.key === "Enter") {
+      } else if (event.key === 'Enter') {
         event.preventDefault();
         selectHighlightedProject();
-      } else if (event.key === "ArrowDown") {
+      } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         setSelectedProjectIndex((prev) =>
           prev < filteredProjects.length - 1 ? prev + 1 : prev
         );
-      } else if (event.key === "ArrowUp") {
+      } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         setSelectedProjectIndex((prev) => (prev > 0 ? prev - 1 : prev));
       } else if (
-        event.key.toLowerCase() === "p" &&
+        event.key.toLowerCase() === 'p' &&
         !event.metaKey &&
         !event.ctrlKey
       ) {
@@ -1126,8 +1123,8 @@ export function Sidebar() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isProjectPickerOpen, selectHighlightedProject, filteredProjects.length]);
 
   // Build keyboard shortcuts for navigation
@@ -1138,14 +1135,14 @@ export function Sidebar() {
     shortcutsList.push({
       key: shortcuts.toggleSidebar,
       action: () => toggleSidebar(),
-      description: "Toggle sidebar",
+      description: 'Toggle sidebar',
     });
 
     // Open project shortcut - opens the folder selection dialog directly
     shortcutsList.push({
       key: shortcuts.openProject,
       action: () => handleOpenFolder(),
-      description: "Open folder selection dialog",
+      description: 'Open folder selection dialog',
     });
 
     // Project picker shortcut - only when we have projects
@@ -1153,7 +1150,7 @@ export function Sidebar() {
       shortcutsList.push({
         key: shortcuts.projectPicker,
         action: () => setIsProjectPickerOpen((prev) => !prev),
-        description: "Toggle project picker",
+        description: 'Toggle project picker',
       });
     }
 
@@ -1162,12 +1159,12 @@ export function Sidebar() {
       shortcutsList.push({
         key: shortcuts.cyclePrevProject,
         action: () => cyclePrevProject(),
-        description: "Cycle to previous project (MRU)",
+        description: 'Cycle to previous project (MRU)',
       });
       shortcutsList.push({
         key: shortcuts.cycleNextProject,
         action: () => cycleNextProject(),
-        description: "Cycle to next project (LRU)",
+        description: 'Cycle to next project (LRU)',
       });
     }
 
@@ -1188,8 +1185,8 @@ export function Sidebar() {
       // Add settings shortcut
       shortcutsList.push({
         key: shortcuts.settings,
-        action: () => navigate({ to: "/settings" }),
-        description: "Navigate to Settings",
+        action: () => navigate({ to: '/settings' }),
+        description: 'Navigate to Settings',
       });
     }
 
@@ -1212,21 +1209,21 @@ export function Sidebar() {
 
   const isActiveRoute = (id: string) => {
     // Map view IDs to route paths
-    const routePath = id === "welcome" ? "/" : `/${id}`;
+    const routePath = id === 'welcome' ? '/' : `/${id}`;
     return location.pathname === routePath;
   };
 
   return (
     <aside
       className={cn(
-        "flex-shrink-0 flex flex-col z-30 relative",
+        'flex-shrink-0 flex flex-col z-30 relative',
         // Glass morphism background with gradient
-        "bg-gradient-to-b from-sidebar/95 via-sidebar/85 to-sidebar/90 backdrop-blur-2xl",
+        'bg-gradient-to-b from-sidebar/95 via-sidebar/85 to-sidebar/90 backdrop-blur-2xl',
         // Premium border with subtle glow
-        "border-r border-border/60 shadow-[1px_0_20px_-5px_rgba(0,0,0,0.1)]",
+        'border-r border-border/60 shadow-[1px_0_20px_-5px_rgba(0,0,0,0.1)]',
         // Smooth width transition
-        "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
-        sidebarOpen ? "w-16 lg:w-72" : "w-16"
+        'transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+        sidebarOpen ? 'w-16 lg:w-72' : 'w-16'
       )}
       data-testid="sidebar"
     >
@@ -1234,16 +1231,16 @@ export function Sidebar() {
       <button
         onClick={toggleSidebar}
         className={cn(
-          "hidden lg:flex absolute top-[68px] -right-3 z-9999",
-          "group/toggle items-center justify-center w-7 h-7 rounded-full",
+          'hidden lg:flex absolute top-[68px] -right-3 z-9999',
+          'group/toggle items-center justify-center w-7 h-7 rounded-full',
           // Glass morphism button
-          "bg-card/95 backdrop-blur-sm border border-border/80",
+          'bg-card/95 backdrop-blur-sm border border-border/80',
           // Premium shadow with glow on hover
-          "shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-brand-500/10",
-          "text-muted-foreground hover:text-brand-500 hover:bg-accent/80",
-          "hover:border-brand-500/30",
-          "transition-all duration-200 ease-out titlebar-no-drag",
-          "hover:scale-110 active:scale-90"
+          'shadow-lg shadow-black/5 hover:shadow-xl hover:shadow-brand-500/10',
+          'text-muted-foreground hover:text-brand-500 hover:bg-accent/80',
+          'hover:border-brand-500/30',
+          'transition-all duration-200 ease-out titlebar-no-drag',
+          'hover:scale-110 active:scale-90'
         )}
         data-testid="sidebar-collapse-button"
       >
@@ -1255,16 +1252,16 @@ export function Sidebar() {
         {/* Tooltip */}
         <div
           className={cn(
-            "absolute left-full ml-3 px-2.5 py-1.5 rounded-lg",
-            "bg-popover text-popover-foreground text-xs font-medium",
-            "border border-border shadow-lg",
-            "opacity-0 group-hover/toggle:opacity-100 transition-all duration-200",
-            "whitespace-nowrap z-50 pointer-events-none",
-            "translate-x-1 group-hover/toggle:translate-x-0"
+            'absolute left-full ml-3 px-2.5 py-1.5 rounded-lg',
+            'bg-popover text-popover-foreground text-xs font-medium',
+            'border border-border shadow-lg',
+            'opacity-0 group-hover/toggle:opacity-100 transition-all duration-200',
+            'whitespace-nowrap z-50 pointer-events-none',
+            'translate-x-1 group-hover/toggle:translate-x-0'
           )}
           data-testid="sidebar-toggle-tooltip"
         >
-          {sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}{" "}
+          {sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}{' '}
           <span
             className="ml-1.5 px-1.5 py-0.5 bg-muted rounded text-[10px] font-mono text-muted-foreground"
             data-testid="sidebar-toggle-shortcut"
@@ -1278,21 +1275,21 @@ export function Sidebar() {
         {/* Logo */}
         <div
           className={cn(
-            "h-20 shrink-0 titlebar-drag-region",
+            'h-20 shrink-0 titlebar-drag-region',
             // Subtle bottom border with gradient fade
-            "border-b border-border/40",
+            'border-b border-border/40',
             // Background gradient for depth
-            "bg-gradient-to-b from-transparent to-background/5",
-            "flex items-center",
-            sidebarOpen ? "px-3 lg:px-5 justify-start" : "px-3 justify-center"
+            'bg-gradient-to-b from-transparent to-background/5',
+            'flex items-center',
+            sidebarOpen ? 'px-3 lg:px-5 justify-start' : 'px-3 justify-center'
           )}
         >
           <div
             className={cn(
-              "flex items-center gap-3 titlebar-no-drag cursor-pointer group",
-              !sidebarOpen && "flex-col gap-1"
+              'flex items-center gap-3 titlebar-no-drag cursor-pointer group',
+              !sidebarOpen && 'flex-col gap-1'
             )}
-            onClick={() => navigate({ to: "/" })}
+            onClick={() => navigate({ to: '/' })}
             data-testid="logo-button"
           >
             {!sidebarOpen ? (
@@ -1315,11 +1312,11 @@ export function Sidebar() {
                     >
                       <stop
                         offset="0%"
-                        style={{ stopColor: "var(--brand-400)" }}
+                        style={{ stopColor: 'var(--brand-400)' }}
                       />
                       <stop
                         offset="100%"
-                        style={{ stopColor: "var(--brand-600)" }}
+                        style={{ stopColor: 'var(--brand-600)' }}
                       />
                     </linearGradient>
                     <filter
@@ -1361,7 +1358,7 @@ export function Sidebar() {
                 </svg>
               </div>
             ) : (
-              <div className={cn("flex items-center gap-1", "hidden lg:flex")}>
+              <div className={cn('flex items-center gap-1', 'hidden lg:flex')}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 256 256"
@@ -1380,11 +1377,11 @@ export function Sidebar() {
                     >
                       <stop
                         offset="0%"
-                        style={{ stopColor: "var(--brand-400)" }}
+                        style={{ stopColor: 'var(--brand-400)' }}
                       />
                       <stop
                         offset="100%"
-                        style={{ stopColor: "var(--brand-600)" }}
+                        style={{ stopColor: 'var(--brand-600)' }}
                       />
                     </linearGradient>
                     <filter
@@ -1431,13 +1428,18 @@ export function Sidebar() {
             )}
           </div>
           {/* Bug Report Button - Inside logo container when expanded */}
-          {sidebarOpen && <BugReportButton sidebarExpanded onClick={handleBugReportClick} />}
+          {sidebarOpen && (
+            <BugReportButton sidebarExpanded onClick={handleBugReportClick} />
+          )}
         </div>
 
         {/* Bug Report Button - Collapsed sidebar version */}
         {!sidebarOpen && (
           <div className="px-3 mt-1.5 flex justify-center">
-            <BugReportButton sidebarExpanded={false} onClick={handleBugReportClick} />
+            <BugReportButton
+              sidebarExpanded={false}
+              onClick={handleBugReportClick}
+            />
           </div>
         )}
 
@@ -1447,16 +1449,16 @@ export function Sidebar() {
             <button
               onClick={() => setShowNewProjectModal(true)}
               className={cn(
-                "group flex items-center justify-center flex-1 px-3 py-2.5 rounded-xl",
-                "relative overflow-hidden",
-                "text-muted-foreground hover:text-foreground",
+                'group flex items-center justify-center flex-1 px-3 py-2.5 rounded-xl',
+                'relative overflow-hidden',
+                'text-muted-foreground hover:text-foreground',
                 // Glass background with gradient on hover
-                "bg-accent/20 hover:bg-gradient-to-br hover:from-brand-500/15 hover:to-brand-600/10",
-                "border border-border/40 hover:border-brand-500/30",
+                'bg-accent/20 hover:bg-gradient-to-br hover:from-brand-500/15 hover:to-brand-600/10',
+                'border border-border/40 hover:border-brand-500/30',
                 // Premium shadow
-                "shadow-sm hover:shadow-md hover:shadow-brand-500/5",
-                "transition-all duration-200 ease-out",
-                "hover:scale-[1.02] active:scale-[0.97]"
+                'shadow-sm hover:shadow-md hover:shadow-brand-500/5',
+                'transition-all duration-200 ease-out',
+                'hover:scale-[1.02] active:scale-[0.97]'
               )}
               title="New Project"
               data-testid="new-project-button"
@@ -1469,15 +1471,15 @@ export function Sidebar() {
             <button
               onClick={handleOpenFolder}
               className={cn(
-                "group flex items-center justify-center flex-1 px-3 py-2.5 rounded-xl",
-                "relative overflow-hidden",
-                "text-muted-foreground hover:text-foreground",
+                'group flex items-center justify-center flex-1 px-3 py-2.5 rounded-xl',
+                'relative overflow-hidden',
+                'text-muted-foreground hover:text-foreground',
                 // Glass background
-                "bg-accent/20 hover:bg-accent/40",
-                "border border-border/40 hover:border-border/60",
-                "shadow-sm hover:shadow-md",
-                "transition-all duration-200 ease-out",
-                "hover:scale-[1.02] active:scale-[0.97]"
+                'bg-accent/20 hover:bg-accent/40',
+                'border border-border/40 hover:border-border/60',
+                'shadow-sm hover:shadow-md',
+                'transition-all duration-200 ease-out',
+                'hover:scale-[1.02] active:scale-[0.97]'
               )}
               title={`Open Folder (${shortcuts.openProject})`}
               data-testid="open-project-button"
@@ -1490,15 +1492,15 @@ export function Sidebar() {
             <button
               onClick={() => setShowTrashDialog(true)}
               className={cn(
-                "group flex items-center justify-center px-3 h-[42px] rounded-xl",
-                "relative",
-                "text-muted-foreground hover:text-destructive",
+                'group flex items-center justify-center px-3 h-[42px] rounded-xl',
+                'relative',
+                'text-muted-foreground hover:text-destructive',
                 // Subtle background that turns red on hover
-                "bg-accent/20 hover:bg-destructive/15",
-                "border border-border/40 hover:border-destructive/40",
-                "shadow-sm hover:shadow-md hover:shadow-destructive/10",
-                "transition-all duration-200 ease-out",
-                "hover:scale-[1.02] active:scale-[0.97]"
+                'bg-accent/20 hover:bg-destructive/15',
+                'border border-border/40 hover:border-destructive/40',
+                'shadow-sm hover:shadow-md hover:shadow-destructive/10',
+                'transition-all duration-200 ease-out',
+                'hover:scale-[1.02] active:scale-[0.97]'
               )}
               title="Recycle Bin"
               data-testid="trash-button"
@@ -1506,7 +1508,7 @@ export function Sidebar() {
               <Recycle className="size-4 shrink-0 transition-transform duration-200 group-hover:rotate-12" />
               {trashedProjects.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 z-10 flex items-center justify-center min-w-4 h-4 px-1 text-[9px] font-bold rounded-full bg-red-500 text-white shadow-md ring-1 ring-red-600/50">
-                  {trashedProjects.length > 9 ? "9+" : trashedProjects.length}
+                  {trashedProjects.length > 9 ? '9+' : trashedProjects.length}
                 </span>
               )}
             </button>
@@ -1523,25 +1525,25 @@ export function Sidebar() {
               <DropdownMenuTrigger asChild>
                 <button
                   className={cn(
-                    "flex-1 flex items-center justify-between px-3.5 py-3 rounded-xl",
+                    'flex-1 flex items-center justify-between px-3.5 py-3 rounded-xl',
                     // Premium glass background
-                    "bg-gradient-to-br from-accent/40 to-accent/20",
-                    "hover:from-accent/50 hover:to-accent/30",
-                    "border border-border/50 hover:border-border/70",
+                    'bg-gradient-to-br from-accent/40 to-accent/20',
+                    'hover:from-accent/50 hover:to-accent/30',
+                    'border border-border/50 hover:border-border/70',
                     // Subtle inner shadow
-                    "shadow-sm shadow-black/5",
-                    "text-foreground titlebar-no-drag min-w-0",
-                    "transition-all duration-200 ease-out",
-                    "hover:scale-[1.01] active:scale-[0.99]",
+                    'shadow-sm shadow-black/5',
+                    'text-foreground titlebar-no-drag min-w-0',
+                    'transition-all duration-200 ease-out',
+                    'hover:scale-[1.01] active:scale-[0.99]',
                     isProjectPickerOpen &&
-                      "from-brand-500/10 to-brand-600/5 border-brand-500/30 ring-2 ring-brand-500/20 shadow-lg shadow-brand-500/5"
+                      'from-brand-500/10 to-brand-600/5 border-brand-500/30 ring-2 ring-brand-500/20 shadow-lg shadow-brand-500/5'
                   )}
                   data-testid="project-selector"
                 >
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
                     <Folder className="h-4 w-4 text-brand-500 shrink-0" />
                     <span className="text-sm font-medium truncate">
-                      {currentProject?.name || "Select Project"}
+                      {currentProject?.name || 'Select Project'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -1553,8 +1555,8 @@ export function Sidebar() {
                     </span>
                     <ChevronDown
                       className={cn(
-                        "h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200",
-                        isProjectPickerOpen && "rotate-180"
+                        'h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200',
+                        isProjectPickerOpen && 'rotate-180'
                       )}
                     />
                   </div>
@@ -1576,11 +1578,11 @@ export function Sidebar() {
                       value={projectSearchQuery}
                       onChange={(e) => setProjectSearchQuery(e.target.value)}
                       className={cn(
-                        "w-full h-9 pl-8 pr-3 text-sm rounded-lg",
-                        "border border-border bg-background/50",
-                        "text-foreground placeholder:text-muted-foreground",
-                        "focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50",
-                        "transition-all duration-200"
+                        'w-full h-9 pl-8 pr-3 text-sm rounded-lg',
+                        'border border-border bg-background/50',
+                        'text-foreground placeholder:text-muted-foreground',
+                        'focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500/50',
+                        'transition-all duration-200'
                       )}
                       data-testid="project-search-input"
                     />
@@ -1622,10 +1624,10 @@ export function Sidebar() {
                 {/* Keyboard hint */}
                 <div className="px-2 pt-2 mt-1.5 border-t border-border/50">
                   <p className="text-[10px] text-muted-foreground text-center tracking-wide">
-                    <span className="text-foreground/60">arrow</span> navigate{" "}
-                    <span className="mx-1 text-foreground/30">|</span>{" "}
-                    <span className="text-foreground/60">enter</span> select{" "}
-                    <span className="mx-1 text-foreground/30">|</span>{" "}
+                    <span className="text-foreground/60">arrow</span> navigate{' '}
+                    <span className="mx-1 text-foreground/30">|</span>{' '}
+                    <span className="text-foreground/60">enter</span> select{' '}
+                    <span className="mx-1 text-foreground/30">|</span>{' '}
                     <span className="text-foreground/60">esc</span> close
                   </p>
                 </div>
@@ -1645,12 +1647,12 @@ export function Sidebar() {
                 <DropdownMenuTrigger asChild>
                   <button
                     className={cn(
-                      "hidden lg:flex items-center justify-center w-[42px] h-[42px] rounded-lg",
-                      "text-muted-foreground hover:text-foreground",
-                      "bg-transparent hover:bg-accent/60",
-                      "border border-border/50 hover:border-border",
-                      "transition-all duration-200 ease-out titlebar-no-drag",
-                      "hover:scale-[1.02] active:scale-[0.98]"
+                      'hidden lg:flex items-center justify-center w-[42px] h-[42px] rounded-lg',
+                      'text-muted-foreground hover:text-foreground',
+                      'bg-transparent hover:bg-accent/60',
+                      'border border-border/50 hover:border-border',
+                      'transition-all duration-200 ease-out titlebar-no-drag',
+                      'hover:scale-[1.02] active:scale-[0.98]'
                     )}
                     title="Project options"
                     data-testid="project-options-menu"
@@ -1686,13 +1688,13 @@ export function Sidebar() {
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuRadioGroup
-                        value={currentProject.theme || ""}
+                        value={currentProject.theme || ''}
                         onValueChange={(value) => {
                           if (currentProject) {
                             // Clear preview theme when a theme is selected
                             setPreviewTheme(null);
                             // If selecting an actual theme (not "Use Global"), also update global
-                            if (value !== "") {
+                            if (value !== '') {
                               setTheme(value as any);
                             } else {
                               // Restore to global theme when "Use Global" is selected
@@ -1700,7 +1702,7 @@ export function Sidebar() {
                             }
                             setProjectTheme(
                               currentProject.id,
-                              value === "" ? null : (value as any)
+                              value === '' ? null : (value as any)
                             );
                           }
                         }}
@@ -1708,7 +1710,7 @@ export function Sidebar() {
                         {PROJECT_THEME_OPTIONS.map((option) => {
                           const Icon = option.icon;
                           const themeValue =
-                            option.value === "" ? globalTheme : option.value;
+                            option.value === '' ? globalTheme : option.value;
                           return (
                             <div
                               key={option.value}
@@ -1734,7 +1736,7 @@ export function Sidebar() {
                               <DropdownMenuRadioItem
                                 value={option.value}
                                 data-testid={`project-theme-${
-                                  option.value || "global"
+                                  option.value || 'global'
                                 }`}
                                 onFocus={() => {
                                   // Preview the theme on keyboard navigation
@@ -1748,7 +1750,7 @@ export function Sidebar() {
                               >
                                 <Icon className="w-4 h-4 mr-2" />
                                 <span>{option.label}</span>
-                                {option.value === "" && (
+                                {option.value === '' && (
                                   <span className="text-[10px] text-muted-foreground ml-1 capitalize">
                                     ({globalTheme})
                                   </span>
@@ -1815,7 +1817,12 @@ export function Sidebar() {
         )}
 
         {/* Nav Items - Scrollable */}
-        <nav className={cn("flex-1 overflow-y-auto px-3 pb-2", sidebarOpen ? "mt-5" : "mt1")}>
+        <nav
+          className={cn(
+            'flex-1 overflow-y-auto px-3 pb-2',
+            sidebarOpen ? 'mt-5' : 'mt1'
+          )}
+        >
           {!currentProject && sidebarOpen ? (
             // Placeholder when no project is selected (only in expanded state)
             <div className="flex items-center justify-center h-full px-4">
@@ -1828,7 +1835,10 @@ export function Sidebar() {
           ) : currentProject ? (
             // Navigation sections when project is selected
             navSections.map((section, sectionIdx) => (
-              <div key={sectionIdx} className={sectionIdx > 0 && sidebarOpen ? "mt-6" : ""}>
+              <div
+                key={sectionIdx}
+                className={sectionIdx > 0 && sidebarOpen ? 'mt-6' : ''}
+              >
                 {/* Section Label */}
                 {section.label && sidebarOpen && (
                   <div className="hidden lg:block px-3 mb-2">
@@ -1852,41 +1862,41 @@ export function Sidebar() {
                         key={item.id}
                         onClick={() => navigate({ to: `/${item.id}` as const })}
                         className={cn(
-                          "group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag",
-                          "transition-all duration-200 ease-out",
+                          'group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag',
+                          'transition-all duration-200 ease-out',
                           isActive
                             ? [
                                 // Active: Premium gradient with glow
-                                "bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10",
-                                "text-foreground font-medium",
-                                "border border-brand-500/30",
-                                "shadow-md shadow-brand-500/10",
+                                'bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10',
+                                'text-foreground font-medium',
+                                'border border-brand-500/30',
+                                'shadow-md shadow-brand-500/10',
                               ]
                             : [
                                 // Inactive: Subtle hover state
-                                "text-muted-foreground hover:text-foreground",
-                                "hover:bg-accent/50",
-                                "border border-transparent hover:border-border/40",
-                                "hover:shadow-sm",
+                                'text-muted-foreground hover:text-foreground',
+                                'hover:bg-accent/50',
+                                'border border-transparent hover:border-border/40',
+                                'hover:shadow-sm',
                               ],
-                          sidebarOpen ? "justify-start" : "justify-center",
-                          "hover:scale-[1.02] active:scale-[0.97]"
+                          sidebarOpen ? 'justify-start' : 'justify-center',
+                          'hover:scale-[1.02] active:scale-[0.97]'
                         )}
                         title={!sidebarOpen ? item.label : undefined}
                         data-testid={`nav-${item.id}`}
                       >
                         <Icon
                           className={cn(
-                            "w-[18px] h-[18px] shrink-0 transition-all duration-200",
+                            'w-[18px] h-[18px] shrink-0 transition-all duration-200',
                             isActive
-                              ? "text-brand-500 drop-shadow-sm"
-                              : "group-hover:text-brand-400 group-hover:scale-110"
+                              ? 'text-brand-500 drop-shadow-sm'
+                              : 'group-hover:text-brand-400 group-hover:scale-110'
                           )}
                         />
                         <span
                           className={cn(
-                            "ml-3 font-medium text-sm flex-1 text-left",
-                            sidebarOpen ? "hidden lg:block" : "hidden"
+                            'ml-3 font-medium text-sm flex-1 text-left',
+                            sidebarOpen ? 'hidden lg:block' : 'hidden'
                           )}
                         >
                           {item.label}
@@ -1894,10 +1904,10 @@ export function Sidebar() {
                         {item.shortcut && sidebarOpen && (
                           <span
                             className={cn(
-                              "hidden lg:flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-mono rounded-md transition-all duration-200",
+                              'hidden lg:flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-mono rounded-md transition-all duration-200',
                               isActive
-                                ? "bg-brand-500/20 text-brand-400"
-                                : "bg-muted text-muted-foreground group-hover:bg-accent"
+                                ? 'bg-brand-500/20 text-brand-400'
+                                : 'bg-muted text-muted-foreground group-hover:bg-accent'
                             )}
                             data-testid={`shortcut-${item.id}`}
                           >
@@ -1908,12 +1918,12 @@ export function Sidebar() {
                         {!sidebarOpen && (
                           <span
                             className={cn(
-                              "absolute left-full ml-3 px-2.5 py-1.5 rounded-lg",
-                              "bg-popover text-popover-foreground text-xs font-medium",
-                              "border border-border shadow-lg",
-                              "opacity-0 group-hover:opacity-100",
-                              "transition-all duration-200 whitespace-nowrap z-50",
-                              "translate-x-1 group-hover:translate-x-0"
+                              'absolute left-full ml-3 px-2.5 py-1.5 rounded-lg',
+                              'bg-popover text-popover-foreground text-xs font-medium',
+                              'border border-border shadow-lg',
+                              'opacity-0 group-hover:opacity-100',
+                              'transition-all duration-200 whitespace-nowrap z-50',
+                              'translate-x-1 group-hover:translate-x-0'
                             )}
                             data-testid={`sidebar-tooltip-${item.label.toLowerCase()}`}
                           >
@@ -1938,52 +1948,52 @@ export function Sidebar() {
       {/* Bottom Section - Running Agents / Bug Report / Settings */}
       <div
         className={cn(
-          "shrink-0",
+          'shrink-0',
           // Top border with gradient fade
-          "border-t border-border/40",
+          'border-t border-border/40',
           // Elevated background for visual separation
-          "bg-gradient-to-t from-background/10 via-sidebar/50 to-transparent"
+          'bg-gradient-to-t from-background/10 via-sidebar/50 to-transparent'
         )}
       >
         {/* Wiki Link */}
         {!hideWiki && (
           <div className="p-2 pb-0">
             <button
-              onClick={() => navigate({ to: "/wiki" })}
+              onClick={() => navigate({ to: '/wiki' })}
               className={cn(
-                "group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag",
-                "transition-all duration-200 ease-out",
-                isActiveRoute("wiki")
+                'group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag',
+                'transition-all duration-200 ease-out',
+                isActiveRoute('wiki')
                   ? [
-                      "bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10",
-                      "text-foreground font-medium",
-                      "border border-brand-500/30",
-                      "shadow-md shadow-brand-500/10",
+                      'bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10',
+                      'text-foreground font-medium',
+                      'border border-brand-500/30',
+                      'shadow-md shadow-brand-500/10',
                     ]
                   : [
-                      "text-muted-foreground hover:text-foreground",
-                      "hover:bg-accent/50",
-                      "border border-transparent hover:border-border/40",
-                      "hover:shadow-sm",
+                      'text-muted-foreground hover:text-foreground',
+                      'hover:bg-accent/50',
+                      'border border-transparent hover:border-border/40',
+                      'hover:shadow-sm',
                     ],
-                sidebarOpen ? "justify-start" : "justify-center",
-                "hover:scale-[1.02] active:scale-[0.97]"
+                sidebarOpen ? 'justify-start' : 'justify-center',
+                'hover:scale-[1.02] active:scale-[0.97]'
               )}
-              title={!sidebarOpen ? "Wiki" : undefined}
+              title={!sidebarOpen ? 'Wiki' : undefined}
               data-testid="wiki-link"
             >
               <BookOpen
                 className={cn(
-                  "w-[18px] h-[18px] shrink-0 transition-all duration-200",
-                  isActiveRoute("wiki")
-                    ? "text-brand-500 drop-shadow-sm"
-                    : "group-hover:text-brand-400 group-hover:scale-110"
+                  'w-[18px] h-[18px] shrink-0 transition-all duration-200',
+                  isActiveRoute('wiki')
+                    ? 'text-brand-500 drop-shadow-sm'
+                    : 'group-hover:text-brand-400 group-hover:scale-110'
                 )}
               />
               <span
                 className={cn(
-                  "ml-3 font-medium text-sm flex-1 text-left",
-                  sidebarOpen ? "hidden lg:block" : "hidden"
+                  'ml-3 font-medium text-sm flex-1 text-left',
+                  sidebarOpen ? 'hidden lg:block' : 'hidden'
                 )}
               >
                 Wiki
@@ -1991,12 +2001,12 @@ export function Sidebar() {
               {!sidebarOpen && (
                 <span
                   className={cn(
-                    "absolute left-full ml-3 px-2.5 py-1.5 rounded-lg",
-                    "bg-popover text-popover-foreground text-xs font-medium",
-                    "border border-border shadow-lg",
-                    "opacity-0 group-hover:opacity-100",
-                    "transition-all duration-200 whitespace-nowrap z-50",
-                    "translate-x-1 group-hover:translate-x-0"
+                    'absolute left-full ml-3 px-2.5 py-1.5 rounded-lg',
+                    'bg-popover text-popover-foreground text-xs font-medium',
+                    'border border-border shadow-lg',
+                    'opacity-0 group-hover:opacity-100',
+                    'transition-all duration-200 whitespace-nowrap z-50',
+                    'translate-x-1 group-hover:translate-x-0'
                   )}
                 >
                   Wiki
@@ -2009,57 +2019,57 @@ export function Sidebar() {
         {!hideRunningAgents && (
           <div className="p-2 pb-0">
             <button
-              onClick={() => navigate({ to: "/running-agents" })}
+              onClick={() => navigate({ to: '/running-agents' })}
               className={cn(
-                "group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag",
-                "transition-all duration-200 ease-out",
-                isActiveRoute("running-agents")
+                'group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag',
+                'transition-all duration-200 ease-out',
+                isActiveRoute('running-agents')
                   ? [
-                      "bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10",
-                      "text-foreground font-medium",
-                      "border border-brand-500/30",
-                      "shadow-md shadow-brand-500/10",
+                      'bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10',
+                      'text-foreground font-medium',
+                      'border border-brand-500/30',
+                      'shadow-md shadow-brand-500/10',
                     ]
                   : [
-                      "text-muted-foreground hover:text-foreground",
-                      "hover:bg-accent/50",
-                      "border border-transparent hover:border-border/40",
-                      "hover:shadow-sm",
+                      'text-muted-foreground hover:text-foreground',
+                      'hover:bg-accent/50',
+                      'border border-transparent hover:border-border/40',
+                      'hover:shadow-sm',
                     ],
-                sidebarOpen ? "justify-start" : "justify-center",
-                "hover:scale-[1.02] active:scale-[0.97]"
+                sidebarOpen ? 'justify-start' : 'justify-center',
+                'hover:scale-[1.02] active:scale-[0.97]'
               )}
-              title={!sidebarOpen ? "Running Agents" : undefined}
+              title={!sidebarOpen ? 'Running Agents' : undefined}
               data-testid="running-agents-link"
             >
               <div className="relative">
                 <Activity
                   className={cn(
-                    "w-[18px] h-[18px] shrink-0 transition-all duration-200",
-                    isActiveRoute("running-agents")
-                      ? "text-brand-500 drop-shadow-sm"
-                      : "group-hover:text-brand-400 group-hover:scale-110"
+                    'w-[18px] h-[18px] shrink-0 transition-all duration-200',
+                    isActiveRoute('running-agents')
+                      ? 'text-brand-500 drop-shadow-sm'
+                      : 'group-hover:text-brand-400 group-hover:scale-110'
                   )}
                 />
                 {/* Running agents count badge - shown in collapsed state */}
                 {!sidebarOpen && runningAgentsCount > 0 && (
                   <span
                     className={cn(
-                      "absolute -top-1.5 -right-1.5 flex items-center justify-center",
-                      "min-w-4 h-4 px-1 text-[9px] font-bold rounded-full",
-                      "bg-brand-500 text-white shadow-sm",
-                      "animate-in fade-in zoom-in duration-200"
+                      'absolute -top-1.5 -right-1.5 flex items-center justify-center',
+                      'min-w-4 h-4 px-1 text-[9px] font-bold rounded-full',
+                      'bg-brand-500 text-white shadow-sm',
+                      'animate-in fade-in zoom-in duration-200'
                     )}
                     data-testid="running-agents-count-collapsed"
                   >
-                    {runningAgentsCount > 99 ? "99" : runningAgentsCount}
+                    {runningAgentsCount > 99 ? '99' : runningAgentsCount}
                   </span>
                 )}
               </div>
               <span
                 className={cn(
-                  "ml-3 font-medium text-sm flex-1 text-left",
-                  sidebarOpen ? "hidden lg:block" : "hidden"
+                  'ml-3 font-medium text-sm flex-1 text-left',
+                  sidebarOpen ? 'hidden lg:block' : 'hidden'
                 )}
               >
                 Running Agents
@@ -2068,26 +2078,26 @@ export function Sidebar() {
               {sidebarOpen && runningAgentsCount > 0 && (
                 <span
                   className={cn(
-                    "hidden lg:flex items-center justify-center",
-                    "min-w-6 h-6 px-1.5 text-xs font-semibold rounded-full",
-                    "bg-brand-500 text-white shadow-sm",
-                    "animate-in fade-in zoom-in duration-200",
-                    isActiveRoute("running-agents") && "bg-brand-600"
+                    'hidden lg:flex items-center justify-center',
+                    'min-w-6 h-6 px-1.5 text-xs font-semibold rounded-full',
+                    'bg-brand-500 text-white shadow-sm',
+                    'animate-in fade-in zoom-in duration-200',
+                    isActiveRoute('running-agents') && 'bg-brand-600'
                   )}
                   data-testid="running-agents-count"
                 >
-                  {runningAgentsCount > 99 ? "99" : runningAgentsCount}
+                  {runningAgentsCount > 99 ? '99' : runningAgentsCount}
                 </span>
               )}
               {!sidebarOpen && (
                 <span
                   className={cn(
-                    "absolute left-full ml-3 px-2.5 py-1.5 rounded-lg",
-                    "bg-popover text-popover-foreground text-xs font-medium",
-                    "border border-border shadow-lg",
-                    "opacity-0 group-hover:opacity-100",
-                    "transition-all duration-200 whitespace-nowrap z-50",
-                    "translate-x-1 group-hover:translate-x-0"
+                    'absolute left-full ml-3 px-2.5 py-1.5 rounded-lg',
+                    'bg-popover text-popover-foreground text-xs font-medium',
+                    'border border-border shadow-lg',
+                    'opacity-0 group-hover:opacity-100',
+                    'transition-all duration-200 whitespace-nowrap z-50',
+                    'translate-x-1 group-hover:translate-x-0'
                   )}
                 >
                   Running Agents
@@ -2104,41 +2114,41 @@ export function Sidebar() {
         {/* Settings Link */}
         <div className="p-2">
           <button
-            onClick={() => navigate({ to: "/settings" })}
+            onClick={() => navigate({ to: '/settings' })}
             className={cn(
-              "group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag",
-              "transition-all duration-200 ease-out",
-              isActiveRoute("settings")
+              'group flex items-center w-full px-3 py-2.5 rounded-xl relative overflow-hidden titlebar-no-drag',
+              'transition-all duration-200 ease-out',
+              isActiveRoute('settings')
                 ? [
-                    "bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10",
-                    "text-foreground font-medium",
-                    "border border-brand-500/30",
-                    "shadow-md shadow-brand-500/10",
+                    'bg-gradient-to-r from-brand-500/20 via-brand-500/15 to-brand-600/10',
+                    'text-foreground font-medium',
+                    'border border-brand-500/30',
+                    'shadow-md shadow-brand-500/10',
                   ]
                 : [
-                    "text-muted-foreground hover:text-foreground",
-                    "hover:bg-accent/50",
-                    "border border-transparent hover:border-border/40",
-                    "hover:shadow-sm",
+                    'text-muted-foreground hover:text-foreground',
+                    'hover:bg-accent/50',
+                    'border border-transparent hover:border-border/40',
+                    'hover:shadow-sm',
                   ],
-              sidebarOpen ? "justify-start" : "justify-center",
-              "hover:scale-[1.02] active:scale-[0.97]"
+              sidebarOpen ? 'justify-start' : 'justify-center',
+              'hover:scale-[1.02] active:scale-[0.97]'
             )}
-            title={!sidebarOpen ? "Settings" : undefined}
+            title={!sidebarOpen ? 'Settings' : undefined}
             data-testid="settings-button"
           >
             <Settings
               className={cn(
-                "w-[18px] h-[18px] shrink-0 transition-all duration-200",
-                isActiveRoute("settings")
-                  ? "text-brand-500 drop-shadow-sm"
-                  : "group-hover:text-brand-400 group-hover:rotate-90 group-hover:scale-110"
+                'w-[18px] h-[18px] shrink-0 transition-all duration-200',
+                isActiveRoute('settings')
+                  ? 'text-brand-500 drop-shadow-sm'
+                  : 'group-hover:text-brand-400 group-hover:rotate-90 group-hover:scale-110'
               )}
             />
             <span
               className={cn(
-                "ml-3 font-medium text-sm flex-1 text-left",
-                sidebarOpen ? "hidden lg:block" : "hidden"
+                'ml-3 font-medium text-sm flex-1 text-left',
+                sidebarOpen ? 'hidden lg:block' : 'hidden'
               )}
             >
               Settings
@@ -2146,10 +2156,10 @@ export function Sidebar() {
             {sidebarOpen && (
               <span
                 className={cn(
-                  "hidden lg:flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-mono rounded-md transition-all duration-200",
-                  isActiveRoute("settings")
-                    ? "bg-brand-500/20 text-brand-400"
-                    : "bg-muted text-muted-foreground group-hover:bg-accent"
+                  'hidden lg:flex items-center justify-center min-w-5 h-5 px-1.5 text-[10px] font-mono rounded-md transition-all duration-200',
+                  isActiveRoute('settings')
+                    ? 'bg-brand-500/20 text-brand-400'
+                    : 'bg-muted text-muted-foreground group-hover:bg-accent'
                 )}
                 data-testid="shortcut-settings"
               >
@@ -2159,12 +2169,12 @@ export function Sidebar() {
             {!sidebarOpen && (
               <span
                 className={cn(
-                  "absolute left-full ml-3 px-2.5 py-1.5 rounded-lg",
-                  "bg-popover text-popover-foreground text-xs font-medium",
-                  "border border-border shadow-lg",
-                  "opacity-0 group-hover:opacity-100",
-                  "transition-all duration-200 whitespace-nowrap z-50",
-                  "translate-x-1 group-hover:translate-x-0"
+                  'absolute left-full ml-3 px-2.5 py-1.5 rounded-lg',
+                  'bg-popover text-popover-foreground text-xs font-medium',
+                  'border border-border shadow-lg',
+                  'opacity-0 group-hover:opacity-100',
+                  'transition-all duration-200 whitespace-nowrap z-50',
+                  'translate-x-1 group-hover:translate-x-0'
                 )}
               >
                 Settings
@@ -2227,8 +2237,8 @@ export function Sidebar() {
                     >
                       <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                       {activeTrashId === project.id
-                        ? "Deleting..."
-                        : "Delete from disk"}
+                        ? 'Deleting...'
+                        : 'Delete from disk'}
                     </Button>
                     <Button
                       size="sm"
@@ -2257,7 +2267,7 @@ export function Sidebar() {
                 disabled={isEmptyingTrash}
                 data-testid="empty-trash"
               >
-                {isEmptyingTrash ? "Clearing..." : "Empty Recycle Bin"}
+                {isEmptyingTrash ? 'Clearing...' : 'Empty Recycle Bin'}
               </Button>
             )}
           </DialogFooter>
@@ -2314,7 +2324,7 @@ export function Sidebar() {
             {/* Main explanation */}
             <div className="space-y-3">
               <p className="text-sm text-foreground leading-relaxed">
-                Would you like to auto-generate your{" "}
+                Would you like to auto-generate your{' '}
                 <strong>app_spec.txt</strong>? This file helps describe your
                 project and is used to pre-populate your backlog with features
                 to work on.

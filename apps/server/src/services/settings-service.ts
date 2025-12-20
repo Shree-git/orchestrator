@@ -7,16 +7,16 @@
  * - Per-project settings ({projectPath}/.automaker/settings.json)
  */
 
-import fs from "fs/promises";
-import path from "path";
-import { createLogger } from "../lib/logger.js";
+import fs from 'fs/promises';
+import path from 'path';
+import { createLogger } from '../lib/logger.js';
 import {
   getGlobalSettingsPath,
   getCredentialsPath,
   getProjectSettingsPath,
   ensureDataDir,
   ensureAutomakerDir,
-} from "../lib/automaker-paths.js";
+} from '../lib/automaker-paths.js';
 import type {
   GlobalSettings,
   Credentials,
@@ -27,7 +27,7 @@ import type {
   TrashedProjectRef,
   BoardBackgroundSettings,
   WorktreeInfo,
-} from "../types/settings.js";
+} from '../types/settings.js';
 import {
   DEFAULT_GLOBAL_SETTINGS,
   DEFAULT_CREDENTIALS,
@@ -35,9 +35,9 @@ import {
   SETTINGS_VERSION,
   CREDENTIALS_VERSION,
   PROJECT_SETTINGS_VERSION,
-} from "../types/settings.js";
+} from '../types/settings.js';
 
-const logger = createLogger("SettingsService");
+const logger = createLogger('SettingsService');
 
 /**
  * Atomic file write - write to temp file then rename
@@ -47,7 +47,7 @@ async function atomicWriteJson(filePath: string, data: unknown): Promise<void> {
   const content = JSON.stringify(data, null, 2);
 
   try {
-    await fs.writeFile(tempPath, content, "utf-8");
+    await fs.writeFile(tempPath, content, 'utf-8');
     await fs.rename(tempPath, filePath);
   } catch (error) {
     // Clean up temp file if it exists
@@ -65,10 +65,10 @@ async function atomicWriteJson(filePath: string, data: unknown): Promise<void> {
  */
 async function readJsonFile<T>(filePath: string, defaultValue: T): Promise<T> {
   try {
-    const content = await fs.readFile(filePath, "utf-8");
+    const content = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(content) as T;
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return defaultValue;
     }
     logger.error(`Error reading ${filePath}:`, error);
@@ -145,7 +145,7 @@ export class SettingsService {
     }
 
     await atomicWriteJson(settingsPath, updated);
-    logger.info("Global settings updated");
+    logger.info('Global settings updated');
 
     return updated;
   }
@@ -185,9 +185,7 @@ export class SettingsService {
   /**
    * Update credentials (partial update)
    */
-  async updateCredentials(
-    updates: Partial<Credentials>
-  ): Promise<Credentials> {
+  async updateCredentials(updates: Partial<Credentials>): Promise<Credentials> {
     await ensureDataDir(this.dataDir);
     const credentialsPath = getCredentialsPath(this.dataDir);
 
@@ -207,7 +205,7 @@ export class SettingsService {
     }
 
     await atomicWriteJson(credentialsPath, updated);
-    logger.info("Credentials updated");
+    logger.info('Credentials updated');
 
     return updated;
   }
@@ -223,7 +221,7 @@ export class SettingsService {
     const credentials = await this.getCredentials();
 
     const maskKey = (key: string): string => {
-      if (!key || key.length < 8) return "";
+      if (!key || key.length < 8) return '';
       return `${key.substring(0, 4)}...${key.substring(key.length - 4)}`;
     };
 
@@ -319,11 +317,11 @@ export class SettingsService {
    * This is called when the UI detects it has localStorage data but no settings files
    */
   async migrateFromLocalStorage(localStorageData: {
-    "automaker-storage"?: string;
-    "automaker-setup"?: string;
-    "worktree-panel-collapsed"?: string;
-    "file-browser-recent-folders"?: string;
-    "automaker:lastProjectDir"?: string;
+    'automaker-storage'?: string;
+    'automaker-setup'?: string;
+    'worktree-panel-collapsed'?: string;
+    'file-browser-recent-folders'?: string;
+    'automaker:lastProjectDir'?: string;
   }): Promise<{
     success: boolean;
     migratedGlobalSettings: boolean;
@@ -339,9 +337,9 @@ export class SettingsService {
     try {
       // Parse the main automaker-storage
       let appState: Record<string, unknown> = {};
-      if (localStorageData["automaker-storage"]) {
+      if (localStorageData['automaker-storage']) {
         try {
-          const parsed = JSON.parse(localStorageData["automaker-storage"]);
+          const parsed = JSON.parse(localStorageData['automaker-storage']);
           appState = parsed.state || parsed;
         } catch (e) {
           errors.push(`Failed to parse automaker-storage: ${e}`);
@@ -350,15 +348,15 @@ export class SettingsService {
 
       // Extract global settings
       const globalSettings: Partial<GlobalSettings> = {
-        theme: (appState.theme as GlobalSettings["theme"]) || "dark",
+        theme: (appState.theme as GlobalSettings['theme']) || 'dark',
         sidebarOpen:
           appState.sidebarOpen !== undefined
             ? (appState.sidebarOpen as boolean)
             : true,
         chatHistoryOpen: (appState.chatHistoryOpen as boolean) || false,
         kanbanCardDetailLevel:
-          (appState.kanbanCardDetailLevel as GlobalSettings["kanbanCardDetailLevel"]) ||
-          "standard",
+          (appState.kanbanCardDetailLevel as GlobalSettings['kanbanCardDetailLevel']) ||
+          'standard',
         maxConcurrency: (appState.maxConcurrency as number) || 3,
         defaultSkipTests:
           appState.defaultSkipTests !== undefined
@@ -371,16 +369,16 @@ export class SettingsService {
         useWorktrees: (appState.useWorktrees as boolean) || false,
         showProfilesOnly: (appState.showProfilesOnly as boolean) || false,
         defaultPlanningMode:
-          (appState.defaultPlanningMode as GlobalSettings["defaultPlanningMode"]) ||
-          "skip",
+          (appState.defaultPlanningMode as GlobalSettings['defaultPlanningMode']) ||
+          'skip',
         defaultRequirePlanApproval:
           (appState.defaultRequirePlanApproval as boolean) || false,
         defaultAIProfileId:
           (appState.defaultAIProfileId as string | null) || null,
         muteDoneSound: (appState.muteDoneSound as boolean) || false,
         enhancementModel:
-          (appState.enhancementModel as GlobalSettings["enhancementModel"]) ||
-          "sonnet",
+          (appState.enhancementModel as GlobalSettings['enhancementModel']) ||
+          'sonnet',
         keyboardShortcuts:
           (appState.keyboardShortcuts as KeyboardShortcuts) ||
           DEFAULT_GLOBAL_SETTINGS.keyboardShortcuts,
@@ -396,30 +394,30 @@ export class SettingsService {
       };
 
       // Add direct localStorage values
-      if (localStorageData["automaker:lastProjectDir"]) {
+      if (localStorageData['automaker:lastProjectDir']) {
         globalSettings.lastProjectDir =
-          localStorageData["automaker:lastProjectDir"];
+          localStorageData['automaker:lastProjectDir'];
       }
 
-      if (localStorageData["file-browser-recent-folders"]) {
+      if (localStorageData['file-browser-recent-folders']) {
         try {
           globalSettings.recentFolders = JSON.parse(
-            localStorageData["file-browser-recent-folders"]
+            localStorageData['file-browser-recent-folders']
           );
         } catch {
           globalSettings.recentFolders = [];
         }
       }
 
-      if (localStorageData["worktree-panel-collapsed"]) {
+      if (localStorageData['worktree-panel-collapsed']) {
         globalSettings.worktreePanelCollapsed =
-          localStorageData["worktree-panel-collapsed"] === "true";
+          localStorageData['worktree-panel-collapsed'] === 'true';
       }
 
       // Save global settings
       await this.updateGlobalSettings(globalSettings);
       migratedGlobalSettings = true;
-      logger.info("Migrated global settings from localStorage");
+      logger.info('Migrated global settings from localStorage');
 
       // Extract and save credentials
       if (appState.apiKeys) {
@@ -430,13 +428,13 @@ export class SettingsService {
         };
         await this.updateCredentials({
           apiKeys: {
-            anthropic: apiKeys.anthropic || "",
-            google: apiKeys.google || "",
-            openai: apiKeys.openai || "",
+            anthropic: apiKeys.anthropic || '',
+            google: apiKeys.google || '',
+            openai: apiKeys.openai || '',
           },
         });
         migratedCredentials = true;
-        logger.info("Migrated credentials from localStorage");
+        logger.info('Migrated credentials from localStorage');
       }
 
       // Migrate per-project settings
@@ -482,8 +480,7 @@ export class SettingsService {
           // Get theme from project object
           const project = projects.find((p) => p.path === projectPath);
           if (project?.theme) {
-            projectSettings.theme =
-              project.theme as ProjectSettings["theme"];
+            projectSettings.theme = project.theme as ProjectSettings['theme'];
           }
 
           if (boardBackgroundByProject?.[projectPath]) {
@@ -505,7 +502,9 @@ export class SettingsService {
             migratedProjectCount++;
           }
         } catch (e) {
-          errors.push(`Failed to migrate project settings for ${projectPath}: ${e}`);
+          errors.push(
+            `Failed to migrate project settings for ${projectPath}: ${e}`
+          );
         }
       }
 
@@ -521,7 +520,7 @@ export class SettingsService {
         errors,
       };
     } catch (error) {
-      logger.error("Migration failed:", error);
+      logger.error('Migration failed:', error);
       errors.push(`Migration failed: ${error}`);
       return {
         success: false,

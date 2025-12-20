@@ -1,16 +1,21 @@
-
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Globe, Loader2, CircleDot, GitPullRequest } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import {
+  RefreshCw,
+  Globe,
+  Loader2,
+  CircleDot,
+  GitPullRequest,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import type { WorktreeInfo, BranchInfo, DevServerInfo, PRInfo } from "../types";
-import { BranchSwitchDropdown } from "./branch-switch-dropdown";
-import { WorktreeActionsDropdown } from "./worktree-actions-dropdown";
+} from '@/components/ui/tooltip';
+import type { WorktreeInfo, BranchInfo, DevServerInfo, PRInfo } from '../types';
+import { BranchSwitchDropdown } from './branch-switch-dropdown';
+import { WorktreeActionsDropdown } from './worktree-actions-dropdown';
 
 interface WorktreeTabProps {
   worktree: WorktreeInfo;
@@ -91,49 +96,48 @@ export function WorktreeTab({
   onStopDevServer,
   onOpenDevServerUrl,
 }: WorktreeTabProps) {
-
   let prBadge: JSX.Element | null = null;
   if (worktree.pr) {
-    const prState = worktree.pr.state?.toLowerCase() ?? "open";
+    const prState = worktree.pr.state?.toLowerCase() ?? 'open';
     const prStateClasses = (() => {
       // When selected (active tab), use high contrast solid background (paper-like)
       if (isSelected) {
-        return "bg-background text-foreground border-transparent shadow-sm";
+        return 'bg-background text-foreground border-transparent shadow-sm';
       }
 
       // When not selected, use the colored variants
       switch (prState) {
-        case "open":
-        case "reopened":
-          return "bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-500/40 hover:bg-emerald-500/25";
-        case "draft":
-          return "bg-amber-500/15 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 dark:border-amber-500/40 hover:bg-amber-500/25";
-        case "merged":
-          return "bg-purple-500/15 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30 dark:border-purple-500/40 hover:bg-purple-500/25";
-        case "closed":
-          return "bg-rose-500/15 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30 dark:border-rose-500/40 hover:bg-rose-500/25";
+        case 'open':
+        case 'reopened':
+          return 'bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-500/40 hover:bg-emerald-500/25';
+        case 'draft':
+          return 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 dark:border-amber-500/40 hover:bg-amber-500/25';
+        case 'merged':
+          return 'bg-purple-500/15 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30 dark:border-purple-500/40 hover:bg-purple-500/25';
+        case 'closed':
+          return 'bg-rose-500/15 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30 dark:border-rose-500/40 hover:bg-rose-500/25';
         default:
-          return "bg-muted text-muted-foreground border-border/60 hover:bg-muted/80";
+          return 'bg-muted text-muted-foreground border-border/60 hover:bg-muted/80';
       }
     })();
 
-    const prLabel = `Pull Request #${worktree.pr.number}, ${prState}${worktree.pr.title ? `: ${worktree.pr.title}` : ""}`;
+    const prLabel = `Pull Request #${worktree.pr.number}, ${prState}${worktree.pr.title ? `: ${worktree.pr.title}` : ''}`;
 
     // Helper to get status icon color for the selected state
     const getStatusColorClass = () => {
-      if (!isSelected) return "";
+      if (!isSelected) return '';
       switch (prState) {
-        case "open":
-        case "reopened":
-          return "text-emerald-600 dark:text-emerald-500";
-        case "draft":
-          return "text-amber-600 dark:text-amber-500";
-        case "merged":
-          return "text-purple-600 dark:text-purple-500";
-        case "closed":
-          return "text-rose-600 dark:text-rose-500";
+        case 'open':
+        case 'reopened':
+          return 'text-emerald-600 dark:text-emerald-500';
+        case 'draft':
+          return 'text-amber-600 dark:text-amber-500';
+        case 'merged':
+          return 'text-purple-600 dark:text-purple-500';
+        case 'closed':
+          return 'text-rose-600 dark:text-rose-500';
         default:
-          return "text-muted-foreground";
+          return 'text-muted-foreground';
       }
     };
 
@@ -142,9 +146,9 @@ export function WorktreeTab({
         role="button"
         tabIndex={0}
         className={cn(
-          "ml-1.5 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background",
-          "cursor-pointer hover:opacity-80 active:opacity-70",
+          'ml-1.5 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-medium transition-colors',
+          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:ring-offset-background',
+          'cursor-pointer hover:opacity-80 active:opacity-70',
           prStateClasses
         )}
         title={`${prLabel} - Click to open`}
@@ -152,25 +156,34 @@ export function WorktreeTab({
         onClick={(e) => {
           e.stopPropagation(); // Prevent triggering worktree selection
           if (worktree.pr?.url) {
-            window.open(worktree.pr.url, "_blank", "noopener,noreferrer");
+            window.open(worktree.pr.url, '_blank', 'noopener,noreferrer');
           }
         }}
         onKeyDown={(e) => {
           // Prevent event from bubbling to parent button
           e.stopPropagation();
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             if (worktree.pr?.url) {
-              window.open(worktree.pr.url, "_blank", "noopener,noreferrer");
+              window.open(worktree.pr.url, '_blank', 'noopener,noreferrer');
             }
           }
         }}
       >
-        <GitPullRequest className={cn("w-3 h-3", getStatusColorClass())} aria-hidden="true" />
-        <span aria-hidden="true" className={isSelected ? "text-foreground font-semibold" : ""}>
+        <GitPullRequest
+          className={cn('w-3 h-3', getStatusColorClass())}
+          aria-hidden="true"
+        />
+        <span
+          aria-hidden="true"
+          className={isSelected ? 'text-foreground font-semibold' : ''}
+        >
           PR #{worktree.pr.number}
         </span>
-        <span className={cn("capitalize", getStatusColorClass())} aria-hidden="true">
+        <span
+          className={cn('capitalize', getStatusColorClass())}
+          aria-hidden="true"
+        >
           {prState}
         </span>
       </span>
@@ -182,12 +195,12 @@ export function WorktreeTab({
       {worktree.isMain ? (
         <>
           <Button
-            variant={isSelected ? "default" : "outline"}
+            variant={isSelected ? 'default' : 'outline'}
             size="sm"
             className={cn(
-              "h-7 px-3 text-xs font-mono gap-1.5 border-r-0 rounded-l-md rounded-r-none",
-              isSelected && "bg-primary text-primary-foreground",
-              !isSelected && "bg-secondary/50 hover:bg-secondary"
+              'h-7 px-3 text-xs font-mono gap-1.5 border-r-0 rounded-l-md rounded-r-none',
+              isSelected && 'bg-primary text-primary-foreground',
+              !isSelected && 'bg-secondary/50 hover:bg-secondary'
             )}
             onClick={() => onSelectWorktree(worktree)}
             disabled={isActivating}
@@ -207,18 +220,23 @@ export function WorktreeTab({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className={cn(
-                      "inline-flex items-center justify-center h-4 min-w-[1rem] px-1 text-[10px] font-medium rounded border",
-                      isSelected
-                        ? "bg-amber-500 text-amber-950 border-amber-400"
-                        : "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                    )}>
+                    <span
+                      className={cn(
+                        'inline-flex items-center justify-center h-4 min-w-[1rem] px-1 text-[10px] font-medium rounded border',
+                        isSelected
+                          ? 'bg-amber-500 text-amber-950 border-amber-400'
+                          : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                      )}
+                    >
                       <CircleDot className="w-2.5 h-2.5 mr-0.5" />
-                      {changedFilesCount ?? "!"}
+                      {changedFilesCount ?? '!'}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{changedFilesCount ?? "Some"} uncommitted file{changedFilesCount !== 1 ? "s" : ""}</p>
+                    <p>
+                      {changedFilesCount ?? 'Some'} uncommitted file
+                      {changedFilesCount !== 1 ? 's' : ''}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -241,20 +259,20 @@ export function WorktreeTab({
         </>
       ) : (
         <Button
-          variant={isSelected ? "default" : "outline"}
+          variant={isSelected ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            "h-7 px-3 text-xs font-mono gap-1.5 rounded-l-md rounded-r-none border-r-0",
-            isSelected && "bg-primary text-primary-foreground",
-            !isSelected && "bg-secondary/50 hover:bg-secondary",
-            !worktree.hasWorktree && !isSelected && "opacity-70"
+            'h-7 px-3 text-xs font-mono gap-1.5 rounded-l-md rounded-r-none border-r-0',
+            isSelected && 'bg-primary text-primary-foreground',
+            !isSelected && 'bg-secondary/50 hover:bg-secondary',
+            !worktree.hasWorktree && !isSelected && 'opacity-70'
           )}
           onClick={() => onSelectWorktree(worktree)}
           disabled={isActivating}
           title={
             worktree.hasWorktree
               ? "Click to switch to this worktree's branch"
-              : "Click to switch to this branch"
+              : 'Click to switch to this branch'
           }
         >
           {isRunning && <Loader2 className="w-3 h-3 animate-spin" />}
@@ -271,18 +289,23 @@ export function WorktreeTab({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className={cn(
-                    "inline-flex items-center justify-center h-4 min-w-[1rem] px-1 text-[10px] font-medium rounded border",
-                    isSelected
-                      ? "bg-amber-500 text-amber-950 border-amber-400"
-                      : "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                  )}>
+                  <span
+                    className={cn(
+                      'inline-flex items-center justify-center h-4 min-w-[1rem] px-1 text-[10px] font-medium rounded border',
+                      isSelected
+                        ? 'bg-amber-500 text-amber-950 border-amber-400'
+                        : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                    )}
+                  >
                     <CircleDot className="w-2.5 h-2.5 mr-0.5" />
-                    {changedFilesCount ?? "!"}
+                    {changedFilesCount ?? '!'}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{changedFilesCount ?? "Some"} uncommitted file{changedFilesCount !== 1 ? "s" : ""}</p>
+                  <p>
+                    {changedFilesCount ?? 'Some'} uncommitted file
+                    {changedFilesCount !== 1 ? 's' : ''}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -293,13 +316,13 @@ export function WorktreeTab({
 
       {isDevServerRunning && (
         <Button
-          variant={isSelected ? "default" : "outline"}
+          variant={isSelected ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            "h-7 w-7 p-0 rounded-none border-r-0",
-            isSelected && "bg-primary text-primary-foreground",
-            !isSelected && "bg-secondary/50 hover:bg-secondary",
-            "text-green-500"
+            'h-7 w-7 p-0 rounded-none border-r-0',
+            isSelected && 'bg-primary text-primary-foreground',
+            !isSelected && 'bg-secondary/50 hover:bg-secondary',
+            'text-green-500'
           )}
           onClick={() => onOpenDevServerUrl(worktree)}
           title={`Open dev server (port ${devServerInfo?.port})`}

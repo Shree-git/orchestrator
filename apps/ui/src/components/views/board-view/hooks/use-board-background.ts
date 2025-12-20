@@ -1,11 +1,13 @@
-import { useMemo } from "react";
-import { useAppStore, defaultBackgroundSettings } from "@/store/app-store";
+import { useMemo } from 'react';
+import { useAppStore, defaultBackgroundSettings } from '@/store/app-store';
 
 interface UseBoardBackgroundProps {
   currentProject: { path: string; id: string } | null;
 }
 
-export function useBoardBackground({ currentProject }: UseBoardBackgroundProps) {
+export function useBoardBackground({
+  currentProject,
+}: UseBoardBackgroundProps) {
   const boardBackgroundByProject = useAppStore(
     (state) => state.boardBackgroundByProject
   );
@@ -26,17 +28,17 @@ export function useBoardBackground({ currentProject }: UseBoardBackgroundProps) 
 
     return {
       backgroundImage: `url(${
-        import.meta.env.VITE_SERVER_URL || "http://localhost:3008"
+        import.meta.env.VITE_SERVER_URL || 'http://localhost:3008'
       }/api/fs/image?path=${encodeURIComponent(
         backgroundSettings.imagePath
       )}&projectPath=${encodeURIComponent(currentProject.path)}${
         backgroundSettings.imageVersion
           ? `&v=${backgroundSettings.imageVersion}`
-          : ""
+          : ''
       })`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
     } as React.CSSProperties;
   }, [backgroundSettings, currentProject]);
 

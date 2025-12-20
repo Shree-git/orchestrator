@@ -5,8 +5,8 @@
  * the available window space without dead space or content being cut off.
  */
 
-import { test, expect } from "@playwright/test";
-import * as fs from "fs";
+import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
 
 import {
   waitForNetworkIdle,
@@ -15,17 +15,17 @@ import {
   createTempDirPath,
   setupProjectWithPathNoWorktrees,
   waitForBoardView,
-} from "./utils";
+} from './utils';
 
 // Create unique temp dir for this test run
-const TEST_TEMP_DIR = createTempDirPath("kanban-responsive-tests");
+const TEST_TEMP_DIR = createTempDirPath('kanban-responsive-tests');
 
 interface TestRepo {
   path: string;
   cleanup: () => Promise<void>;
 }
 
-test.describe("Kanban Responsive Scaling Tests", () => {
+test.describe('Kanban Responsive Scaling Tests', () => {
   let testRepo: TestRepo;
 
   test.beforeAll(async () => {
@@ -52,12 +52,12 @@ test.describe("Kanban Responsive Scaling Tests", () => {
     cleanupTempDir(TEST_TEMP_DIR);
   });
 
-  test("kanban columns should scale to fill available width at different viewport sizes", async ({
+  test('kanban columns should scale to fill available width at different viewport sizes', async ({
     page,
   }) => {
     // Setup project and navigate to board view
     await setupProjectWithPathNoWorktrees(page, testRepo.path);
-    await page.goto("/");
+    await page.goto('/');
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
@@ -66,9 +66,15 @@ test.describe("Kanban Responsive Scaling Tests", () => {
 
     // Get all four kanban columns
     const backlogColumn = page.locator('[data-testid="kanban-column-backlog"]');
-    const inProgressColumn = page.locator('[data-testid="kanban-column-in_progress"]');
-    const waitingApprovalColumn = page.locator('[data-testid="kanban-column-waiting_approval"]');
-    const verifiedColumn = page.locator('[data-testid="kanban-column-verified"]');
+    const inProgressColumn = page.locator(
+      '[data-testid="kanban-column-in_progress"]'
+    );
+    const waitingApprovalColumn = page.locator(
+      '[data-testid="kanban-column-waiting_approval"]'
+    );
+    const verifiedColumn = page.locator(
+      '[data-testid="kanban-column-verified"]'
+    );
 
     // Verify all columns are visible
     await expect(backlogColumn).toBeVisible();
@@ -115,19 +121,25 @@ test.describe("Kanban Responsive Scaling Tests", () => {
         expect(baseWidth).toBeLessThanOrEqual(360);
 
         // Columns should not overlap (check x positions)
-        expect(inProgressBox.x).toBeGreaterThan(backlogBox.x + backlogBox.width - 5);
-        expect(waitingApprovalBox.x).toBeGreaterThan(inProgressBox.x + inProgressBox.width - 5);
-        expect(verifiedBox.x).toBeGreaterThan(waitingApprovalBox.x + waitingApprovalBox.width - 5);
+        expect(inProgressBox.x).toBeGreaterThan(
+          backlogBox.x + backlogBox.width - 5
+        );
+        expect(waitingApprovalBox.x).toBeGreaterThan(
+          inProgressBox.x + inProgressBox.width - 5
+        );
+        expect(verifiedBox.x).toBeGreaterThan(
+          waitingApprovalBox.x + waitingApprovalBox.width - 5
+        );
       }
     }
   });
 
-  test("kanban columns should be centered in the viewport", async ({
+  test('kanban columns should be centered in the viewport', async ({
     page,
   }) => {
     // Setup project and navigate to board view
     await setupProjectWithPathNoWorktrees(page, testRepo.path);
-    await page.goto("/");
+    await page.goto('/');
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
@@ -140,7 +152,9 @@ test.describe("Kanban Responsive Scaling Tests", () => {
 
     // Get the first and last columns
     const backlogColumn = page.locator('[data-testid="kanban-column-backlog"]');
-    const verifiedColumn = page.locator('[data-testid="kanban-column-verified"]');
+    const verifiedColumn = page.locator(
+      '[data-testid="kanban-column-verified"]'
+    );
 
     const backlogBox = await backlogColumn.boundingBox();
     const verifiedBox = await verifiedColumn.boundingBox();
@@ -172,7 +186,8 @@ test.describe("Kanban Responsive Scaling Tests", () => {
 
       // Calculate margins relative to the container
       const leftMargin = backlogBox.x - containerLeft;
-      const rightMargin = containerWidth - (verifiedBox.x + verifiedBox.width - containerLeft);
+      const rightMargin =
+        containerWidth - (verifiedBox.x + verifiedBox.width - containerLeft);
 
       // The margins should be roughly equal (columns are centered)
       // Allow for some tolerance due to padding and gaps
@@ -181,12 +196,12 @@ test.describe("Kanban Responsive Scaling Tests", () => {
     }
   });
 
-  test("kanban columns should have no horizontal scrollbar at standard viewport width", async ({
+  test('kanban columns should have no horizontal scrollbar at standard viewport width', async ({
     page,
   }) => {
     // Setup project and navigate to board view
     await setupProjectWithPathNoWorktrees(page, testRepo.path);
-    await page.goto("/");
+    await page.goto('/');
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
@@ -196,7 +211,9 @@ test.describe("Kanban Responsive Scaling Tests", () => {
 
     // Check if horizontal scrollbar is present by comparing scrollWidth and clientWidth
     const hasHorizontalScroll = await page.evaluate(() => {
-      const boardContainer = document.querySelector('[data-testid="board-view"]');
+      const boardContainer = document.querySelector(
+        '[data-testid="board-view"]'
+      );
       if (!boardContainer) return false;
       return boardContainer.scrollWidth > boardContainer.clientWidth;
     });

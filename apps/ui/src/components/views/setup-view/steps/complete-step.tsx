@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, AlertCircle, Shield, Sparkles } from "lucide-react";
-import { useSetupStore } from "@/store/setup-store";
-import { useAppStore } from "@/store/app-store";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { CheckCircle2, AlertCircle, Shield, Sparkles } from 'lucide-react';
+import { useSetupStore } from '@/store/setup-store';
+import { useAppStore } from '@/store/app-store';
 
 interface CompleteStepProps {
   onFinish: () => void;

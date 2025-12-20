@@ -1,16 +1,20 @@
-
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ImageIcon, Archive, Minimize2, Square, Maximize2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { ImageIcon, Archive, Minimize2, Square, Maximize2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BoardControlsProps {
   isMounted: boolean;
   onShowBoardBackground: () => void;
   onShowCompletedModal: () => void;
   completedCount: number;
-  kanbanCardDetailLevel: "minimal" | "standard" | "detailed";
-  onDetailLevelChange: (level: "minimal" | "standard" | "detailed") => void;
+  kanbanCardDetailLevel: 'minimal' | 'standard' | 'detailed';
+  onDetailLevelChange: (level: 'minimal' | 'standard' | 'detailed') => void;
 }
 
 export function BoardControls({
@@ -57,7 +61,7 @@ export function BoardControls({
               <Archive className="w-4 h-4" />
               {completedCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-brand-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {completedCount > 99 ? "99+" : completedCount}
+                  {completedCount > 99 ? '99+' : completedCount}
                 </span>
               )}
             </Button>
@@ -75,12 +79,12 @@ export function BoardControls({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onDetailLevelChange("minimal")}
+                onClick={() => onDetailLevelChange('minimal')}
                 className={cn(
-                  "p-2 rounded-l-lg transition-colors",
-                  kanbanCardDetailLevel === "minimal"
-                    ? "bg-brand-500/20 text-brand-500"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  'p-2 rounded-l-lg transition-colors',
+                  kanbanCardDetailLevel === 'minimal'
+                    ? 'bg-brand-500/20 text-brand-500'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 )}
                 data-testid="kanban-toggle-minimal"
               >
@@ -94,12 +98,12 @@ export function BoardControls({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onDetailLevelChange("standard")}
+                onClick={() => onDetailLevelChange('standard')}
                 className={cn(
-                  "p-2 transition-colors",
-                  kanbanCardDetailLevel === "standard"
-                    ? "bg-brand-500/20 text-brand-500"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  'p-2 transition-colors',
+                  kanbanCardDetailLevel === 'standard'
+                    ? 'bg-brand-500/20 text-brand-500'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 )}
                 data-testid="kanban-toggle-standard"
               >
@@ -113,12 +117,12 @@ export function BoardControls({
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onDetailLevelChange("detailed")}
+                onClick={() => onDetailLevelChange('detailed')}
                 className={cn(
-                  "p-2 rounded-r-lg transition-colors",
-                  kanbanCardDetailLevel === "detailed"
-                    ? "bg-brand-500/20 text-brand-500"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  'p-2 rounded-r-lg transition-colors',
+                  kanbanCardDetailLevel === 'detailed'
+                    ? 'bg-brand-500/20 text-brand-500'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 )}
                 data-testid="kanban-toggle-detailed"
               >

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Archive } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Archive } from 'lucide-react';
 
 interface ArchiveAllVerifiedDialogProps {
   open: boolean;
@@ -43,7 +43,11 @@ export function ArchiveAllVerifiedDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="default" onClick={onConfirm} data-testid="confirm-archive-all-verified">
+          <Button
+            variant="default"
+            onClick={onConfirm}
+            data-testid="confirm-archive-all-verified"
+          >
             <Archive className="w-4 h-4 mr-2" />
             Archive All
           </Button>
@@ -52,5 +56,3 @@ export function ArchiveAllVerifiedDialog({
     </Dialog>
   );
 }
-
-

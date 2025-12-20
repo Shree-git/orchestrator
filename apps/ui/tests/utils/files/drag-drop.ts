@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page } from '@playwright/test';
 
 /**
  * Simulate drag and drop of a file onto an element
@@ -8,7 +8,7 @@ export async function simulateFileDrop(
   targetSelector: string,
   fileName: string,
   fileContent: string,
-  mimeType: string = "text/plain"
+  mimeType: string = 'text/plain'
 ): Promise<void> {
   await page.evaluate(
     ({ selector, content, name, mime }) => {
@@ -21,19 +21,24 @@ export async function simulateFileDrop(
 
       // Dispatch drag events
       target.dispatchEvent(
-        new DragEvent("dragover", {
+        new DragEvent('dragover', {
           dataTransfer,
           bubbles: true,
         })
       );
       target.dispatchEvent(
-        new DragEvent("drop", {
+        new DragEvent('drop', {
           dataTransfer,
           bubbles: true,
         })
       );
     },
-    { selector: targetSelector, content: fileContent, name: fileName, mime: mimeType }
+    {
+      selector: targetSelector,
+      content: fileContent,
+      name: fileName,
+      mime: mimeType,
+    }
   );
 }
 
@@ -45,7 +50,7 @@ export async function simulateImagePaste(
   page: Page,
   targetSelector: string,
   imageBase64: string,
-  mimeType: string = "image/png"
+  mimeType: string = 'image/png'
 ): Promise<void> {
   await page.evaluate(
     ({ selector, base64, mime }) => {
@@ -62,14 +67,14 @@ export async function simulateImagePaste(
       const blob = new Blob([byteArray], { type: mime });
 
       // Create a File from Blob
-      const file = new File([blob], "pasted-image.png", { type: mime });
+      const file = new File([blob], 'pasted-image.png', { type: mime });
 
       // Create a DataTransfer with clipboard items
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
 
       // Create ClipboardEvent with the image data
-      const clipboardEvent = new ClipboardEvent("paste", {
+      const clipboardEvent = new ClipboardEvent('paste', {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,

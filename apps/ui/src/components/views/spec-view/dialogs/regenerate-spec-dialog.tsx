@@ -1,4 +1,4 @@
-import { Sparkles, Clock, Loader2 } from "lucide-react";
+import { Sparkles, Clock, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -6,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { FEATURE_COUNT_OPTIONS } from "../constants";
-import type { RegenerateSpecDialogProps, FeatureCount } from "../types";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { FEATURE_COUNT_OPTIONS } from '../constants';
+import type { RegenerateSpecDialogProps, FeatureCount } from '../types';
 
 export function RegenerateSpecDialog({
   open,
@@ -84,7 +84,7 @@ export function RegenerateSpecDialog({
               <label
                 htmlFor="regenerate-analyze-project"
                 className={`text-sm font-medium ${
-                  isDisabled ? "" : "cursor-pointer"
+                  isDisabled ? '' : 'cursor-pointer'
                 }`}
               >
                 Analyze current project for additional context
@@ -111,7 +111,7 @@ export function RegenerateSpecDialog({
               <label
                 htmlFor="regenerate-generate-features"
                 className={`text-sm font-medium ${
-                  isDisabled ? "" : "cursor-pointer"
+                  isDisabled ? '' : 'cursor-pointer'
                 }`}
               >
                 Generate feature list
@@ -133,7 +133,7 @@ export function RegenerateSpecDialog({
                     key={option.value}
                     type="button"
                     variant={
-                      featureCount === option.value ? "default" : "outline"
+                      featureCount === option.value ? 'default' : 'outline'
                     }
                     size="sm"
                     onClick={() =>
@@ -141,10 +141,10 @@ export function RegenerateSpecDialog({
                     }
                     disabled={isDisabled}
                     className={cn(
-                      "flex-1 transition-all",
+                      'flex-1 transition-all',
                       featureCount === option.value
-                        ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                        : "bg-muted/30 hover:bg-muted/50 border-border"
+                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                        : 'bg-muted/30 hover:bg-muted/50 border-border'
                     )}
                     data-testid={`regenerate-feature-count-${option.value}`}
                   >
@@ -174,7 +174,7 @@ export function RegenerateSpecDialog({
             <HotkeyButton
               onClick={onRegenerate}
               disabled={!projectDefinition.trim() || isDisabled}
-              hotkey={{ key: "Enter", cmdCtrl: true }}
+              hotkey={{ key: 'Enter', cmdCtrl: true }}
               hotkeyActive={open && !isDisabled}
             >
               {isRegenerating ? (

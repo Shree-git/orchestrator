@@ -1,9 +1,8 @@
-
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { useAppStore, type AgentModel } from "@/store/app-store";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ImageDropZone } from "@/components/ui/image-drop-zone";
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useAppStore, type AgentModel } from '@/store/app-store';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ImageDropZone } from '@/components/ui/image-drop-zone';
 import {
   Bot,
   Send,
@@ -18,37 +17,37 @@ import {
   X,
   ImageIcon,
   ChevronDown,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useElectronAgent } from "@/hooks/use-electron-agent";
-import { SessionManager } from "@/components/session-manager";
-import { Markdown } from "@/components/ui/markdown";
-import type { ImageAttachment } from "@/store/app-store";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useElectronAgent } from '@/hooks/use-electron-agent';
+import { SessionManager } from '@/components/session-manager';
+import { Markdown } from '@/components/ui/markdown';
+import type { ImageAttachment } from '@/store/app-store';
 import {
   useKeyboardShortcuts,
   useKeyboardShortcutsConfig,
   KeyboardShortcut,
-} from "@/hooks/use-keyboard-shortcuts";
+} from '@/hooks/use-keyboard-shortcuts';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CLAUDE_MODELS } from "@/components/views/board-view/shared/model-constants";
+} from '@/components/ui/dropdown-menu';
+import { CLAUDE_MODELS } from '@/components/views/board-view/shared/model-constants';
 
 export function AgentView() {
   const { currentProject, setLastSelectedSession, getLastSelectedSession } =
     useAppStore();
   const shortcuts = useKeyboardShortcutsConfig();
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [selectedImages, setSelectedImages] = useState<ImageAttachment[]>([]);
   const [showImageDropZone, setShowImageDropZone] = useState(false);
   const [currentTool, setCurrentTool] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showSessionManager, setShowSessionManager] = useState(true);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<AgentModel>("sonnet");
+  const [selectedModel, setSelectedModel] = useState<AgentModel>('sonnet');
 
   // Track if initial session has been loaded
   const initialSessionLoadedRef = useRef(false);
@@ -72,7 +71,7 @@ export function AgentView() {
     clearHistory,
     error: agentError,
   } = useElectronAgent({
-    sessionId: currentSessionId || "",
+    sessionId: currentSessionId || '',
     workingDirectory: currentProject?.path,
     model: selectedModel,
     onToolUse: (toolName) => {
@@ -109,7 +108,7 @@ export function AgentView() {
     const lastSessionId = getLastSelectedSession(currentProject.path);
     if (lastSessionId) {
       console.log(
-        "[AgentView] Restoring last selected session:",
+        '[AgentView] Restoring last selected session:',
         lastSessionId
       );
       setCurrentSessionId(lastSessionId);
@@ -127,7 +126,7 @@ export function AgentView() {
     const messageContent = input;
     const messageImages = selectedImages;
 
-    setInput("");
+    setInput('');
     setSelectedImages([]);
     setShowImageDropZone(false);
 
@@ -147,13 +146,13 @@ export function AgentView() {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        if (typeof reader.result === "string") {
+        if (typeof reader.result === 'string') {
           resolve(reader.result);
         } else {
-          reject(new Error("Failed to read file as base64"));
+          reject(new Error('Failed to read file as base64'));
         }
       };
-      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
     });
   }, []);
@@ -164,11 +163,11 @@ export function AgentView() {
       if (isProcessing) return;
 
       const ACCEPTED_IMAGE_TYPES = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/gif",
-        "image/webp",
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
       ];
       const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
       const MAX_FILES = 5;
@@ -216,7 +215,7 @@ export function AgentView() {
       }
 
       if (errors.length > 0) {
-        console.warn("Image upload errors:", errors);
+        console.warn('Image upload errors:', errors);
       }
 
       if (newImages.length > 0) {
@@ -239,7 +238,7 @@ export function AgentView() {
       if (isProcessing || !isConnected) return;
 
       // Check if dragged items contain files
-      if (e.dataTransfer.types.includes("Files")) {
+      if (e.dataTransfer.types.includes('Files')) {
         setIsDragOver(true);
       }
     },
@@ -285,7 +284,7 @@ export function AgentView() {
       if (items && items.length > 0) {
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
-          if (item.kind === "file") {
+          if (item.kind === 'file') {
             const file = item.getAsFile();
             if (file) {
               const dataTransfer = new DataTransfer();
@@ -309,9 +308,9 @@ export function AgentView() {
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
 
-          if (item.kind === "file") {
+          if (item.kind === 'file') {
             const file = item.getAsFile();
-            if (file && file.type.startsWith("image/")) {
+            if (file && file.type.startsWith('image/')) {
               e.preventDefault(); // Prevent default paste of file path
               files.push(file);
             }
@@ -329,14 +328,14 @@ export function AgentView() {
   );
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
   const handleClearChat = async () => {
-    if (!confirm("Are you sure you want to clear this conversation?")) return;
+    if (!confirm('Are you sure you want to clear this conversation?')) return;
     await clearHistory();
   };
 
@@ -354,7 +353,7 @@ export function AgentView() {
   }, []);
 
   // Scroll to bottom function
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
@@ -375,7 +374,7 @@ export function AgentView() {
     if (isUserAtBottom && messages.length > 0) {
       // Use a small delay to ensure DOM is updated
       setTimeout(() => {
-        scrollToBottom("smooth");
+        scrollToBottom('smooth');
       }, 100);
     }
   }, [messages, isUserAtBottom, scrollToBottom]);
@@ -385,7 +384,7 @@ export function AgentView() {
     if (currentSessionId && messages.length > 0) {
       // Scroll immediately without animation when switching sessions
       setTimeout(() => {
-        scrollToBottom("auto");
+        scrollToBottom('auto');
         setIsUserAtBottom(true);
       }, 100);
     }
@@ -414,7 +413,7 @@ export function AgentView() {
             quickCreateSessionRef.current();
           }
         },
-        description: "Create new session",
+        description: 'Create new session',
       });
     }
 
@@ -450,8 +449,8 @@ export function AgentView() {
     messages.length === 0
       ? [
           {
-            id: "welcome",
-            role: "assistant" as const,
+            id: 'welcome',
+            role: 'assistant' as const,
             content:
               "Hello! I'm the Automaker Agent. I can help you build software autonomously. I can read and modify files in this project, run commands, and execute tests. What would you like to create today?",
             timestamp: new Date().toISOString(),
@@ -503,7 +502,7 @@ export function AgentView() {
               </h1>
               <p className="text-sm text-muted-foreground">
                 {currentProject.name}
-                {currentSessionId && !isConnected && " - Connecting..."}
+                {currentSessionId && !isConnected && ' - Connecting...'}
               </p>
             </div>
           </div>
@@ -521,7 +520,9 @@ export function AgentView() {
                   data-testid="model-selector"
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  {CLAUDE_MODELS.find((m) => m.id === selectedModel)?.label.replace("Claude ", "") || "Sonnet"}
+                  {CLAUDE_MODELS.find(
+                    (m) => m.id === selectedModel
+                  )?.label.replace('Claude ', '') || 'Sonnet'}
                   <ChevronDown className="w-3 h-3 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -531,8 +532,8 @@ export function AgentView() {
                     key={model.id}
                     onClick={() => setSelectedModel(model.id)}
                     className={cn(
-                      "cursor-pointer",
-                      selectedModel === model.id && "bg-accent"
+                      'cursor-pointer',
+                      selectedModel === model.id && 'bg-accent'
                     )}
                     data-testid={`model-option-${model.id}`}
                   >
@@ -595,7 +596,7 @@ export function AgentView() {
                 className="gap-2"
               >
                 <PanelLeft className="w-4 h-4" />
-                {showSessionManager ? "View" : "Show"} Sessions
+                {showSessionManager ? 'View' : 'Show'} Sessions
               </Button>
             </div>
           </div>
@@ -610,20 +611,20 @@ export function AgentView() {
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-4 max-w-4xl",
-                  message.role === "user" ? "flex-row-reverse ml-auto" : ""
+                  'flex gap-4 max-w-4xl',
+                  message.role === 'user' ? 'flex-row-reverse ml-auto' : ''
                 )}
               >
                 {/* Avatar */}
                 <div
                   className={cn(
-                    "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm",
-                    message.role === "assistant"
-                      ? "bg-primary/10 ring-1 ring-primary/20"
-                      : "bg-muted ring-1 ring-border"
+                    'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm',
+                    message.role === 'assistant'
+                      ? 'bg-primary/10 ring-1 ring-primary/20'
+                      : 'bg-muted ring-1 ring-border'
                   )}
                 >
-                  {message.role === "assistant" ? (
+                  {message.role === 'assistant' ? (
                     <Bot className="w-4 h-4 text-primary" />
                   ) : (
                     <User className="w-4 h-4 text-muted-foreground" />
@@ -633,13 +634,13 @@ export function AgentView() {
                 {/* Message Bubble */}
                 <div
                   className={cn(
-                    "flex-1 max-w-[85%] rounded-2xl px-4 py-3 shadow-sm",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card border border-border"
+                    'flex-1 max-w-[85%] rounded-2xl px-4 py-3 shadow-sm',
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-card border border-border'
                   )}
                 >
-                  {message.role === "assistant" ? (
+                  {message.role === 'assistant' ? (
                     <Markdown className="text-sm text-foreground prose-p:leading-relaxed prose-headings:text-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded">
                       {message.content}
                     </Markdown>
@@ -650,7 +651,7 @@ export function AgentView() {
                   )}
 
                   {/* Display attached images for user messages */}
-                  {message.role === "user" &&
+                  {message.role === 'user' &&
                     message.images &&
                     message.images.length > 0 && (
                       <div className="mt-3 space-y-2">
@@ -658,15 +659,15 @@ export function AgentView() {
                           <ImageIcon className="w-3 h-3" />
                           <span>
                             {message.images.length} image
-                            {message.images.length > 1 ? "s" : ""} attached
+                            {message.images.length > 1 ? 's' : ''} attached
                           </span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {message.images.map((image, index) => {
                             // Construct proper data URL from base64 data and mime type
-                            const dataUrl = image.data.startsWith("data:")
+                            const dataUrl = image.data.startsWith('data:')
                               ? image.data
-                              : `data:${image.mimeType || "image/png"};base64,${
+                              : `data:${image.mimeType || 'image/png'};base64,${
                                   image.data
                                 }`;
                             return (
@@ -694,15 +695,15 @@ export function AgentView() {
 
                   <p
                     className={cn(
-                      "text-[11px] mt-2 font-medium",
-                      message.role === "user"
-                        ? "text-primary-foreground/70"
-                        : "text-muted-foreground"
+                      'text-[11px] mt-2 font-medium',
+                      message.role === 'user'
+                        ? 'text-primary-foreground/70'
+                        : 'text-muted-foreground'
                     )}
                   >
                     {new Date(message.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </p>
                 </div>
@@ -720,15 +721,15 @@ export function AgentView() {
                     <div className="flex items-center gap-1">
                       <span
                         className="w-2 h-2 rounded-full bg-primary animate-pulse"
-                        style={{ animationDelay: "0ms" }}
+                        style={{ animationDelay: '0ms' }}
                       />
                       <span
                         className="w-2 h-2 rounded-full bg-primary animate-pulse"
-                        style={{ animationDelay: "150ms" }}
+                        style={{ animationDelay: '150ms' }}
                       />
                       <span
                         className="w-2 h-2 rounded-full bg-primary animate-pulse"
-                        style={{ animationDelay: "300ms" }}
+                        style={{ animationDelay: '300ms' }}
                       />
                     </div>
                     <span className="text-sm text-muted-foreground">
@@ -761,7 +762,7 @@ export function AgentView() {
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-foreground">
                     {selectedImages.length} image
-                    {selectedImages.length > 1 ? "s" : ""} attached
+                    {selectedImages.length > 1 ? 's' : ''} attached
                   </p>
                   <button
                     onClick={() => setSelectedImages([])}
@@ -815,8 +816,8 @@ export function AgentView() {
             {/* Text Input and Controls */}
             <div
               className={cn(
-                "flex gap-2 transition-all duration-200 rounded-xl p-1",
-                isDragOver && "bg-primary/5 ring-2 ring-primary/30"
+                'flex gap-2 transition-all duration-200 rounded-xl p-1',
+                isDragOver && 'bg-primary/5 ring-2 ring-primary/30'
               )}
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
@@ -828,8 +829,8 @@ export function AgentView() {
                   ref={inputRef}
                   placeholder={
                     isDragOver
-                      ? "Drop your images here..."
-                      : "Describe what you want to build..."
+                      ? 'Drop your images here...'
+                      : 'Describe what you want to build...'
                   }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -838,16 +839,16 @@ export function AgentView() {
                   disabled={isProcessing || !isConnected}
                   data-testid="agent-input"
                   className={cn(
-                    "h-11 bg-background border-border rounded-xl pl-4 pr-20 text-sm transition-all",
-                    "focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
-                    selectedImages.length > 0 && "border-primary/30",
-                    isDragOver && "border-primary bg-primary/5"
+                    'h-11 bg-background border-border rounded-xl pl-4 pr-20 text-sm transition-all',
+                    'focus:ring-2 focus:ring-primary/20 focus:border-primary/50',
+                    selectedImages.length > 0 && 'border-primary/30',
+                    isDragOver && 'border-primary bg-primary/5'
                   )}
                 />
                 {selectedImages.length > 0 && !isDragOver && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">
                     {selectedImages.length} image
-                    {selectedImages.length > 1 ? "s" : ""}
+                    {selectedImages.length > 1 ? 's' : ''}
                   </div>
                 )}
                 {isDragOver && (
@@ -865,10 +866,10 @@ export function AgentView() {
                 onClick={toggleImageDropZone}
                 disabled={isProcessing || !isConnected}
                 className={cn(
-                  "h-11 w-11 rounded-xl border-border",
+                  'h-11 w-11 rounded-xl border-border',
                   showImageDropZone &&
-                    "bg-primary/10 text-primary border-primary/30",
-                  selectedImages.length > 0 && "border-primary/30 text-primary"
+                    'bg-primary/10 text-primary border-primary/30',
+                  selectedImages.length > 0 && 'border-primary/30 text-primary'
                 )}
                 title="Attach images"
               >
@@ -892,10 +893,10 @@ export function AgentView() {
 
             {/* Keyboard hint */}
             <p className="text-[11px] text-muted-foreground mt-2 text-center">
-              Press{" "}
+              Press{' '}
               <kbd className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-medium">
                 Enter
-              </kbd>{" "}
+              </kbd>{' '}
               to send
             </p>
           </div>
@@ -907,9 +908,9 @@ export function AgentView() {
 
 // Helper function to format file size
 function formatFileSize(bytes: number): string {
-  if (bytes === 0) return "0 B";
+  if (bytes === 0) return '0 B';
   const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB"];
+  const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }

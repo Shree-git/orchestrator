@@ -1,6 +1,5 @@
-
-import { useCallback } from "react";
-import type { WorktreeInfo, FeatureInfo } from "../types";
+import { useCallback } from 'react';
+import type { WorktreeInfo, FeatureInfo } from '../types';
 
 interface UseRunningFeaturesOptions {
   runningFeatureIds: string[];

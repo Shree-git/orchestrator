@@ -153,9 +153,9 @@ export function create{Module}Routes(events: EventEmitter): Router {
 **Pattern**:
 
 ```typescript
-import { createLogger } from "../../lib/logger.js";
+import { createLogger } from '../../lib/logger.js';
 
-const logger = createLogger("{ModuleName}");
+const logger = createLogger('{ModuleName}');
 
 // Shared state
 export let isRunning = false;
@@ -176,7 +176,7 @@ export function logError(error: unknown, context: string): void {
 }
 
 export function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Unknown error";
+  return error instanceof Error ? error.message : 'Unknown error';
 }
 ```
 
@@ -289,13 +289,13 @@ export function create{Action}Handler(events: EventEmitter) {
  * {Brief description of what this function does}
  */
 
-import { query, type Options } from "@anthropic-ai/claude-agent-sdk";
-import type { EventEmitter } from "../../lib/events.js";
-import { createLogger } from "../../lib/logger.js";
-import { logAuthStatus } from "./common.js";
-import { anotherBusinessFunction } from "./another-business-function.js";
+import { query, type Options } from '@anthropic-ai/claude-agent-sdk';
+import type { EventEmitter } from '../../lib/events.js';
+import { createLogger } from '../../lib/logger.js';
+import { logAuthStatus } from './common.js';
+import { anotherBusinessFunction } from './another-business-function.js';
 
-const logger = createLogger("{ModuleName}");
+const logger = createLogger('{ModuleName}');
 
 export async function businessLogicFunction(
   param1: string,
@@ -303,7 +303,7 @@ export async function businessLogicFunction(
   events: EventEmitter,
   abortController: AbortController
 ): Promise<void> {
-  logger.debug("========== businessLogicFunction() started ==========");
+  logger.debug('========== businessLogicFunction() started ==========');
 
   try {
     // Business logic here
@@ -312,9 +312,9 @@ export async function businessLogicFunction(
     // Can call other business logic functions
     await anotherBusinessFunction(param1, events, abortController);
 
-    logger.debug("========== businessLogicFunction() completed ==========");
+    logger.debug('========== businessLogicFunction() completed ==========');
   } catch (error) {
-    logger.error("❌ businessLogicFunction() failed:", error);
+    logger.error('❌ businessLogicFunction() failed:', error);
     throw error;
   }
 }
@@ -458,7 +458,6 @@ The `app-spec` module demonstrates this pattern:
 ### Migrating an Existing Route Module
 
 1. **Analyze current structure**
-
    - Identify all endpoints
    - Identify shared state/utilities
    - Identify large functions (>150 lines)
@@ -470,31 +469,26 @@ The `app-spec` module demonstrates this pattern:
    ```
 
 3. **Extract common utilities**
-
    - Move shared state to `common.ts`
    - Move utility functions to `common.ts`
    - Update imports in existing files
 
 4. **Extract business logic**
-
    - Identify functions to extract
    - Create `{function-name}.ts` files
    - Move logic, update imports
 
 5. **Create route handlers**
-
    - Create `routes/{endpoint-name}.ts` for each endpoint
    - Move HTTP handling logic
    - Keep handlers thin
 
 6. **Create index.ts**
-
    - Import route handlers
    - Register routes
    - Export router creation function
 
 7. **Update main routes file**
-
    - Import from new `index.ts`
    - Update route registration
 
@@ -509,11 +503,11 @@ The `app-spec` module demonstrates this pattern:
 
 ```typescript
 // routes.ts - 500+ lines
-router.post("/create", async (req, res) => {
+router.post('/create', async (req, res) => {
   // 200 lines of logic
 });
 
-router.post("/generate", async (req, res) => {
+router.post('/generate', async (req, res) => {
   // 200 lines of similar logic
 });
 ```
@@ -580,6 +574,3 @@ The route organization pattern provides:
 5. **Testability** - Functions can be tested independently
 
 Apply this pattern to all route modules for consistency and improved code quality.
-
-
-

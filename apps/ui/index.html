@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <title>Automaker - Autonomous AI Development Studio</title>
-    <meta name="description" content="Build software autonomously with AI agents" />
+    <meta
+      name="description"
+      content="Build software autonomously with AI agents"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <script>
       // Prevent theme flash - apply stored theme before React hydrates
-      (function() {
+      (function () {
         try {
           const stored = localStorage.getItem('automaker-storage');
           if (stored) {
@@ -17,7 +20,10 @@
             if (theme && theme !== 'system' && theme !== 'light') {
               // Apply the actual theme class (dark, retro, dracula, nord, etc.)
               document.documentElement.classList.add(theme);
-            } else if (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            } else if (
+              theme === 'system' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches
+            ) {
               document.documentElement.classList.add('dark');
             }
           }

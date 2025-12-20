@@ -1,41 +1,41 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Project, TrashedProject } from "@/lib/electron";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Project, TrashedProject } from '@/lib/electron';
 
 export type ViewMode =
-  | "welcome"
-  | "setup"
-  | "spec"
-  | "board"
-  | "agent"
-  | "settings"
-  | "interview"
-  | "context"
-  | "profiles"
-  | "running-agents"
-  | "terminal"
-  | "wiki";
+  | 'welcome'
+  | 'setup'
+  | 'spec'
+  | 'board'
+  | 'agent'
+  | 'settings'
+  | 'interview'
+  | 'context'
+  | 'profiles'
+  | 'running-agents'
+  | 'terminal'
+  | 'wiki';
 
 export type ThemeMode =
-  | "light"
-  | "dark"
-  | "system"
-  | "retro"
-  | "dracula"
-  | "nord"
-  | "monokai"
-  | "tokyonight"
-  | "solarized"
-  | "gruvbox"
-  | "catppuccin"
-  | "onedark"
-  | "synthwave"
-  | "red"
-  | "cream"
-  | "sunset"
-  | "gray";
+  | 'light'
+  | 'dark'
+  | 'system'
+  | 'retro'
+  | 'dracula'
+  | 'nord'
+  | 'monokai'
+  | 'tokyonight'
+  | 'solarized'
+  | 'gruvbox'
+  | 'catppuccin'
+  | 'onedark'
+  | 'synthwave'
+  | 'red'
+  | 'cream'
+  | 'sunset'
+  | 'gray';
 
-export type KanbanCardDetailLevel = "minimal" | "standard" | "detailed";
+export type KanbanCardDetailLevel = 'minimal' | 'standard' | 'detailed';
 
 export interface ApiKeys {
   anthropic: string;
@@ -55,30 +55,30 @@ export interface ShortcutKey {
 export function parseShortcut(
   shortcut: string | undefined | null
 ): ShortcutKey {
-  if (!shortcut) return { key: "" };
-  const parts = shortcut.split("+").map((p) => p.trim());
+  if (!shortcut) return { key: '' };
+  const parts = shortcut.split('+').map((p) => p.trim());
   const result: ShortcutKey = { key: parts[parts.length - 1] };
 
   // Normalize common OS-specific modifiers (Cmd/Ctrl/Win/Super symbols) into cmdCtrl
   for (let i = 0; i < parts.length - 1; i++) {
     const modifier = parts[i].toLowerCase();
-    if (modifier === "shift") result.shift = true;
+    if (modifier === 'shift') result.shift = true;
     else if (
-      modifier === "cmd" ||
-      modifier === "ctrl" ||
-      modifier === "win" ||
-      modifier === "super" ||
-      modifier === "⌘" ||
-      modifier === "^" ||
-      modifier === "⊞" ||
-      modifier === "◆"
+      modifier === 'cmd' ||
+      modifier === 'ctrl' ||
+      modifier === 'win' ||
+      modifier === 'super' ||
+      modifier === '⌘' ||
+      modifier === '^' ||
+      modifier === '⊞' ||
+      modifier === '◆'
     )
       result.cmdCtrl = true;
     else if (
-      modifier === "alt" ||
-      modifier === "opt" ||
-      modifier === "option" ||
-      modifier === "⌥"
+      modifier === 'alt' ||
+      modifier === 'opt' ||
+      modifier === 'option' ||
+      modifier === '⌥'
     )
       result.alt = true;
   }
@@ -91,34 +91,34 @@ export function formatShortcut(
   shortcut: string | undefined | null,
   forDisplay = false
 ): string {
-  if (!shortcut) return "";
+  if (!shortcut) return '';
   const parsed = parseShortcut(shortcut);
   const parts: string[] = [];
 
   // Prefer User-Agent Client Hints when available; fall back to legacy
-  const platform: "darwin" | "win32" | "linux" = (() => {
-    if (typeof navigator === "undefined") return "linux";
+  const platform: 'darwin' | 'win32' | 'linux' = (() => {
+    if (typeof navigator === 'undefined') return 'linux';
 
     const uaPlatform = (
       navigator as Navigator & { userAgentData?: { platform?: string } }
     ).userAgentData?.platform?.toLowerCase?.();
     const legacyPlatform = navigator.platform?.toLowerCase?.();
-    const platformString = uaPlatform || legacyPlatform || "";
+    const platformString = uaPlatform || legacyPlatform || '';
 
-    if (platformString.includes("mac")) return "darwin";
-    if (platformString.includes("win")) return "win32";
-    return "linux";
+    if (platformString.includes('mac')) return 'darwin';
+    if (platformString.includes('win')) return 'win32';
+    return 'linux';
   })();
 
   // Primary modifier - OS-specific
   if (parsed.cmdCtrl) {
     if (forDisplay) {
       parts.push(
-        platform === "darwin" ? "⌘" : platform === "win32" ? "⊞" : "◆"
+        platform === 'darwin' ? '⌘' : platform === 'win32' ? '⊞' : '◆'
       );
     } else {
       parts.push(
-        platform === "darwin" ? "Cmd" : platform === "win32" ? "Win" : "Super"
+        platform === 'darwin' ? 'Cmd' : platform === 'win32' ? 'Win' : 'Super'
       );
     }
   }
@@ -127,24 +127,24 @@ export function formatShortcut(
   if (parsed.alt) {
     parts.push(
       forDisplay
-        ? platform === "darwin"
-          ? "⌥"
-          : "Alt"
-        : platform === "darwin"
-        ? "Opt"
-        : "Alt"
+        ? platform === 'darwin'
+          ? '⌥'
+          : 'Alt'
+        : platform === 'darwin'
+          ? 'Opt'
+          : 'Alt'
     );
   }
 
   // Shift
   if (parsed.shift) {
-    parts.push(forDisplay ? "⇧" : "Shift");
+    parts.push(forDisplay ? '⇧' : 'Shift');
   }
 
   parts.push(parsed.key.toUpperCase());
 
   // Add spacing when displaying symbols
-  return parts.join(forDisplay ? " " : "+");
+  return parts.join(forDisplay ? ' ' : '+');
 }
 
 // Keyboard Shortcuts - stored as strings like "K", "Shift+N", "Cmd+K"
@@ -181,35 +181,35 @@ export interface KeyboardShortcuts {
 // Default keyboard shortcuts
 export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
   // Navigation
-  board: "K",
-  agent: "A",
-  spec: "D",
-  context: "C",
-  settings: "S",
-  profiles: "M",
-  terminal: "T",
+  board: 'K',
+  agent: 'A',
+  spec: 'D',
+  context: 'C',
+  settings: 'S',
+  profiles: 'M',
+  terminal: 'T',
 
   // UI
-  toggleSidebar: "`",
+  toggleSidebar: '`',
 
   // Actions
   // Note: Some shortcuts share the same key (e.g., "N" for addFeature, newSession, addProfile)
   // This is intentional as they are context-specific and only active in their respective views
-  addFeature: "N", // Only active in board view
-  addContextFile: "N", // Only active in context view
-  startNext: "G", // Only active in board view
-  newSession: "N", // Only active in agent view
-  openProject: "O", // Global shortcut
-  projectPicker: "P", // Global shortcut
-  cyclePrevProject: "Q", // Global shortcut
-  cycleNextProject: "E", // Global shortcut
-  addProfile: "N", // Only active in profiles view
+  addFeature: 'N', // Only active in board view
+  addContextFile: 'N', // Only active in context view
+  startNext: 'G', // Only active in board view
+  newSession: 'N', // Only active in agent view
+  openProject: 'O', // Global shortcut
+  projectPicker: 'P', // Global shortcut
+  cyclePrevProject: 'Q', // Global shortcut
+  cycleNextProject: 'E', // Global shortcut
+  addProfile: 'N', // Only active in profiles view
 
   // Terminal shortcuts (only active in terminal view)
   // Using Alt modifier to avoid conflicts with both terminal signals AND browser shortcuts
-  splitTerminalRight: "Alt+D",
-  splitTerminalDown: "Alt+S",
-  closeTerminal: "Alt+W",
+  splitTerminalRight: 'Alt+D',
+  splitTerminalDown: 'Alt+S',
+  closeTerminal: 'Alt+W',
 };
 
 export interface ImageAttachment {
@@ -222,7 +222,7 @@ export interface ImageAttachment {
 
 export interface ChatMessage {
   id: string;
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
   images?: ImageAttachment[];
@@ -254,14 +254,14 @@ export interface FeatureImagePath {
 }
 
 // Available models for feature execution
-export type ClaudeModel = "opus" | "sonnet" | "haiku";
+export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
 export type AgentModel = ClaudeModel;
 
 // Model provider type
-export type ModelProvider = "claude";
+export type ModelProvider = 'claude';
 
 // Thinking level (budget_tokens) options
-export type ThinkingLevel = "none" | "low" | "medium" | "high" | "ultrathink";
+export type ThinkingLevel = 'none' | 'low' | 'medium' | 'high' | 'ultrathink';
 
 // Planning mode for feature specifications
 export type PlanningMode = 'skip' | 'lite' | 'spec' | 'full';
@@ -286,11 +286,11 @@ export interface Feature {
   description: string;
   steps: string[];
   status:
-    | "backlog"
-    | "in_progress"
-    | "waiting_approval"
-    | "verified"
-    | "completed";
+    | 'backlog'
+    | 'in_progress'
+    | 'waiting_approval'
+    | 'verified'
+    | 'completed';
   images?: FeatureImage[];
   imagePaths?: FeatureImagePath[]; // Paths to temp files for agent context
   startedAt?: string; // ISO timestamp for when the card moved to in_progress
@@ -312,10 +312,10 @@ export interface Feature {
 
 // Parsed task from spec (for spec and full planning modes)
 export interface ParsedTask {
-  id: string;          // e.g., "T001"
+  id: string; // e.g., "T001"
   description: string; // e.g., "Create user model"
-  filePath?: string;   // e.g., "src/models/user.ts"
-  phase?: string;      // e.g., "Phase 1: Foundation" (for full mode)
+  filePath?: string; // e.g., "src/models/user.ts"
+  phase?: string; // e.g., "Phase 1: Foundation" (for full mode)
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
 }
 
@@ -330,7 +330,7 @@ export interface PlanSpec {
   tasksCompleted?: number;
   tasksTotal?: number;
   currentTaskId?: string; // ID of the task currently being worked on
-  tasks?: ParsedTask[];   // Parsed tasks from the spec
+  tasks?: ParsedTask[]; // Parsed tasks from the spec
 }
 
 // File tree node for project analysis
@@ -353,10 +353,10 @@ export interface ProjectAnalysis {
 
 // Terminal panel layout types (recursive for splits)
 export type TerminalPanelContent =
-  | { type: "terminal"; sessionId: string; size?: number; fontSize?: number }
+  | { type: 'terminal'; sessionId: string; size?: number; fontSize?: number }
   | {
-      type: "split";
-      direction: "horizontal" | "vertical";
+      type: 'split';
+      direction: 'horizontal' | 'vertical';
       panels: TerminalPanelContent[];
       size?: number;
     };
@@ -505,7 +505,7 @@ export interface AppState {
     featureId: string;
     projectPath: string;
     planContent: string;
-    planningMode: "lite" | "spec" | "full";
+    planningMode: 'lite' | 'spec' | 'full';
   } | null;
 }
 
@@ -536,19 +536,19 @@ export interface AutoModeActivity {
   featureId: string;
   timestamp: Date;
   type:
-    | "start"
-    | "progress"
-    | "tool"
-    | "complete"
-    | "error"
-    | "planning"
-    | "action"
-    | "verification";
+    | 'start'
+    | 'progress'
+    | 'tool'
+    | 'complete'
+    | 'error'
+    | 'planning'
+    | 'action'
+    | 'verification';
   message: string;
   tool?: string;
   passes?: boolean;
-  phase?: "planning" | "action" | "verification";
-  errorType?: "authentication" | "execution";
+  phase?: 'planning' | 'action' | 'verification';
+  errorType?: 'authentication' | 'execution';
 }
 
 export interface AppActions {
@@ -586,10 +586,10 @@ export interface AppActions {
   setFeatures: (features: Feature[]) => void;
   updateFeature: (id: string, updates: Partial<Feature>) => void;
   addFeature: (
-    feature: Omit<Feature, "id"> & Partial<Pick<Feature, "id">>
+    feature: Omit<Feature, 'id'> & Partial<Pick<Feature, 'id'>>
   ) => Feature;
   removeFeature: (id: string) => void;
-  moveFeature: (id: string, newStatus: Feature["status"]) => void;
+  moveFeature: (id: string, newStatus: Feature['status']) => void;
 
   // App spec actions
   setAppSpec: (spec: string) => void;
@@ -621,7 +621,7 @@ export interface AppActions {
     runningTasks: string[];
   };
   addAutoModeActivity: (
-    activity: Omit<AutoModeActivity, "id" | "timestamp">
+    activity: Omit<AutoModeActivity, 'id' | 'timestamp'>
   ) => void;
   clearAutoModeActivity: () => void;
   setMaxConcurrency: (max: number) => void;
@@ -678,7 +678,7 @@ export interface AppActions {
   setEnhancementModel: (model: AgentModel) => void;
 
   // AI Profile actions
-  addAIProfile: (profile: Omit<AIProfile, "id">) => void;
+  addAIProfile: (profile: Omit<AIProfile, 'id'>) => void;
   updateAIProfile: (id: string, updates: Partial<AIProfile>) => void;
   removeAIProfile: (id: string) => void;
   reorderAIProfiles: (oldIndex: number, newIndex: number) => void;
@@ -722,7 +722,7 @@ export interface AppActions {
   setActiveTerminalSession: (sessionId: string | null) => void;
   addTerminalToLayout: (
     sessionId: string,
-    direction?: "horizontal" | "vertical",
+    direction?: 'horizontal' | 'vertical',
     targetSessionId?: string
   ) => void;
   removeTerminalFromLayout: (sessionId: string) => void;
@@ -733,11 +733,11 @@ export interface AppActions {
   removeTerminalTab: (tabId: string) => void;
   setActiveTerminalTab: (tabId: string) => void;
   renameTerminalTab: (tabId: string, name: string) => void;
-  moveTerminalToTab: (sessionId: string, targetTabId: string | "new") => void;
+  moveTerminalToTab: (sessionId: string, targetTabId: string | 'new') => void;
   addTerminalToTab: (
     sessionId: string,
     tabId: string,
-    direction?: "horizontal" | "vertical"
+    direction?: 'horizontal' | 'vertical'
   ) => void;
 
   // Spec Creation actions
@@ -749,12 +749,14 @@ export interface AppActions {
   setDefaultAIProfileId: (profileId: string | null) => void;
 
   // Plan Approval actions
-  setPendingPlanApproval: (approval: {
-    featureId: string;
-    projectPath: string;
-    planContent: string;
-    planningMode: "lite" | "spec" | "full";
-  } | null) => void;
+  setPendingPlanApproval: (
+    approval: {
+      featureId: string;
+      projectPath: string;
+      planContent: string;
+      planningMode: 'lite' | 'spec' | 'full';
+    } | null
+  ) => void;
 
   // Reset
   reset: () => void;
@@ -763,36 +765,36 @@ export interface AppActions {
 // Default built-in AI profiles
 const DEFAULT_AI_PROFILES: AIProfile[] = [
   {
-    id: "profile-heavy-task",
-    name: "Heavy Task",
+    id: 'profile-heavy-task',
+    name: 'Heavy Task',
     description:
-      "Claude Opus with Ultrathink for complex architecture, migrations, or deep debugging.",
-    model: "opus",
-    thinkingLevel: "ultrathink",
-    provider: "claude",
+      'Claude Opus with Ultrathink for complex architecture, migrations, or deep debugging.',
+    model: 'opus',
+    thinkingLevel: 'ultrathink',
+    provider: 'claude',
     isBuiltIn: true,
-    icon: "Brain",
+    icon: 'Brain',
   },
   {
-    id: "profile-balanced",
-    name: "Balanced",
+    id: 'profile-balanced',
+    name: 'Balanced',
     description:
-      "Claude Sonnet with medium thinking for typical development tasks.",
-    model: "sonnet",
-    thinkingLevel: "medium",
-    provider: "claude",
+      'Claude Sonnet with medium thinking for typical development tasks.',
+    model: 'sonnet',
+    thinkingLevel: 'medium',
+    provider: 'claude',
     isBuiltIn: true,
-    icon: "Scale",
+    icon: 'Scale',
   },
   {
-    id: "profile-quick-edit",
-    name: "Quick Edit",
-    description: "Claude Haiku for fast, simple edits and minor fixes.",
-    model: "haiku",
-    thinkingLevel: "none",
-    provider: "claude",
+    id: 'profile-quick-edit',
+    name: 'Quick Edit',
+    description: 'Claude Haiku for fast, simple edits and minor fixes.',
+    model: 'haiku',
+    thinkingLevel: 'none',
+    provider: 'claude',
     isBuiltIn: true,
-    icon: "Zap",
+    icon: 'Zap',
   },
 ];
 
@@ -802,17 +804,17 @@ const initialState: AppState = {
   trashedProjects: [],
   projectHistory: [],
   projectHistoryIndex: -1,
-  currentView: "welcome",
+  currentView: 'welcome',
   sidebarOpen: true,
   lastSelectedSessionByProject: {},
-  theme: "dark",
+  theme: 'dark',
   features: [],
-  appSpec: "",
+  appSpec: '',
   ipcConnected: false,
   apiKeys: {
-    anthropic: "",
-    google: "",
-    openai: "",
+    anthropic: '',
+    google: '',
+    openai: '',
   },
   chatSessions: [],
   currentChatSession: null,
@@ -820,7 +822,7 @@ const initialState: AppState = {
   autoModeByProject: {},
   autoModeActivityLog: [],
   maxConcurrency: 3, // Default to 3 concurrent agents
-  kanbanCardDetailLevel: "standard", // Default to standard detail level
+  kanbanCardDetailLevel: 'standard', // Default to standard detail level
   defaultSkipTests: true, // Default to manual verification (tests disabled)
   enableDependencyBlocking: true, // Default to enabled (show dependency blocking UI)
   useWorktrees: false, // Default to disabled (worktree feature is experimental)
@@ -829,7 +831,7 @@ const initialState: AppState = {
   showProfilesOnly: false, // Default to showing all options (not profiles only)
   keyboardShortcuts: DEFAULT_KEYBOARD_SHORTCUTS, // Default keyboard shortcuts
   muteDoneSound: false, // Default to sound enabled (not muted)
-  enhancementModel: "sonnet", // Default to sonnet for feature enhancement
+  enhancementModel: 'sonnet', // Default to sonnet for feature enhancement
   aiProfiles: DEFAULT_AI_PROFILES,
   projectAnalysis: null,
   isAnalyzing: false,
@@ -904,7 +906,7 @@ export const useAppStore = create<AppState & AppActions>()(
           projects: remainingProjects,
           trashedProjects: [trashedProject, ...existingTrash],
           currentProject: isCurrent ? null : get().currentProject,
-          currentView: isCurrent ? "welcome" : get().currentView,
+          currentView: isCurrent ? 'welcome' : get().currentView,
         });
       },
 
@@ -928,7 +930,7 @@ export const useAppStore = create<AppState & AppActions>()(
           set({
             trashedProjects: remainingTrash,
             currentProject: samePathProject,
-            currentView: "board",
+            currentView: 'board',
           });
           return;
         }
@@ -945,7 +947,7 @@ export const useAppStore = create<AppState & AppActions>()(
           trashedProjects: remainingTrash,
           projects: [...projectsWithoutId, restoredProject],
           currentProject: restoredProject,
-          currentView: "board",
+          currentView: 'board',
         });
       },
 
@@ -969,7 +971,7 @@ export const useAppStore = create<AppState & AppActions>()(
       setCurrentProject: (project) => {
         set({ currentProject: project });
         if (project) {
-          set({ currentView: "board" });
+          set({ currentView: 'board' });
           // Add to project history (MRU order)
           const currentHistory = get().projectHistory;
           // Remove this project if it's already in history
@@ -981,7 +983,7 @@ export const useAppStore = create<AppState & AppActions>()(
           // Reset history index to 0 (current project)
           set({ projectHistory: newHistory, projectHistoryIndex: 0 });
         } else {
-          set({ currentView: "welcome" });
+          set({ currentView: 'welcome' });
         }
       },
 
@@ -1067,7 +1069,7 @@ export const useAppStore = create<AppState & AppActions>()(
             currentProject: targetProject,
             projectHistory: validHistory,
             projectHistoryIndex: newIndex,
-            currentView: "board",
+            currentView: 'board',
           });
         }
       },
@@ -1103,7 +1105,7 @@ export const useAppStore = create<AppState & AppActions>()(
             currentProject: targetProject,
             projectHistory: validHistory,
             projectHistoryIndex: newIndex,
-            currentView: "board",
+            currentView: 'board',
           });
         }
       },
@@ -1216,7 +1218,7 @@ export const useAppStore = create<AppState & AppActions>()(
       createChatSession: (title) => {
         const currentProject = get().currentProject;
         if (!currentProject) {
-          throw new Error("No project selected");
+          throw new Error('No project selected');
         }
 
         const now = new Date();
@@ -1228,8 +1230,8 @@ export const useAppStore = create<AppState & AppActions>()(
           projectId: currentProject.id,
           messages: [
             {
-              id: "welcome",
-              role: "assistant",
+              id: 'welcome',
+              role: 'assistant',
               content:
                 "Hello! I'm the Automaker Agent. I can help you build software autonomously. What would you like to create today?",
               timestamp: now,
@@ -1734,12 +1736,12 @@ export const useAppStore = create<AppState & AppActions>()(
 
       addTerminalToLayout: (
         sessionId,
-        direction = "horizontal",
+        direction = 'horizontal',
         targetSessionId
       ) => {
         const current = get().terminalState;
         const newTerminal: TerminalPanelContent = {
-          type: "terminal",
+          type: 'terminal',
           sessionId,
           size: 50,
         };
@@ -1753,8 +1755,8 @@ export const useAppStore = create<AppState & AppActions>()(
               tabs: [
                 {
                   id: newTabId,
-                  name: "Terminal 1",
-                  layout: { type: "terminal", sessionId, size: 100 },
+                  name: 'Terminal 1',
+                  layout: { type: 'terminal', sessionId, size: 100 },
                 },
               ],
               activeTabId: newTabId,
@@ -1774,13 +1776,13 @@ export const useAppStore = create<AppState & AppActions>()(
         const splitTargetTerminal = (
           node: TerminalPanelContent,
           targetId: string,
-          targetDirection: "horizontal" | "vertical"
+          targetDirection: 'horizontal' | 'vertical'
         ): TerminalPanelContent => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             if (node.sessionId === targetId) {
               // Found the target - split it
               return {
-                type: "split",
+                type: 'split',
                 direction: targetDirection,
                 panels: [{ ...node, size: 50 }, newTerminal],
               };
@@ -1800,11 +1802,11 @@ export const useAppStore = create<AppState & AppActions>()(
         // Legacy behavior: add to root layout (when no targetSessionId)
         const addToRootLayout = (
           node: TerminalPanelContent,
-          targetDirection: "horizontal" | "vertical"
+          targetDirection: 'horizontal' | 'vertical'
         ): TerminalPanelContent => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             return {
-              type: "split",
+              type: 'split',
               direction: targetDirection,
               panels: [{ ...node, size: 50 }, newTerminal],
             };
@@ -1822,7 +1824,7 @@ export const useAppStore = create<AppState & AppActions>()(
           }
           // Different direction, wrap in new split
           return {
-            type: "split",
+            type: 'split',
             direction: targetDirection,
             panels: [{ ...node, size: 50 }, newTerminal],
           };
@@ -1830,7 +1832,7 @@ export const useAppStore = create<AppState & AppActions>()(
 
         let newLayout: TerminalPanelContent;
         if (!activeTab.layout) {
-          newLayout = { type: "terminal", sessionId, size: 100 };
+          newLayout = { type: 'terminal', sessionId, size: 100 };
         } else if (targetSessionId) {
           newLayout = splitTargetTerminal(
             activeTab.layout,
@@ -1863,7 +1865,7 @@ export const useAppStore = create<AppState & AppActions>()(
           node: TerminalPanelContent | null
         ): string | null => {
           if (!node) return null;
-          if (node.type === "terminal") return node.sessionId;
+          if (node.type === 'terminal') return node.sessionId;
           for (const panel of node.panels) {
             const found = findFirstTerminal(panel);
             if (found) return found;
@@ -1874,7 +1876,7 @@ export const useAppStore = create<AppState & AppActions>()(
         const removeAndCollapse = (
           node: TerminalPanelContent
         ): TerminalPanelContent | null => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             return node.sessionId === sessionId ? null : node;
           }
           const newPanels: TerminalPanelContent[] = [];
@@ -1927,7 +1929,7 @@ export const useAppStore = create<AppState & AppActions>()(
         const swapInLayout = (
           node: TerminalPanelContent
         ): TerminalPanelContent => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             if (node.sessionId === sessionId1)
               return { ...node, sessionId: sessionId2 };
             if (node.sessionId === sessionId2)
@@ -1967,7 +1969,7 @@ export const useAppStore = create<AppState & AppActions>()(
         const updateFontSize = (
           node: TerminalPanelContent
         ): TerminalPanelContent => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             if (node.sessionId === sessionId) {
               return { ...node, fontSize: clampedSize };
             }
@@ -2016,7 +2018,7 @@ export const useAppStore = create<AppState & AppActions>()(
           if (newActiveTabId) {
             const newActiveTab = newTabs.find((t) => t.id === newActiveTabId);
             const findFirst = (node: TerminalPanelContent): string | null => {
-              if (node.type === "terminal") return node.sessionId;
+              if (node.type === 'terminal') return node.sessionId;
               for (const p of node.panels) {
                 const f = findFirst(p);
                 if (f) return f;
@@ -2049,7 +2051,7 @@ export const useAppStore = create<AppState & AppActions>()(
         let newActiveSessionId = current.activeSessionId;
         if (tab.layout) {
           const findFirst = (node: TerminalPanelContent): string | null => {
-            if (node.type === "terminal") return node.sessionId;
+            if (node.type === 'terminal') return node.sessionId;
             for (const p of node.panels) {
               const f = findFirst(p);
               if (f) return f;
@@ -2083,13 +2085,13 @@ export const useAppStore = create<AppState & AppActions>()(
 
         let sourceTabId: string | null = null;
         let originalTerminalNode:
-          | (TerminalPanelContent & { type: "terminal" })
+          | (TerminalPanelContent & { type: 'terminal' })
           | null = null;
 
         const findTerminal = (
           node: TerminalPanelContent
-        ): (TerminalPanelContent & { type: "terminal" }) | null => {
-          if (node.type === "terminal") {
+        ): (TerminalPanelContent & { type: 'terminal' }) | null => {
+          if (node.type === 'terminal') {
             return node.sessionId === sessionId ? node : null;
           }
           for (const panel of node.panels) {
@@ -2118,7 +2120,7 @@ export const useAppStore = create<AppState & AppActions>()(
         const removeAndCollapse = (
           node: TerminalPanelContent
         ): TerminalPanelContent | null => {
-          if (node.type === "terminal") {
+          if (node.type === 'terminal') {
             return node.sessionId === sessionId ? null : node;
           }
           const newPanels: TerminalPanelContent[] = [];
@@ -2136,7 +2138,7 @@ export const useAppStore = create<AppState & AppActions>()(
         let finalTargetTabId = targetTabId;
         let newTabs = current.tabs;
 
-        if (targetTabId === "new") {
+        if (targetTabId === 'new') {
           const newTabId = `tab-${Date.now()}`;
           const sourceWillBeRemoved = !newSourceLayout;
           const tabName = sourceWillBeRemoved
@@ -2148,7 +2150,7 @@ export const useAppStore = create<AppState & AppActions>()(
               id: newTabId,
               name: tabName,
               layout: {
-                type: "terminal",
+                type: 'terminal',
                 sessionId,
                 size: 100,
                 fontSize: originalTerminalNode.fontSize,
@@ -2161,7 +2163,7 @@ export const useAppStore = create<AppState & AppActions>()(
           if (!targetTab) return;
 
           const terminalNode: TerminalPanelContent = {
-            type: "terminal",
+            type: 'terminal',
             sessionId,
             size: 50,
             fontSize: originalTerminalNode.fontSize,
@@ -2170,15 +2172,15 @@ export const useAppStore = create<AppState & AppActions>()(
 
           if (!targetTab.layout) {
             newTargetLayout = {
-              type: "terminal",
+              type: 'terminal',
               sessionId,
               size: 100,
               fontSize: originalTerminalNode.fontSize,
             };
-          } else if (targetTab.layout.type === "terminal") {
+          } else if (targetTab.layout.type === 'terminal') {
             newTargetLayout = {
-              type: "split",
-              direction: "horizontal",
+              type: 'split',
+              direction: 'horizontal',
               panels: [{ ...targetTab.layout, size: 50 }, terminalNode],
             };
           } else {
@@ -2211,23 +2213,23 @@ export const useAppStore = create<AppState & AppActions>()(
         });
       },
 
-      addTerminalToTab: (sessionId, tabId, direction = "horizontal") => {
+      addTerminalToTab: (sessionId, tabId, direction = 'horizontal') => {
         const current = get().terminalState;
         const tab = current.tabs.find((t) => t.id === tabId);
         if (!tab) return;
 
         const terminalNode: TerminalPanelContent = {
-          type: "terminal",
+          type: 'terminal',
           sessionId,
           size: 50,
         };
         let newLayout: TerminalPanelContent;
 
         if (!tab.layout) {
-          newLayout = { type: "terminal", sessionId, size: 100 };
-        } else if (tab.layout.type === "terminal") {
+          newLayout = { type: 'terminal', sessionId, size: 100 };
+        } else if (tab.layout.type === 'terminal') {
           newLayout = {
-            type: "split",
+            type: 'split',
             direction,
             panels: [{ ...tab.layout, size: 50 }, terminalNode],
           };
@@ -2243,7 +2245,7 @@ export const useAppStore = create<AppState & AppActions>()(
             };
           } else {
             newLayout = {
-              type: "split",
+              type: 'split',
               direction,
               panels: [{ ...tab.layout, size: 50 }, terminalNode],
             };
@@ -2274,17 +2276,20 @@ export const useAppStore = create<AppState & AppActions>()(
       },
 
       setDefaultPlanningMode: (mode) => set({ defaultPlanningMode: mode }),
-      setDefaultRequirePlanApproval: (require) => set({ defaultRequirePlanApproval: require }),
-      setDefaultAIProfileId: (profileId) => set({ defaultAIProfileId: profileId }),
+      setDefaultRequirePlanApproval: (require) =>
+        set({ defaultRequirePlanApproval: require }),
+      setDefaultAIProfileId: (profileId) =>
+        set({ defaultAIProfileId: profileId }),
 
       // Plan Approval actions
-      setPendingPlanApproval: (approval) => set({ pendingPlanApproval: approval }),
+      setPendingPlanApproval: (approval) =>
+        set({ pendingPlanApproval: approval }),
 
       // Reset
       reset: () => set(initialState),
     }),
     {
-      name: "automaker-storage",
+      name: 'automaker-storage',
       version: 2, // Increment when making breaking changes to persisted state
       migrate: (persistedState: unknown, version: number) => {
         const state = persistedState as Partial<AppState>;
@@ -2292,8 +2297,8 @@ export const useAppStore = create<AppState & AppActions>()(
         // Migration from version 0 (no version) to version 1:
         // - Change addContextFile shortcut from "F" to "N"
         if (version === 0) {
-          if (state.keyboardShortcuts?.addContextFile === "F") {
-            state.keyboardShortcuts.addContextFile = "N";
+          if (state.keyboardShortcuts?.addContextFile === 'F') {
+            state.keyboardShortcuts.addContextFile = 'N';
           }
         }
 
@@ -2301,13 +2306,13 @@ export const useAppStore = create<AppState & AppActions>()(
         // - Change terminal shortcut from "Cmd+`" to "T"
         if (version <= 1) {
           if (
-            state.keyboardShortcuts?.terminal === "Cmd+`" ||
+            state.keyboardShortcuts?.terminal === 'Cmd+`' ||
             state.keyboardShortcuts?.terminal === undefined
           ) {
             state.keyboardShortcuts = {
               ...DEFAULT_KEYBOARD_SHORTCUTS,
               ...state.keyboardShortcuts,
-              terminal: "T",
+              terminal: 'T',
             };
           }
         }
@@ -2371,7 +2376,7 @@ const SYNC_DEBOUNCE_MS = 2000; // Wait 2 seconds after last change before syncin
  */
 function scheduleSyncToServer() {
   // Only sync in Electron mode
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
 
   // Clear any pending sync
   if (syncTimeoutId) {
@@ -2382,12 +2387,11 @@ function scheduleSyncToServer() {
   syncTimeoutId = setTimeout(async () => {
     try {
       // Dynamic import to avoid circular dependencies
-      const { syncSettingsToServer } = await import(
-        "@/hooks/use-settings-migration"
-      );
+      const { syncSettingsToServer } =
+        await import('@/hooks/use-settings-migration');
       await syncSettingsToServer();
     } catch (error) {
-      console.error("[AppStore] Failed to sync settings to server:", error);
+      console.error('[AppStore] Failed to sync settings to server:', error);
     }
   }, SYNC_DEBOUNCE_MS);
 }
@@ -2399,9 +2403,9 @@ let previousProjectSettings: Record<
   string,
   {
     theme?: string;
-    boardBackground?: typeof initialState.boardBackgroundByProject[string];
-    currentWorktree?: typeof initialState.currentWorktreeByProject[string];
-    worktrees?: typeof initialState.worktreesByProject[string];
+    boardBackground?: (typeof initialState.boardBackgroundByProject)[string];
+    currentWorktree?: (typeof initialState.currentWorktreeByProject)[string];
+    worktrees?: (typeof initialState.worktreesByProject)[string];
   }
 > = {};
 
@@ -2417,7 +2421,7 @@ function scheduleProjectSettingsSync(
   updates: Record<string, unknown>
 ) {
   // Only sync in Electron mode
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
 
   // Clear any pending sync for this project
   if (projectSyncTimeouts[projectPath]) {
@@ -2427,9 +2431,8 @@ function scheduleProjectSettingsSync(
   // Schedule new sync
   projectSyncTimeouts[projectPath] = setTimeout(async () => {
     try {
-      const { syncProjectSettingsToServer } = await import(
-        "@/hooks/use-settings-migration"
-      );
+      const { syncProjectSettingsToServer } =
+        await import('@/hooks/use-settings-migration');
       await syncProjectSettingsToServer(projectPath, updates);
     } catch (error) {
       console.error(
@@ -2488,7 +2491,8 @@ useAppStore.subscribe((state) => {
     state.muteDoneSound !== previousState.muteDoneSound ||
     state.enhancementModel !== previousState.enhancementModel ||
     state.defaultPlanningMode !== previousState.defaultPlanningMode ||
-    state.defaultRequirePlanApproval !== previousState.defaultRequirePlanApproval ||
+    state.defaultRequirePlanApproval !==
+      previousState.defaultRequirePlanApproval ||
     state.defaultAIProfileId !== previousState.defaultAIProfileId;
 
   if (importantSettingsChanged) {

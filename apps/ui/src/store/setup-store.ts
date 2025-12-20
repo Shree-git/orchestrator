@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // CLI Installation Status
 export interface CliStatus {
@@ -22,13 +22,13 @@ export interface GhCliStatus {
 
 // Claude Auth Method - all possible authentication sources
 export type ClaudeAuthMethod =
-  | "oauth_token_env"
-  | "oauth_token" // Stored OAuth token from claude login
-  | "api_key_env" // ANTHROPIC_API_KEY environment variable
-  | "api_key" // Manually stored API key
-  | "credentials_file" // Generic credentials file detection
-  | "cli_authenticated" // Claude CLI is installed and has active sessions/activity
-  | "none";
+  | 'oauth_token_env'
+  | 'oauth_token' // Stored OAuth token from claude login
+  | 'api_key_env' // ANTHROPIC_API_KEY environment variable
+  | 'api_key' // Manually stored API key
+  | 'credentials_file' // Generic credentials file detection
+  | 'cli_authenticated' // Claude CLI is installed and has active sessions/activity
+  | 'none';
 
 // Claude Auth Status
 export interface ClaudeAuthStatus {
@@ -52,12 +52,12 @@ export interface InstallProgress {
 }
 
 export type SetupStep =
-  | "welcome"
-  | "theme"
-  | "claude_detect"
-  | "claude_auth"
-  | "github"
-  | "complete";
+  | 'welcome'
+  | 'theme'
+  | 'claude_detect'
+  | 'claude_auth'
+  | 'github'
+  | 'complete';
 
 export interface SetupState {
   // Setup wizard state
@@ -100,18 +100,18 @@ export interface SetupActions {
 
 const initialInstallProgress: InstallProgress = {
   isInstalling: false,
-  currentStep: "",
+  currentStep: '',
   progress: 0,
   output: [],
 };
 
 // Check if setup should be skipped (for E2E testing)
-const shouldSkipSetup = import.meta.env.VITE_SKIP_SETUP === "true";
+const shouldSkipSetup = import.meta.env.VITE_SKIP_SETUP === 'true';
 
 const initialState: SetupState = {
   isFirstRun: !shouldSkipSetup,
   setupComplete: shouldSkipSetup,
-  currentStep: shouldSkipSetup ? "complete" : "welcome",
+  currentStep: shouldSkipSetup ? 'complete' : 'welcome',
 
   claudeCliStatus: null,
   claudeAuthStatus: null,
@@ -133,11 +133,11 @@ export const useSetupStore = create<SetupState & SetupActions>()(
       setSetupComplete: (complete) =>
         set({
           setupComplete: complete,
-          currentStep: complete ? "complete" : "welcome",
+          currentStep: complete ? 'complete' : 'welcome',
         }),
 
       completeSetup: () =>
-        set({ setupComplete: true, currentStep: "complete" }),
+        set({ setupComplete: true, currentStep: 'complete' }),
 
       resetSetup: () =>
         set({
@@ -172,7 +172,7 @@ export const useSetupStore = create<SetupState & SetupActions>()(
       setSkipClaudeSetup: (skip) => set({ skipClaudeSetup: skip }),
     }),
     {
-      name: "automaker-setup",
+      name: 'automaker-setup',
       partialize: (state) => ({
         isFirstRun: state.isFirstRun,
         setupComplete: state.setupComplete,

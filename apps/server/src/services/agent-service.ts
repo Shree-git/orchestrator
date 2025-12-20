@@ -3,20 +3,20 @@
  * Manages conversation sessions and streams responses via WebSocket
  */
 
-import { AbortError } from "@anthropic-ai/claude-agent-sdk";
-import path from "path";
-import fs from "fs/promises";
-import type { EventEmitter } from "../lib/events.js";
-import { ProviderFactory } from "../providers/provider-factory.js";
-import type { ExecuteOptions } from "../providers/types.js";
-import { readImageAsBase64 } from "../lib/image-handler.js";
-import { buildPromptWithImages } from "../lib/prompt-builder.js";
-import { createChatOptions } from "../lib/sdk-options.js";
-import { isAbortError } from "../lib/error-handler.js";
+import { AbortError } from '@anthropic-ai/claude-agent-sdk';
+import path from 'path';
+import fs from 'fs/promises';
+import type { EventEmitter } from '../lib/events.js';
+import { ProviderFactory } from '../providers/provider-factory.js';
+import type { ExecuteOptions } from '../providers/types.js';
+import { readImageAsBase64 } from '../lib/image-handler.js';
+import { buildPromptWithImages } from '../lib/prompt-builder.js';
+import { createChatOptions } from '../lib/sdk-options.js';
+import { isAbortError } from '../lib/error-handler.js';
 
 interface Message {
   id: string;
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
   images?: Array<{
     data: string;
@@ -56,8 +56,8 @@ export class AgentService {
   private events: EventEmitter;
 
   constructor(dataDir: string, events: EventEmitter) {
-    this.stateDir = path.join(dataDir, "agent-sessions");
-    this.metadataFile = path.join(dataDir, "sessions-metadata.json");
+    this.stateDir = path.join(dataDir, 'agent-sessions');
+    this.metadataFile = path.join(dataDir, 'sessions-metadata.json');
     this.events = events;
   }
 
@@ -119,7 +119,7 @@ export class AgentService {
     }
 
     if (session.isRunning) {
-      throw new Error("Agent is already processing a message");
+      throw new Error('Agent is already processing a message');
     }
 
     // Update session model if provided
@@ -129,7 +129,7 @@ export class AgentService {
     }
 
     // Read images and convert to base64
-    const images: Message["images"] = [];
+    const images: Message['images'] = [];
     if (imagePaths && imagePaths.length > 0) {
       for (const imagePath of imagePaths) {
         try {
@@ -151,7 +151,7 @@ export class AgentService {
     // Add user message
     const userMessage: Message = {
       id: this.generateId(),
-      role: "user",
+      role: 'user',
       content: message,
       images: images.length > 0 ? images : undefined,
       timestamp: new Date().toISOString(),
@@ -169,7 +169,7 @@ export class AgentService {
 
     // Emit user message event
     this.emitAgentEvent(sessionId, {
-      type: "message",
+      type: 'message',
       message: userMessage,
     });
 
@@ -199,7 +199,7 @@ export class AgentService {
 
       // Build options for provider
       const options: ExecuteOptions = {
-        prompt: "", // Will be set below based on images
+        prompt: '', // Will be set below based on images
         model: effectiveModel,
         cwd: workingDirectory || session.workingDirectory,
         systemPrompt: this.getSystemPrompt(),
@@ -226,7 +226,7 @@ export class AgentService {
       const stream = provider.executeQuery(options);
 
       let currentAssistantMessage: Message | null = null;
-      let responseText = "";
+      let responseText = '';
       const toolUses: Array<{ name: string; input: unknown }> = [];
 
       for await (const msg of stream) {
@@ -240,16 +240,16 @@ export class AgentService {
           await this.updateSession(sessionId, { sdkSessionId: msg.session_id });
         }
 
-        if (msg.type === "assistant") {
+        if (msg.type === 'assistant') {
           if (msg.message?.content) {
             for (const block of msg.message.content) {
-              if (block.type === "text") {
+              if (block.type === 'text') {
                 responseText += block.text;
 
                 if (!currentAssistantMessage) {
                   currentAssistantMessage = {
                     id: this.generateId(),
-                    role: "assistant",
+                    role: 'assistant',
                     content: responseText,
                     timestamp: new Date().toISOString(),
                   };
@@ -259,27 +259,27 @@ export class AgentService {
                 }
 
                 this.emitAgentEvent(sessionId, {
-                  type: "stream",
+                  type: 'stream',
                   messageId: currentAssistantMessage.id,
                   content: responseText,
                   isComplete: false,
                 });
-              } else if (block.type === "tool_use") {
+              } else if (block.type === 'tool_use') {
                 const toolUse = {
-                  name: block.name || "unknown",
+                  name: block.name || 'unknown',
                   input: block.input,
                 };
                 toolUses.push(toolUse);
 
                 this.emitAgentEvent(sessionId, {
-                  type: "tool_use",
+                  type: 'tool_use',
                   tool: toolUse,
                 });
               }
             }
           }
-        } else if (msg.type === "result") {
-          if (msg.subtype === "success" && msg.result) {
+        } else if (msg.type === 'result') {
+          if (msg.subtype === 'success' && msg.result) {
             if (currentAssistantMessage) {
               currentAssistantMessage.content = msg.result;
               responseText = msg.result;
@@ -287,7 +287,7 @@ export class AgentService {
           }
 
           this.emitAgentEvent(sessionId, {
-            type: "complete",
+            type: 'complete',
             messageId: currentAssistantMessage?.id,
             content: responseText,
             toolUses,
@@ -311,14 +311,14 @@ export class AgentService {
         return { success: false, aborted: true };
       }
 
-      console.error("[AgentService] Error:", error);
+      console.error('[AgentService] Error:', error);
 
       session.isRunning = false;
       session.abortController = null;
 
       const errorMessage: Message = {
         id: this.generateId(),
-        role: "assistant",
+        role: 'assistant',
         content: `Error: ${(error as Error).message}`,
         timestamp: new Date().toISOString(),
         isError: true,
@@ -328,7 +328,7 @@ export class AgentService {
       await this.saveSession(sessionId, session.messages);
 
       this.emitAgentEvent(sessionId, {
-        type: "error",
+        type: 'error',
         error: (error as Error).message,
         message: errorMessage,
       });
@@ -343,7 +343,7 @@ export class AgentService {
   getHistory(sessionId: string) {
     const session = this.sessions.get(sessionId);
     if (!session) {
-      return { success: false, error: "Session not found" };
+      return { success: false, error: 'Session not found' };
     }
 
     return {
@@ -359,7 +359,7 @@ export class AgentService {
   async stopExecution(sessionId: string) {
     const session = this.sessions.get(sessionId);
     if (!session) {
-      return { success: false, error: "Session not found" };
+      return { success: false, error: 'Session not found' };
     }
 
     if (session.abortController) {
@@ -391,7 +391,7 @@ export class AgentService {
     const sessionFile = path.join(this.stateDir, `${sessionId}.json`);
 
     try {
-      const data = await fs.readFile(sessionFile, "utf-8");
+      const data = await fs.readFile(sessionFile, 'utf-8');
       return JSON.parse(data);
     } catch {
       return [];
@@ -405,17 +405,17 @@ export class AgentService {
       await fs.writeFile(
         sessionFile,
         JSON.stringify(messages, null, 2),
-        "utf-8"
+        'utf-8'
       );
       await this.updateSessionTimestamp(sessionId);
     } catch (error) {
-      console.error("[AgentService] Failed to save session:", error);
+      console.error('[AgentService] Failed to save session:', error);
     }
   }
 
   async loadMetadata(): Promise<Record<string, SessionMetadata>> {
     try {
-      const data = await fs.readFile(this.metadataFile, "utf-8");
+      const data = await fs.readFile(this.metadataFile, 'utf-8');
       return JSON.parse(data);
     } catch {
       return {};
@@ -426,7 +426,7 @@ export class AgentService {
     await fs.writeFile(
       this.metadataFile,
       JSON.stringify(metadata, null, 2),
-      "utf-8"
+      'utf-8'
     );
   }
 
@@ -539,7 +539,7 @@ export class AgentService {
     sessionId: string,
     data: Record<string, unknown>
   ): void {
-    this.events.emit("agent:stream", { sessionId, ...data });
+    this.events.emit('agent:stream', { sessionId, ...data });
   }
 
   private getSystemPrompt(): string {

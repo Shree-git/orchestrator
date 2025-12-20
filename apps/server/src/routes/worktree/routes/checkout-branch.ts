@@ -2,10 +2,10 @@
  * POST /checkout-branch endpoint - Create and checkout a new branch
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { getErrorMessage, logError } from '../common.js';
 
 const execAsync = promisify(exec);
 
@@ -20,7 +20,7 @@ export function createCheckoutBranchHandler() {
       if (!worktreePath) {
         res.status(400).json({
           success: false,
-          error: "worktreePath required",
+          error: 'worktreePath required',
         });
         return;
       }
@@ -28,7 +28,7 @@ export function createCheckoutBranchHandler() {
       if (!branchName) {
         res.status(400).json({
           success: false,
-          error: "branchName required",
+          error: 'branchName required',
         });
         return;
       }
@@ -38,14 +38,14 @@ export function createCheckoutBranchHandler() {
       if (invalidChars.test(branchName)) {
         res.status(400).json({
           success: false,
-          error: "Branch name contains invalid characters",
+          error: 'Branch name contains invalid characters',
         });
         return;
       }
 
       // Get current branch for reference
       const { stdout: currentBranchOutput } = await execAsync(
-        "git rev-parse --abbrev-ref HEAD",
+        'git rev-parse --abbrev-ref HEAD',
         { cwd: worktreePath }
       );
       const currentBranch = currentBranchOutput.trim();
@@ -79,7 +79,7 @@ export function createCheckoutBranchHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Checkout branch failed");
+      logError(error, 'Checkout branch failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

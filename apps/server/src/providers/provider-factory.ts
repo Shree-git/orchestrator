@@ -6,9 +6,9 @@
  * new providers (Cursor, OpenCode, etc.) trivial - just add one line.
  */
 
-import { BaseProvider } from "./base-provider.js";
-import { ClaudeProvider } from "./claude-provider.js";
-import type { InstallationStatus } from "./types.js";
+import { BaseProvider } from './base-provider.js';
+import { ClaudeProvider } from './claude-provider.js';
+import type { InstallationStatus } from './types.js';
 
 export class ProviderFactory {
   /**
@@ -22,8 +22,8 @@ export class ProviderFactory {
 
     // Claude models (claude-*, opus, sonnet, haiku)
     if (
-      lowerModel.startsWith("claude-") ||
-      ["haiku", "sonnet", "opus"].includes(lowerModel)
+      lowerModel.startsWith('claude-') ||
+      ['haiku', 'sonnet', 'opus'].includes(lowerModel)
     ) {
       return new ClaudeProvider();
     }
@@ -83,8 +83,8 @@ export class ProviderFactory {
     const lowerName = name.toLowerCase();
 
     switch (lowerName) {
-      case "claude":
-      case "anthropic":
+      case 'claude':
+      case 'anthropic':
         return new ClaudeProvider();
 
       // Future providers:

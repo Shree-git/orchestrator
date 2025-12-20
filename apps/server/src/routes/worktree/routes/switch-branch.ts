@@ -6,10 +6,10 @@
  * the user should commit first.
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { getErrorMessage, logError } from '../common.js';
 
 const execAsync = promisify(exec);
 
@@ -19,13 +19,17 @@ const execAsync = promisify(exec);
  */
 async function hasUncommittedChanges(cwd: string): Promise<boolean> {
   try {
-    const { stdout } = await execAsync("git status --porcelain", { cwd });
-    const lines = stdout.trim().split("\n").filter((line) => {
-      if (!line.trim()) return false;
-      // Exclude .worktrees/ directory (created by automaker)
-      if (line.includes(".worktrees/") || line.endsWith(".worktrees")) return false;
-      return true;
-    });
+    const { stdout } = await execAsync('git status --porcelain', { cwd });
+    const lines = stdout
+      .trim()
+      .split('\n')
+      .filter((line) => {
+        if (!line.trim()) return false;
+        // Exclude .worktrees/ directory (created by automaker)
+        if (line.includes('.worktrees/') || line.endsWith('.worktrees'))
+          return false;
+        return true;
+      });
     return lines.length > 0;
   } catch {
     return false;
@@ -38,18 +42,22 @@ async function hasUncommittedChanges(cwd: string): Promise<boolean> {
  */
 async function getChangesSummary(cwd: string): Promise<string> {
   try {
-    const { stdout } = await execAsync("git status --short", { cwd });
-    const lines = stdout.trim().split("\n").filter((line) => {
-      if (!line.trim()) return false;
-      // Exclude .worktrees/ directory
-      if (line.includes(".worktrees/") || line.endsWith(".worktrees")) return false;
-      return true;
-    });
-    if (lines.length === 0) return "";
-    if (lines.length <= 5) return lines.join(", ");
-    return `${lines.slice(0, 5).join(", ")} and ${lines.length - 5} more files`;
+    const { stdout } = await execAsync('git status --short', { cwd });
+    const lines = stdout
+      .trim()
+      .split('\n')
+      .filter((line) => {
+        if (!line.trim()) return false;
+        // Exclude .worktrees/ directory
+        if (line.includes('.worktrees/') || line.endsWith('.worktrees'))
+          return false;
+        return true;
+      });
+    if (lines.length === 0) return '';
+    if (lines.length <= 5) return lines.join(', ');
+    return `${lines.slice(0, 5).join(', ')} and ${lines.length - 5} more files`;
   } catch {
-    return "unknown changes";
+    return 'unknown changes';
   }
 }
 
@@ -64,7 +72,7 @@ export function createSwitchBranchHandler() {
       if (!worktreePath) {
         res.status(400).json({
           success: false,
-          error: "worktreePath required",
+          error: 'worktreePath required',
         });
         return;
       }
@@ -72,14 +80,14 @@ export function createSwitchBranchHandler() {
       if (!branchName) {
         res.status(400).json({
           success: false,
-          error: "branchName required",
+          error: 'branchName required',
         });
         return;
       }
 
       // Get current branch
       const { stdout: currentBranchOutput } = await execAsync(
-        "git rev-parse --abbrev-ref HEAD",
+        'git rev-parse --abbrev-ref HEAD',
         { cwd: worktreePath }
       );
       const previousBranch = currentBranchOutput.trim();
@@ -115,7 +123,7 @@ export function createSwitchBranchHandler() {
         res.status(400).json({
           success: false,
           error: `Cannot switch branches: you have uncommitted changes (${summary}). Please commit your changes first.`,
-          code: "UNCOMMITTED_CHANGES",
+          code: 'UNCOMMITTED_CHANGES',
         });
         return;
       }
@@ -132,7 +140,7 @@ export function createSwitchBranchHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Switch branch failed");
+      logError(error, 'Switch branch failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

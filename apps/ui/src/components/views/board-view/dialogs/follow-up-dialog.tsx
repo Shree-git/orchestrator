@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,17 +6,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
 import {
   DescriptionImageDropZone,
   FeatureImagePath as DescriptionImagePath,
   ImagePreviewMap,
-} from "@/components/ui/description-image-dropzone";
-import { MessageSquare } from "lucide-react";
-import { Feature } from "@/store/app-store";
+} from '@/components/ui/description-image-dropzone';
+import { MessageSquare } from 'lucide-react';
+import { Feature } from '@/store/app-store';
 
 interface FollowUpDialogProps {
   open: boolean;
@@ -58,7 +57,7 @@ export function FollowUpDialog({
         compact={!isMaximized}
         data-testid="follow-up-dialog"
         onKeyDown={(e: React.KeyboardEvent) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && prompt.trim()) {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && prompt.trim()) {
             e.preventDefault();
             onSend();
           }
@@ -71,7 +70,7 @@ export function FollowUpDialog({
             {feature && (
               <span className="block mt-2 text-primary">
                 Feature: {feature.description.slice(0, 100)}
-                {feature.description.length > 100 ? "..." : ""}
+                {feature.description.length > 100 ? '...' : ''}
               </span>
             )}
           </DialogDescription>
@@ -106,7 +105,7 @@ export function FollowUpDialog({
           <HotkeyButton
             onClick={onSend}
             disabled={!prompt.trim()}
-            hotkey={{ key: "Enter", cmdCtrl: true }}
+            hotkey={{ key: 'Enter', cmdCtrl: true }}
             hotkeyActive={open}
             data-testid="confirm-follow-up"
           >

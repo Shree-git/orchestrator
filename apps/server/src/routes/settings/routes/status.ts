@@ -3,9 +3,9 @@
  * Returns whether settings files exist (to determine if migration is needed)
  */
 
-import type { Request, Response } from "express";
-import type { SettingsService } from "../../../services/settings-service.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import type { SettingsService } from '../../../services/settings-service.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createStatusHandler(settingsService: SettingsService) {
   return async (_req: Request, res: Response): Promise<void> => {
@@ -21,7 +21,7 @@ export function createStatusHandler(settingsService: SettingsService) {
         needsMigration: !hasGlobalSettings,
       });
     } catch (error) {
-      logError(error, "Get settings status failed");
+      logError(error, 'Get settings status failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

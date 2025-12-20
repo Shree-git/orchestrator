@@ -2,12 +2,12 @@
  * POST /clone endpoint - Clone a GitHub template to a new project directory
  */
 
-import type { Request, Response } from "express";
-import { spawn } from "child_process";
-import path from "path";
-import fs from "fs/promises";
-import { addAllowedPath } from "../../../lib/security.js";
-import { logger, getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs/promises';
+import { addAllowedPath } from '../../../lib/security.js';
+import { logger, getErrorMessage, logError } from '../common.js';
 
 export function createCloneHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -22,7 +22,7 @@ export function createCloneHandler() {
       if (!repoUrl || !projectName || !parentDir) {
         res.status(400).json({
           success: false,
-          error: "repoUrl, projectName, and parentDir are required",
+          error: 'repoUrl, projectName, and parentDir are required',
         });
         return;
       }
@@ -36,13 +36,13 @@ export function createCloneHandler() {
       if (!githubUrlPattern.test(repoUrl)) {
         res.status(400).json({
           success: false,
-          error: "Invalid GitHub repository URL",
+          error: 'Invalid GitHub repository URL',
         });
         return;
       }
 
       // Sanitize project name (allow alphanumeric, dash, underscore)
-      const sanitizedName = projectName.replace(/[^a-zA-Z0-9-_]/g, "-");
+      const sanitizedName = projectName.replace(/[^a-zA-Z0-9-_]/g, '-');
       if (sanitizedName !== projectName) {
         logger.info(
           `[Templates] Sanitized project name: ${projectName} -> ${sanitizedName}`
@@ -55,10 +55,10 @@ export function createCloneHandler() {
       const resolvedParent = path.resolve(parentDir);
       const resolvedProject = path.resolve(projectPath);
       const relativePath = path.relative(resolvedParent, resolvedProject);
-      if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
         res.status(400).json({
           success: false,
-          error: "Invalid project name; potential path traversal attempt.",
+          error: 'Invalid project name; potential path traversal attempt.',
         });
         return;
       }
@@ -79,7 +79,7 @@ export function createCloneHandler() {
       try {
         // Check if parentDir is a root path (Windows: C:\, D:\, etc. or Unix: /)
         const isWindowsRoot = /^[A-Za-z]:\\?$/.test(parentDir);
-        const isUnixRoot = parentDir === "/" || parentDir === "";
+        const isUnixRoot = parentDir === '/' || parentDir === '';
         const isRoot = isWindowsRoot || isUnixRoot;
 
         if (isRoot) {
@@ -104,7 +104,7 @@ export function createCloneHandler() {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         logger.error(
-          "[Templates] Failed to access parent directory:",
+          '[Templates] Failed to access parent directory:',
           parentDir,
           error
         );
@@ -122,17 +122,17 @@ export function createCloneHandler() {
         success: boolean;
         error?: string;
       }>((resolve) => {
-        const gitProcess = spawn("git", ["clone", repoUrl, projectPath], {
+        const gitProcess = spawn('git', ['clone', repoUrl, projectPath], {
           cwd: parentDir,
         });
 
-        let stderr = "";
+        let stderr = '';
 
-        gitProcess.stderr.on("data", (data) => {
+        gitProcess.stderr.on('data', (data) => {
           stderr += data.toString();
         });
 
-        gitProcess.on("close", (code) => {
+        gitProcess.on('close', (code) => {
           if (code === 0) {
             resolve({ success: true });
           } else {
@@ -143,7 +143,7 @@ export function createCloneHandler() {
           }
         });
 
-        gitProcess.on("error", (error) => {
+        gitProcess.on('error', (error) => {
           resolve({
             success: false,
             error: `Failed to spawn git: ${error.message}`,
@@ -154,34 +154,34 @@ export function createCloneHandler() {
       if (!cloneResult.success) {
         res.status(500).json({
           success: false,
-          error: cloneResult.error || "Failed to clone repository",
+          error: cloneResult.error || 'Failed to clone repository',
         });
         return;
       }
 
       // Remove .git directory to start fresh
       try {
-        const gitDir = path.join(projectPath, ".git");
+        const gitDir = path.join(projectPath, '.git');
         await fs.rm(gitDir, { recursive: true, force: true });
-        logger.info("[Templates] Removed .git directory");
+        logger.info('[Templates] Removed .git directory');
       } catch (error) {
-        logger.warn("[Templates] Could not remove .git directory:", error);
+        logger.warn('[Templates] Could not remove .git directory:', error);
         // Continue anyway - not critical
       }
 
       // Initialize a fresh git repository
       await new Promise<void>((resolve) => {
-        const gitInit = spawn("git", ["init"], {
+        const gitInit = spawn('git', ['init'], {
           cwd: projectPath,
         });
 
-        gitInit.on("close", () => {
-          logger.info("[Templates] Initialized fresh git repository");
+        gitInit.on('close', () => {
+          logger.info('[Templates] Initialized fresh git repository');
           resolve();
         });
 
-        gitInit.on("error", () => {
-          logger.warn("[Templates] Could not initialize git");
+        gitInit.on('error', () => {
+          logger.warn('[Templates] Could not initialize git');
           resolve();
         });
       });
@@ -197,7 +197,7 @@ export function createCloneHandler() {
         projectName: sanitizedName,
       });
     } catch (error) {
-      logError(error, "Clone template failed");
+      logError(error, 'Clone template failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

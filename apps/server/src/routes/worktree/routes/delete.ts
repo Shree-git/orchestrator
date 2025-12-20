@@ -2,10 +2,10 @@
  * POST /delete endpoint - Delete a git worktree
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import { isGitRepo, getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { isGitRepo, getErrorMessage, logError } from '../common.js';
 
 const execAsync = promisify(exec);
 
@@ -21,7 +21,7 @@ export function createDeleteHandler() {
       if (!projectPath || !worktreePath) {
         res.status(400).json({
           success: false,
-          error: "projectPath and worktreePath required",
+          error: 'projectPath and worktreePath required',
         });
         return;
       }
@@ -29,7 +29,7 @@ export function createDeleteHandler() {
       if (!(await isGitRepo(projectPath))) {
         res.status(400).json({
           success: false,
-          error: "Not a git repository",
+          error: 'Not a git repository',
         });
         return;
       }
@@ -37,7 +37,7 @@ export function createDeleteHandler() {
       // Get branch name before removing worktree
       let branchName: string | null = null;
       try {
-        const { stdout } = await execAsync("git rev-parse --abbrev-ref HEAD", {
+        const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD', {
           cwd: worktreePath,
         });
         branchName = stdout.trim();
@@ -52,11 +52,16 @@ export function createDeleteHandler() {
         });
       } catch (error) {
         // Try with prune if remove fails
-        await execAsync("git worktree prune", { cwd: projectPath });
+        await execAsync('git worktree prune', { cwd: projectPath });
       }
 
       // Optionally delete the branch
-      if (deleteBranch && branchName && branchName !== "main" && branchName !== "master") {
+      if (
+        deleteBranch &&
+        branchName &&
+        branchName !== 'main' &&
+        branchName !== 'master'
+      ) {
         try {
           await execAsync(`git branch -D ${branchName}`, { cwd: projectPath });
         } catch {
@@ -72,7 +77,7 @@ export function createDeleteHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Delete worktree failed");
+      logError(error, 'Delete worktree failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

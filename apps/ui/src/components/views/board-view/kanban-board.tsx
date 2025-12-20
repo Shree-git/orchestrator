@@ -1,22 +1,28 @@
-
-import {
-  DndContext,
-  DragOverlay,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { KanbanColumn, KanbanCard } from "./components";
-import { Feature } from "@/store/app-store";
-import { FastForward, Lightbulb, Archive } from "lucide-react";
-import { useKeyboardShortcutsConfig } from "@/hooks/use-keyboard-shortcuts";
-import { useResponsiveKanban } from "@/hooks/use-responsive-kanban";
-import { COLUMNS, ColumnId } from "./constants";
+} from '@dnd-kit/sortable';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { KanbanColumn, KanbanCard } from './components';
+import { Feature } from '@/store/app-store';
+import { FastForward, Lightbulb, Archive } from 'lucide-react';
+import { useKeyboardShortcutsConfig } from '@/hooks/use-keyboard-shortcuts';
+import { useResponsiveKanban } from '@/hooks/use-responsive-kanban';
+import { COLUMNS, ColumnId } from './constants';
 
 interface KanbanBoardProps {
   sensors: any;
@@ -118,8 +124,7 @@ export function KanbanBoard({
                 showBorder={backgroundSettings.columnBorderEnabled}
                 hideScrollbar={backgroundSettings.hideScrollbar}
                 headerAction={
-                  column.id === "verified" &&
-                  columnFeatures.length > 0 ? (
+                  column.id === 'verified' && columnFeatures.length > 0 ? (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -130,7 +135,7 @@ export function KanbanBoard({
                       <Archive className="w-3 h-3 mr-1" />
                       Archive All
                     </Button>
-                  ) : column.id === "backlog" ? (
+                  ) : column.id === 'backlog' ? (
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
@@ -175,9 +180,8 @@ export function KanbanBoard({
                   {columnFeatures.map((feature, index) => {
                     // Calculate shortcut key for in-progress cards (first 10 get 1-9, 0)
                     let shortcutKey: string | undefined;
-                    if (column.id === "in_progress" && index < 10) {
-                      shortcutKey =
-                        index === 9 ? "0" : String(index + 1);
+                    if (column.id === 'in_progress' && index < 10) {
+                      shortcutKey = index === 9 ? '0' : String(index + 1);
                     }
                     return (
                       <KanbanCard
@@ -205,15 +209,9 @@ export function KanbanBoard({
                         )}
                         shortcutKey={shortcutKey}
                         opacity={backgroundSettings.cardOpacity}
-                        glassmorphism={
-                          backgroundSettings.cardGlassmorphism
-                        }
-                        cardBorderEnabled={
-                          backgroundSettings.cardBorderEnabled
-                        }
-                        cardBorderOpacity={
-                          backgroundSettings.cardBorderOpacity
-                        }
+                        glassmorphism={backgroundSettings.cardGlassmorphism}
+                        cardBorderEnabled={backgroundSettings.cardBorderEnabled}
+                        cardBorderOpacity={backgroundSettings.cardBorderOpacity}
                       />
                     );
                   })}
@@ -226,7 +224,7 @@ export function KanbanBoard({
         <DragOverlay
           dropAnimation={{
             duration: 200,
-            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+            easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
           }}
         >
           {activeFeature && (

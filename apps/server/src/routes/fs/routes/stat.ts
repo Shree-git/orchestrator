@@ -2,10 +2,10 @@
  * POST /stat endpoint - Get file stats
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import { validatePath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import { validatePath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createStatHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -13,7 +13,7 @@ export function createStatHandler() {
       const { filePath } = req.body as { filePath: string };
 
       if (!filePath) {
-        res.status(400).json({ success: false, error: "filePath is required" });
+        res.status(400).json({ success: false, error: 'filePath is required' });
         return;
       }
 
@@ -30,7 +30,7 @@ export function createStatHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Get file stats failed");
+      logError(error, 'Get file stats failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

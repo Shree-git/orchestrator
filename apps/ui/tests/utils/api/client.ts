@@ -3,8 +3,8 @@
  * Provides type-safe wrappers around common API operations
  */
 
-import { Page, APIResponse } from "@playwright/test";
-import { API_ENDPOINTS } from "../core/constants";
+import { Page, APIResponse } from '@playwright/test';
+import { API_ENDPOINTS } from '../core/constants';
 
 // ============================================================================
 // Types
@@ -92,13 +92,16 @@ export class WorktreeApiClient {
     branchName: string,
     baseBranch?: string
   ): Promise<{ response: APIResponse; data: WorktreeCreateResponse }> {
-    const response = await this.page.request.post(API_ENDPOINTS.worktree.create, {
-      data: {
-        projectPath,
-        branchName,
-        baseBranch,
-      },
-    });
+    const response = await this.page.request.post(
+      API_ENDPOINTS.worktree.create,
+      {
+        data: {
+          projectPath,
+          branchName,
+          baseBranch,
+        },
+      }
+    );
     const data = await response.json();
     return { response, data };
   }
@@ -111,13 +114,16 @@ export class WorktreeApiClient {
     worktreePath: string,
     deleteBranch: boolean = true
   ): Promise<{ response: APIResponse; data: WorktreeDeleteResponse }> {
-    const response = await this.page.request.post(API_ENDPOINTS.worktree.delete, {
-      data: {
-        projectPath,
-        worktreePath,
-        deleteBranch,
-      },
-    });
+    const response = await this.page.request.post(
+      API_ENDPOINTS.worktree.delete,
+      {
+        data: {
+          projectPath,
+          worktreePath,
+          deleteBranch,
+        },
+      }
+    );
     const data = await response.json();
     return { response, data };
   }
@@ -146,12 +152,15 @@ export class WorktreeApiClient {
     worktreePath: string,
     message: string
   ): Promise<{ response: APIResponse; data: CommitResponse }> {
-    const response = await this.page.request.post(API_ENDPOINTS.worktree.commit, {
-      data: {
-        worktreePath,
-        message,
-      },
-    });
+    const response = await this.page.request.post(
+      API_ENDPOINTS.worktree.commit,
+      {
+        data: {
+          worktreePath,
+          message,
+        },
+      }
+    );
     const data = await response.json();
     return { response, data };
   }
@@ -163,12 +172,15 @@ export class WorktreeApiClient {
     worktreePath: string,
     branchName: string
   ): Promise<{ response: APIResponse; data: SwitchBranchResponse }> {
-    const response = await this.page.request.post(API_ENDPOINTS.worktree.switchBranch, {
-      data: {
-        worktreePath,
-        branchName,
-      },
-    });
+    const response = await this.page.request.post(
+      API_ENDPOINTS.worktree.switchBranch,
+      {
+        data: {
+          worktreePath,
+          branchName,
+        },
+      }
+    );
     const data = await response.json();
     return { response, data };
   }
@@ -179,11 +191,14 @@ export class WorktreeApiClient {
   async listBranches(
     worktreePath: string
   ): Promise<{ response: APIResponse; data: ListBranchesResponse }> {
-    const response = await this.page.request.post(API_ENDPOINTS.worktree.listBranches, {
-      data: {
-        worktreePath,
-      },
-    });
+    const response = await this.page.request.post(
+      API_ENDPOINTS.worktree.listBranches,
+      {
+        data: {
+          worktreePath,
+        },
+      }
+    );
     const data = await response.json();
     return { response, data };
   }
@@ -213,7 +228,11 @@ export async function apiCreateWorktree(
   branchName: string,
   baseBranch?: string
 ): Promise<{ response: APIResponse; data: WorktreeCreateResponse }> {
-  return new WorktreeApiClient(page).create(projectPath, branchName, baseBranch);
+  return new WorktreeApiClient(page).create(
+    projectPath,
+    branchName,
+    baseBranch
+  );
 }
 
 /**
@@ -225,7 +244,11 @@ export async function apiDeleteWorktree(
   worktreePath: string,
   deleteBranch: boolean = true
 ): Promise<{ response: APIResponse; data: WorktreeDeleteResponse }> {
-  return new WorktreeApiClient(page).delete(projectPath, worktreePath, deleteBranch);
+  return new WorktreeApiClient(page).delete(
+    projectPath,
+    worktreePath,
+    deleteBranch
+  );
 }
 
 /**

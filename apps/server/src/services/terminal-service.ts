@@ -5,10 +5,10 @@
  * Supports cross-platform shell detection including WSL.
  */
 
-import * as pty from "node-pty";
-import { EventEmitter } from "events";
-import * as os from "os";
-import * as fs from "fs";
+import * as pty from 'node-pty';
+import { EventEmitter } from 'events';
+import * as os from 'os';
+import * as fs from 'fs';
 
 // Maximum scrollback buffer size (characters)
 const MAX_SCROLLBACK_SIZE = 50000; // ~50KB per terminal
@@ -53,20 +53,21 @@ export class TerminalService extends EventEmitter {
     const platform = os.platform();
 
     // Check if running in WSL
-    if (platform === "linux" && this.isWSL()) {
+    if (platform === 'linux' && this.isWSL()) {
       // In WSL, prefer the user's configured shell or bash
-      const userShell = process.env.SHELL || "/bin/bash";
+      const userShell = process.env.SHELL || '/bin/bash';
       if (fs.existsSync(userShell)) {
-        return { shell: userShell, args: ["--login"] };
+        return { shell: userShell, args: ['--login'] };
       }
-      return { shell: "/bin/bash", args: ["--login"] };
+      return { shell: '/bin/bash', args: ['--login'] };
     }
 
     switch (platform) {
-      case "win32": {
+      case 'win32': {
         // Windows: prefer PowerShell, fall back to cmd
-        const pwsh = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
-        const pwshCore = "C:\\Program Files\\PowerShell\\7\\pwsh.exe";
+        const pwsh =
+          'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe';
+        const pwshCore = 'C:\\Program Files\\PowerShell\\7\\pwsh.exe';
 
         if (fs.existsSync(pwshCore)) {
           return { shell: pwshCore, args: [] };
@@ -74,32 +75,32 @@ export class TerminalService extends EventEmitter {
         if (fs.existsSync(pwsh)) {
           return { shell: pwsh, args: [] };
         }
-        return { shell: "cmd.exe", args: [] };
+        return { shell: 'cmd.exe', args: [] };
       }
 
-      case "darwin": {
+      case 'darwin': {
         // macOS: prefer user's shell, then zsh, then bash
         const userShell = process.env.SHELL;
         if (userShell && fs.existsSync(userShell)) {
-          return { shell: userShell, args: ["--login"] };
+          return { shell: userShell, args: ['--login'] };
         }
-        if (fs.existsSync("/bin/zsh")) {
-          return { shell: "/bin/zsh", args: ["--login"] };
+        if (fs.existsSync('/bin/zsh')) {
+          return { shell: '/bin/zsh', args: ['--login'] };
         }
-        return { shell: "/bin/bash", args: ["--login"] };
+        return { shell: '/bin/bash', args: ['--login'] };
       }
 
-      case "linux":
+      case 'linux':
       default: {
         // Linux: prefer user's shell, then bash, then sh
         const userShell = process.env.SHELL;
         if (userShell && fs.existsSync(userShell)) {
-          return { shell: userShell, args: ["--login"] };
+          return { shell: userShell, args: ['--login'] };
         }
-        if (fs.existsSync("/bin/bash")) {
-          return { shell: "/bin/bash", args: ["--login"] };
+        if (fs.existsSync('/bin/bash')) {
+          return { shell: '/bin/bash', args: ['--login'] };
         }
-        return { shell: "/bin/sh", args: [] };
+        return { shell: '/bin/sh', args: [] };
       }
     }
   }
@@ -110,9 +111,9 @@ export class TerminalService extends EventEmitter {
   isWSL(): boolean {
     try {
       // Check /proc/version for Microsoft/WSL indicators
-      if (fs.existsSync("/proc/version")) {
-        const version = fs.readFileSync("/proc/version", "utf-8").toLowerCase();
-        return version.includes("microsoft") || version.includes("wsl");
+      if (fs.existsSync('/proc/version')) {
+        const version = fs.readFileSync('/proc/version', 'utf-8').toLowerCase();
+        return version.includes('microsoft') || version.includes('wsl');
       }
       // Check for WSL environment variable
       if (process.env.WSL_DISTRO_NAME || process.env.WSLENV) {
@@ -157,7 +158,7 @@ export class TerminalService extends EventEmitter {
     let cwd = requestedCwd.trim();
 
     // Fix double slashes at start (but not for Windows UNC paths)
-    if (cwd.startsWith("//") && !cwd.startsWith("//wsl")) {
+    if (cwd.startsWith('//') && !cwd.startsWith('//wsl')) {
       cwd = cwd.slice(1);
     }
 
@@ -167,10 +168,14 @@ export class TerminalService extends EventEmitter {
       if (stat.isDirectory()) {
         return cwd;
       }
-      console.warn(`[Terminal] Path exists but is not a directory: ${cwd}, falling back to home`);
+      console.warn(
+        `[Terminal] Path exists but is not a directory: ${cwd}, falling back to home`
+      );
       return homeDir;
     } catch {
-      console.warn(`[Terminal] Working directory does not exist: ${cwd}, falling back to home`);
+      console.warn(
+        `[Terminal] Working directory does not exist: ${cwd}, falling back to home`
+      );
       return homeDir;
     }
   }
@@ -190,16 +195,18 @@ export class TerminalService extends EventEmitter {
     // Build environment with some useful defaults
     const env: Record<string, string> = {
       ...process.env,
-      TERM: "xterm-256color",
-      COLORTERM: "truecolor",
-      TERM_PROGRAM: "automaker-terminal",
+      TERM: 'xterm-256color',
+      COLORTERM: 'truecolor',
+      TERM_PROGRAM: 'automaker-terminal',
       ...options.env,
     };
 
-    console.log(`[Terminal] Creating session ${id} with shell: ${shell} in ${cwd}`);
+    console.log(
+      `[Terminal] Creating session ${id} with shell: ${shell} in ${cwd}`
+    );
 
     const ptyProcess = pty.spawn(shell, shellArgs, {
-      name: "xterm-256color",
+      name: 'xterm-256color',
       cols: options.cols || 80,
       rows: options.rows || 24,
       cwd,
@@ -212,8 +219,8 @@ export class TerminalService extends EventEmitter {
       cwd,
       createdAt: new Date(),
       shell,
-      scrollbackBuffer: "",
-      outputBuffer: "",
+      scrollbackBuffer: '',
+      outputBuffer: '',
       flushTimeout: null,
       resizeInProgress: false,
       resizeDebounceTimeout: null,
@@ -233,12 +240,12 @@ export class TerminalService extends EventEmitter {
         // Schedule another flush for remaining data
         session.flushTimeout = setTimeout(flushOutput, OUTPUT_THROTTLE_MS);
       } else {
-        session.outputBuffer = "";
+        session.outputBuffer = '';
         session.flushTimeout = null;
       }
 
       this.dataCallbacks.forEach((cb) => cb(id, dataToSend));
-      this.emit("data", id, dataToSend);
+      this.emit('data', id, dataToSend);
     };
 
     // Forward data events with throttling
@@ -254,7 +261,8 @@ export class TerminalService extends EventEmitter {
       session.scrollbackBuffer += data;
       // Trim if too large (keep the most recent data)
       if (session.scrollbackBuffer.length > MAX_SCROLLBACK_SIZE) {
-        session.scrollbackBuffer = session.scrollbackBuffer.slice(-MAX_SCROLLBACK_SIZE);
+        session.scrollbackBuffer =
+          session.scrollbackBuffer.slice(-MAX_SCROLLBACK_SIZE);
       }
 
       // Buffer output for throttled live delivery
@@ -271,7 +279,7 @@ export class TerminalService extends EventEmitter {
       console.log(`[Terminal] Session ${id} exited with code ${exitCode}`);
       this.sessions.delete(id);
       this.exitCallbacks.forEach((cb) => cb(id, exitCode));
-      this.emit("exit", id, exitCode);
+      this.emit('exit', id, exitCode);
     });
 
     console.log(`[Terminal] Session ${id} created successfully`);
@@ -296,7 +304,12 @@ export class TerminalService extends EventEmitter {
    * @param suppressOutput - If true, suppress output during resize to prevent duplicate prompts.
    *                         Should be false for the initial resize so the first prompt isn't dropped.
    */
-  resize(sessionId: string, cols: number, rows: number, suppressOutput: boolean = true): boolean {
+  resize(
+    sessionId: string,
+    cols: number,
+    rows: number,
+    suppressOutput: boolean = true
+  ): boolean {
     const session = this.sessions.get(sessionId);
     if (!session) {
       console.warn(`[Terminal] Session ${sessionId} not found for resize`);
@@ -386,7 +399,7 @@ export class TerminalService extends EventEmitter {
 
     // Clear any pending output that hasn't been flushed yet
     // This data is already in scrollbackBuffer
-    session.outputBuffer = "";
+    session.outputBuffer = '';
     if (session.flushTimeout) {
       clearTimeout(session.flushTimeout);
       session.flushTimeout = null;

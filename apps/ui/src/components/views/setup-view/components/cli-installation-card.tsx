@@ -4,11 +4,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, Loader2, AlertCircle } from "lucide-react";
-import { CopyableCommandField } from "./copyable-command-field";
-import { TerminalOutput } from "./terminal-output";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Download, Loader2, AlertCircle } from 'lucide-react';
+import { CopyableCommandField } from './copyable-command-field';
+import { TerminalOutput } from './terminal-output';
 
 interface CommandInfo {
   label: string; // e.g., "macOS / Linux"
@@ -23,7 +23,7 @@ interface CliInstallationCardProps {
   installProgress: { output: string[] };
   onInstall: () => void;
   warningMessage?: string;
-  color?: "brand" | "green"; // For different CLI themes
+  color?: 'brand' | 'green'; // For different CLI themes
 }
 
 export function CliInstallationCard({
@@ -34,11 +34,11 @@ export function CliInstallationCard({
   installProgress,
   onInstall,
   warningMessage,
-  color = "brand",
+  color = 'brand',
 }: CliInstallationCardProps) {
   const colorClasses = {
-    brand: "bg-brand-500 hover:bg-brand-600",
-    green: "bg-green-500 hover:bg-green-600",
+    brand: 'bg-brand-500 hover:bg-brand-600',
+    green: 'bg-green-500 hover:bg-green-600',
   };
 
   return (
@@ -59,9 +59,7 @@ export function CliInstallationCard({
           />
         ))}
 
-        {isInstalling && (
-          <TerminalOutput lines={installProgress.output} />
-        )}
+        {isInstalling && <TerminalOutput lines={installProgress.output} />}
 
         <Button
           onClick={onInstall}

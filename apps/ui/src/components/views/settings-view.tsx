@@ -1,26 +1,25 @@
+import { useState } from 'react';
+import { useAppStore } from '@/store/app-store';
 
-import { useState } from "react";
-import { useAppStore } from "@/store/app-store";
-
-import { useCliStatus, useSettingsView } from "./settings-view/hooks";
-import { NAV_ITEMS } from "./settings-view/config/navigation";
-import { SettingsHeader } from "./settings-view/components/settings-header";
-import { KeyboardMapDialog } from "./settings-view/components/keyboard-map-dialog";
-import { DeleteProjectDialog } from "./settings-view/components/delete-project-dialog";
-import { SettingsNavigation } from "./settings-view/components/settings-navigation";
-import { ApiKeysSection } from "./settings-view/api-keys/api-keys-section";
-import { ClaudeCliStatus } from "./settings-view/cli-status/claude-cli-status";
-import { AIEnhancementSection } from "./settings-view/ai-enhancement";
-import { AppearanceSection } from "./settings-view/appearance/appearance-section";
-import { AudioSection } from "./settings-view/audio/audio-section";
-import { KeyboardShortcutsSection } from "./settings-view/keyboard-shortcuts/keyboard-shortcuts-section";
-import { FeatureDefaultsSection } from "./settings-view/feature-defaults/feature-defaults-section";
-import { DangerZoneSection } from "./settings-view/danger-zone/danger-zone-section";
+import { useCliStatus, useSettingsView } from './settings-view/hooks';
+import { NAV_ITEMS } from './settings-view/config/navigation';
+import { SettingsHeader } from './settings-view/components/settings-header';
+import { KeyboardMapDialog } from './settings-view/components/keyboard-map-dialog';
+import { DeleteProjectDialog } from './settings-view/components/delete-project-dialog';
+import { SettingsNavigation } from './settings-view/components/settings-navigation';
+import { ApiKeysSection } from './settings-view/api-keys/api-keys-section';
+import { ClaudeCliStatus } from './settings-view/cli-status/claude-cli-status';
+import { AIEnhancementSection } from './settings-view/ai-enhancement';
+import { AppearanceSection } from './settings-view/appearance/appearance-section';
+import { AudioSection } from './settings-view/audio/audio-section';
+import { KeyboardShortcutsSection } from './settings-view/keyboard-shortcuts/keyboard-shortcuts-section';
+import { FeatureDefaultsSection } from './settings-view/feature-defaults/feature-defaults-section';
+import { DangerZoneSection } from './settings-view/danger-zone/danger-zone-section';
 import type {
   Project as SettingsProject,
   Theme,
-} from "./settings-view/shared/types";
-import type { Project as ElectronProject } from "@/lib/electron";
+} from './settings-view/shared/types';
+import type { Project as ElectronProject } from '@/lib/electron';
 
 export function SettingsView() {
   const {
@@ -90,7 +89,7 @@ export function SettingsView() {
   // Render the active section based on current view
   const renderActiveSection = () => {
     switch (activeView) {
-      case "claude":
+      case 'claude':
         return (
           <ClaudeCliStatus
             status={claudeCliStatus}
@@ -98,9 +97,9 @@ export function SettingsView() {
             onRefresh={handleRefreshClaudeCli}
           />
         );
-      case "ai-enhancement":
+      case 'ai-enhancement':
         return <AIEnhancementSection />;
-      case "appearance":
+      case 'appearance':
         return (
           <AppearanceSection
             effectiveTheme={effectiveTheme}
@@ -108,20 +107,20 @@ export function SettingsView() {
             onThemeChange={handleSetTheme}
           />
         );
-      case "keyboard":
+      case 'keyboard':
         return (
           <KeyboardShortcutsSection
             onOpenKeyboardMap={() => setShowKeyboardMapDialog(true)}
           />
         );
-      case "audio":
+      case 'audio':
         return (
           <AudioSection
             muteDoneSound={muteDoneSound}
             onMuteDoneSoundChange={setMuteDoneSound}
           />
         );
-      case "defaults":
+      case 'defaults':
         return (
           <FeatureDefaultsSection
             showProfilesOnly={showProfilesOnly}
@@ -141,7 +140,7 @@ export function SettingsView() {
             onDefaultAIProfileIdChange={setDefaultAIProfileId}
           />
         );
-      case "danger":
+      case 'danger':
         return (
           <DangerZoneSection
             project={settingsProject}

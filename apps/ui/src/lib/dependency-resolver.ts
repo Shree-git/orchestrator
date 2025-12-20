@@ -5,13 +5,13 @@
  * Uses a modified Kahn's algorithm that respects both dependencies and priorities.
  */
 
-import type { Feature } from "@/store/app-store";
+import type { Feature } from '@/store/app-store';
 
 export interface DependencyResolutionResult {
-  orderedFeatures: Feature[];       // Features in dependency-aware order
+  orderedFeatures: Feature[]; // Features in dependency-aware order
   circularDependencies: string[][]; // Groups of IDs forming cycles
   missingDependencies: Map<string, string[]>; // featureId -> missing dep IDs
-  blockedFeatures: Map<string, string[]>;     // featureId -> blocking dep IDs (incomplete dependencies)
+  blockedFeatures: Map<string, string[]>; // featureId -> blocking dep IDs (incomplete dependencies)
 }
 
 /**
@@ -26,8 +26,10 @@ export interface DependencyResolutionResult {
  * @param features - Array of features to order
  * @returns Resolution result with ordered features and dependency metadata
  */
-export function resolveDependencies(features: Feature[]): DependencyResolutionResult {
-  const featureMap = new Map<string, Feature>(features.map(f => [f.id, f]));
+export function resolveDependencies(
+  features: Feature[]
+): DependencyResolutionResult {
+  const featureMap = new Map<string, Feature>(features.map((f) => [f.id, f]));
   const inDegree = new Map<string, number>();
   const adjacencyList = new Map<string, string[]>(); // dependencyId -> [dependentIds]
   const missingDependencies = new Map<string, string[]>();
@@ -56,7 +58,10 @@ export function resolveDependencies(features: Feature[]): DependencyResolutionRe
 
         // Check if dependency is incomplete (blocking)
         const depFeature = featureMap.get(depId)!;
-        if (depFeature.status !== 'completed' && depFeature.status !== 'verified') {
+        if (
+          depFeature.status !== 'completed' &&
+          depFeature.status !== 'verified'
+        ) {
           if (!blockedFeatures.has(feature.id)) {
             blockedFeatures.set(feature.id, []);
           }
@@ -109,11 +114,11 @@ export function resolveDependencies(features: Feature[]): DependencyResolutionRe
 
   // Detect circular dependencies (features not in output = part of cycle)
   const circularDependencies: string[][] = [];
-  const processedIds = new Set(orderedFeatures.map(f => f.id));
+  const processedIds = new Set(orderedFeatures.map((f) => f.id));
 
   if (orderedFeatures.length < features.length) {
     // Find cycles using DFS
-    const remaining = features.filter(f => !processedIds.has(f.id));
+    const remaining = features.filter((f) => !processedIds.has(f.id));
     const cycles = detectCycles(remaining, featureMap);
     circularDependencies.push(...cycles);
 
@@ -125,7 +130,7 @@ export function resolveDependencies(features: Feature[]): DependencyResolutionRe
     orderedFeatures,
     circularDependencies,
     missingDependencies,
-    blockedFeatures
+    blockedFeatures,
   };
 }
 
@@ -193,8 +198,8 @@ export function areDependenciesSatisfied(
     return true; // No dependencies = always ready
   }
 
-  return feature.dependencies.every(depId => {
-    const dep = allFeatures.find(f => f.id === depId);
+  return feature.dependencies.every((depId) => {
+    const dep = allFeatures.find((f) => f.id === depId);
     return dep && (dep.status === 'completed' || dep.status === 'verified');
   });
 }
@@ -214,8 +219,8 @@ export function getBlockingDependencies(
     return [];
   }
 
-  return feature.dependencies.filter(depId => {
-    const dep = allFeatures.find(f => f.id === depId);
+  return feature.dependencies.filter((depId) => {
+    const dep = allFeatures.find((f) => f.id === depId);
     return dep && dep.status !== 'completed' && dep.status !== 'verified';
   });
 }

@@ -15,7 +15,7 @@ export interface ProviderConfig {
  * Message in conversation history
  */
 export interface ConversationMessage {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string | Array<{ type: string; text?: string; source?: object }>;
 }
 
@@ -39,7 +39,7 @@ export interface ExecuteOptions {
  * Content block in a provider message (matches Claude SDK format)
  */
 export interface ContentBlock {
-  type: "text" | "tool_use" | "thinking" | "tool_result";
+  type: 'text' | 'tool_use' | 'thinking' | 'tool_result';
   text?: string;
   thinking?: string;
   name?: string;
@@ -52,11 +52,11 @@ export interface ContentBlock {
  * Message returned by a provider (matches Claude SDK streaming format)
  */
 export interface ProviderMessage {
-  type: "assistant" | "user" | "error" | "result";
-  subtype?: "success" | "error";
+  type: 'assistant' | 'user' | 'error' | 'result';
+  subtype?: 'success' | 'error';
   session_id?: string;
   message?: {
-    role: "user" | "assistant";
+    role: 'user' | 'assistant';
     content: ContentBlock[];
   };
   result?: string;
@@ -71,7 +71,7 @@ export interface InstallationStatus {
   installed: boolean;
   path?: string;
   version?: string;
-  method?: "cli" | "npm" | "brew" | "sdk";
+  method?: 'cli' | 'npm' | 'brew' | 'sdk';
   hasApiKey?: boolean;
   authenticated?: boolean;
   error?: string;
@@ -99,6 +99,6 @@ export interface ModelDefinition {
   maxOutputTokens?: number;
   supportsVision?: boolean;
   supportsTools?: boolean;
-  tier?: "basic" | "standard" | "premium";
+  tier?: 'basic' | 'standard' | 'premium';
   default?: boolean;
 }

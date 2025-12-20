@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant retro (&:is(.retro *));
@@ -175,9 +175,12 @@
   /* Shadow tokens */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* Transition tokens */
   --transition-fast: 150ms ease;
@@ -201,7 +204,7 @@
     /* Card and popover backgrounds */
     --card: oklch(0.14 0 0);
     --card-foreground: oklch(1 0 0);
-    --popover: oklch(0.10 0 0);
+    --popover: oklch(0.1 0 0);
     --popover-foreground: oklch(1 0 0);
 
     /* Brand colors - purple/violet theme */
@@ -273,9 +276,12 @@
     /* Shadow tokens - darker for dark mode */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-md:
+      0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg:
+      0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl:
+      0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -336,7 +342,6 @@
   --running-indicator-text: oklch(0.6 0.22 265);
 }
 
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -351,19 +356,19 @@
 
   /* Ensure all clickable elements show pointer cursor */
   button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
+  [role='button']:not([aria-disabled='true']),
   a[href],
-  input[type="button"]:not(:disabled),
-  input[type="submit"]:not(:disabled),
-  input[type="reset"]:not(:disabled),
+  input[type='button']:not(:disabled),
+  input[type='submit']:not(:disabled),
+  input[type='reset']:not(:disabled),
   select:not(:disabled),
-  [tabindex]:not([tabindex="-1"]):not(:disabled) {
+  [tabindex]:not([tabindex='-1']):not(:disabled) {
     cursor: pointer;
   }
 
   /* Disabled elements should show not-allowed cursor */
   button:disabled,
-  [role="button"][aria-disabled="true"],
+  [role='button'][aria-disabled='true'],
   input:disabled,
   select:disabled,
   textarea:disabled {
@@ -372,12 +377,44 @@
 }
 
 /* Custom scrollbar for dark themes */
-:is(.dark, .retro, .dracula, .nord, .monokai, .tokyonight, .solarized, .gruvbox, .catppuccin, .onedark, .synthwave, .red, .sunset, .gray) ::-webkit-scrollbar {
+:is(
+    .dark,
+    .retro,
+    .dracula,
+    .nord,
+    .monokai,
+    .tokyonight,
+    .solarized,
+    .gruvbox,
+    .catppuccin,
+    .onedark,
+    .synthwave,
+    .red,
+    .sunset,
+    .gray
+  )
+  ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-:is(.dark, .retro, .dracula, .nord, .monokai, .tokyonight, .solarized, .gruvbox, .catppuccin, .onedark, .synthwave, .red, .sunset, .gray) ::-webkit-scrollbar-track {
+:is(
+    .dark,
+    .retro,
+    .dracula,
+    .nord,
+    .monokai,
+    .tokyonight,
+    .solarized,
+    .gruvbox,
+    .catppuccin,
+    .onedark,
+    .synthwave,
+    .red,
+    .sunset,
+    .gray
+  )
+  ::-webkit-scrollbar-track {
   background: var(--muted);
 }
 
@@ -392,11 +429,11 @@
 
 /* Retro Scrollbar override */
 .retro ::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 0;
+  background: var(--primary);
+  border-radius: 0;
 }
 .retro ::-webkit-scrollbar-track {
-    background: var(--background);
+  background: var(--background);
 }
 
 /* Red theme scrollbar */
@@ -499,11 +536,19 @@
 
   /* Brand gradient utilities */
   .gradient-brand {
-    background: linear-gradient(135deg, oklch(0.55 0.25 265), oklch(0.5 0.28 270));
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.25 265),
+      oklch(0.5 0.28 270)
+    );
   }
 
   .gradient-brand-subtle {
-    background: linear-gradient(135deg, oklch(0.55 0.25 265 / 0.1), oklch(0.5 0.28 270 / 0.1));
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.25 265 / 0.1),
+      oklch(0.5 0.28 270 / 0.1)
+    );
   }
 
   /* Glass morphism background utilities */
@@ -518,8 +563,6 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-  
-  
 
   /* Hover state utilities */
   .hover-glass {
@@ -542,8 +585,6 @@
   .content-bg {
     background: var(--background);
   }
-
-
 
   /* Action button utilities */
   .bg-action-view {
@@ -584,12 +625,19 @@
   }
 
   .bg-running-indicator\/20 {
-    background-color: color-mix(in oklch, var(--running-indicator), transparent 80%);
+    background-color: color-mix(
+      in oklch,
+      var(--running-indicator),
+      transparent 80%
+    );
   }
 
   .shadow-running-indicator\/50 {
-    box-shadow: 0 10px 15px -3px color-mix(in oklch, var(--running-indicator), transparent 50%),
-                0 4px 6px -4px color-mix(in oklch, var(--running-indicator), transparent 50%);
+    box-shadow:
+      0 10px 15px -3px
+        color-mix(in oklch, var(--running-indicator), transparent 50%),
+      0 4px 6px -4px
+        color-mix(in oklch, var(--running-indicator), transparent 50%);
   }
 
   .text-running-indicator {
@@ -632,131 +680,82 @@
 
 /* Retro Overrides for Utilities */
 
-
-
 .retro * {
-    border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 
 /* Animated Outline Button Styles */
 .animated-outline-gradient {
-    /* Default gradient - purple to blue */
-    background: conic-gradient(from 90deg at 50% 50%, #a855f7 0%, #3b82f6 50%, #a855f7 100%);
+  /* Default gradient - purple to blue */
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    #a855f7 0%,
+    #3b82f6 50%,
+    #a855f7 100%
+  );
 }
 
 /* Light mode - deeper purple to blue gradient for better visibility */
 
-
-
 /* Dark mode - purple to blue gradient */
-
-
 
 /* Retro mode - unique scanline + neon effect */
 
 @keyframes retro-glow {
-    from {
-        filter: brightness(1) drop-shadow(0 0 2px #00ff41);
-    }
-    to {
-        filter: brightness(1.2) drop-shadow(0 0 8px #00ff41);
-    }
+  from {
+    filter: brightness(1) drop-shadow(0 0 2px #00ff41);
+  }
+  to {
+    filter: brightness(1.2) drop-shadow(0 0 8px #00ff41);
+  }
 }
-
-
-
 
 /* Dracula animated-outline - purple/pink */
 
-
-
 /* Nord animated-outline - frost blue */
-
-
 
 /* Monokai animated-outline - pink/yellow */
 
-
-
 /* Tokyo Night animated-outline - blue/magenta */
-
-
 
 /* Solarized animated-outline - blue/cyan */
 
-
-
 /* Gruvbox animated-outline - yellow/orange */
-
-
 
 /* Catppuccin animated-outline - mauve/pink */
 
-
-
 /* One Dark animated-outline - blue/magenta */
-
-
 
 /* Synthwave animated-outline - hot pink/cyan with glow */
 
 @keyframes synthwave-glow {
-    from {
-        filter: brightness(1) drop-shadow(0 0 3px #f97e72);
-    }
-    to {
-        filter: brightness(1.3) drop-shadow(0 0 10px #ff7edb);
-    }
+  from {
+    filter: brightness(1) drop-shadow(0 0 3px #f97e72);
+  }
+  to {
+    filter: brightness(1.3) drop-shadow(0 0 10px #ff7edb);
+  }
 }
-
-
 
 /* Slider Theme Styles */
 
-
-
-
-
-
-
-
-
-
 /* Dracula slider */
-
-
 
 /* Nord slider */
 
-
-
 /* Monokai slider */
-
-
 
 /* Tokyo Night slider */
 
-
-
 /* Solarized slider */
-
-
 
 /* Gruvbox slider */
 
-
-
 /* Catppuccin slider */
-
-
 
 /* One Dark slider */
 
-
-
 /* Synthwave slider */
-
-
 
 /* Line clamp utilities for text overflow prevention */
 .line-clamp-2 {
@@ -807,135 +806,27 @@
 
 /* Light theme - professional and readable */
 
-
-
-
-
-
-
-
-
-
 /* Dark theme - high contrast */
-
-
-
-
-
-
-
-
-
 
 /* Retro theme - neon green on black */
 
-
-
-
-
-
-
-
-
-
 /* Dracula theme */
-
-
-
-
-
-
-
-
-
 
 /* Nord theme */
 
-
-
-
-
-
-
-
-
-
 /* Monokai theme */
-
-
-
-
-
-
-
-
-
 
 /* Tokyo Night theme */
 
-
-
-
-
-
-
-
-
-
 /* Solarized theme */
-
-
-
-
-
-
-
-
-
 
 /* Gruvbox theme */
 
-
-
-
-
-
-
-
-
-
 /* Catppuccin theme */
-
-
-
-
-
-
-
-
-
 
 /* One Dark theme */
 
-
-
-
-
-
-
-
-
-
 /* Synthwave theme */
-
-
-
-
-
-
-
-
-
 
 /* XML Editor container styles */
 .xml-editor {

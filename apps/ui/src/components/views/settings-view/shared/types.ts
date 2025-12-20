@@ -18,24 +18,24 @@ export interface CliStatus {
 }
 
 export type Theme =
-  | "dark"
-  | "light"
-  | "retro"
-  | "dracula"
-  | "nord"
-  | "monokai"
-  | "tokyonight"
-  | "solarized"
-  | "gruvbox"
-  | "catppuccin"
-  | "onedark"
-  | "synthwave"
-  | "red"
-  | "cream"
-  | "sunset"
-  | "gray";
+  | 'dark'
+  | 'light'
+  | 'retro'
+  | 'dracula'
+  | 'nord'
+  | 'monokai'
+  | 'tokyonight'
+  | 'solarized'
+  | 'gruvbox'
+  | 'catppuccin'
+  | 'onedark'
+  | 'synthwave'
+  | 'red'
+  | 'cream'
+  | 'sunset'
+  | 'gray';
 
-export type KanbanDetailLevel = "minimal" | "standard" | "detailed";
+export type KanbanDetailLevel = 'minimal' | 'standard' | 'detailed';
 
 export interface Project {
   id: string;

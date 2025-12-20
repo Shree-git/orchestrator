@@ -1,4 +1,4 @@
-import { Sparkles, Clock, Loader2 } from "lucide-react";
+import { Sparkles, Clock, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -6,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { FEATURE_COUNT_OPTIONS } from "../constants";
-import type { CreateSpecDialogProps, FeatureCount } from "../types";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { FEATURE_COUNT_OPTIONS } from '../constants';
+import type { CreateSpecDialogProps, FeatureCount } from '../types';
 
 export function CreateSpecDialog({
   open,
@@ -29,7 +29,7 @@ export function CreateSpecDialog({
   onSkip,
   isCreatingSpec,
   showSkipButton = false,
-  title = "Create App Specification",
+  title = 'Create App Specification',
   description = "We didn't find an app_spec.txt file. Let us help you generate your app_spec.txt to help describe your project for our system. We'll analyze your project's tech stack and create a comprehensive specification.",
 }: CreateSpecDialogProps) {
   const selectedOption = FEATURE_COUNT_OPTIONS.find(
@@ -85,7 +85,7 @@ export function CreateSpecDialog({
               <label
                 htmlFor="create-analyze-project"
                 className={`text-sm font-medium ${
-                  isCreatingSpec ? "" : "cursor-pointer"
+                  isCreatingSpec ? '' : 'cursor-pointer'
                 }`}
               >
                 Analyze current project for additional context
@@ -112,7 +112,7 @@ export function CreateSpecDialog({
               <label
                 htmlFor="create-generate-features"
                 className={`text-sm font-medium ${
-                  isCreatingSpec ? "" : "cursor-pointer"
+                  isCreatingSpec ? '' : 'cursor-pointer'
                 }`}
               >
                 Generate feature list
@@ -134,7 +134,7 @@ export function CreateSpecDialog({
                     key={option.value}
                     type="button"
                     variant={
-                      featureCount === option.value ? "default" : "outline"
+                      featureCount === option.value ? 'default' : 'outline'
                     }
                     size="sm"
                     onClick={() =>
@@ -142,10 +142,10 @@ export function CreateSpecDialog({
                     }
                     disabled={isCreatingSpec}
                     className={cn(
-                      "flex-1 transition-all",
+                      'flex-1 transition-all',
                       featureCount === option.value
-                        ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                        : "bg-muted/30 hover:bg-muted/50 border-border"
+                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                        : 'bg-muted/30 hover:bg-muted/50 border-border'
                     )}
                     data-testid={`feature-count-${option.value}`}
                   >
@@ -180,7 +180,7 @@ export function CreateSpecDialog({
           <HotkeyButton
             onClick={onCreateSpec}
             disabled={!projectOverview.trim() || isCreatingSpec}
-            hotkey={{ key: "Enter", cmdCtrl: true }}
+            hotkey={{ key: 'Enter', cmdCtrl: true }}
             hotkeyActive={open && !isCreatingSpec}
           >
             {isCreatingSpec ? (

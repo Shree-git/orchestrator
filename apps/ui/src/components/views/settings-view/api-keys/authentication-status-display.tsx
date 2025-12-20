@@ -1,12 +1,12 @@
-import { Label } from "@/components/ui/label";
+import { Label } from '@/components/ui/label';
 import {
   CheckCircle2,
   AlertCircle,
   Info,
   Terminal,
   Sparkles,
-} from "lucide-react";
-import type { ClaudeAuthStatus } from "@/store/setup-store";
+} from 'lucide-react';
+import type { ClaudeAuthStatus } from '@/store/setup-store';
 
 interface AuthenticationStatusDisplayProps {
   claudeAuthStatus: ClaudeAuthStatus | null;
@@ -55,19 +55,19 @@ export function AuthenticationStatusDisplay({
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Info className="w-3 h-3 shrink-0" />
                   <span>
-                    {claudeAuthStatus.method === "oauth_token"
-                      ? "Using stored OAuth token (subscription)"
-                      : claudeAuthStatus.method === "api_key_env"
-                      ? "Using ANTHROPIC_API_KEY"
-                      : claudeAuthStatus.method === "api_key"
-                      ? "Using stored API key"
-                      : claudeAuthStatus.method === "credentials_file"
-                      ? "Using credentials file"
-                      : claudeAuthStatus.method === "cli_authenticated"
-                      ? "Using Claude CLI authentication"
-                      : `Using ${
-                          claudeAuthStatus.method || "detected"
-                        } authentication`}
+                    {claudeAuthStatus.method === 'oauth_token'
+                      ? 'Using stored OAuth token (subscription)'
+                      : claudeAuthStatus.method === 'api_key_env'
+                        ? 'Using ANTHROPIC_API_KEY'
+                        : claudeAuthStatus.method === 'api_key'
+                          ? 'Using stored API key'
+                          : claudeAuthStatus.method === 'credentials_file'
+                            ? 'Using credentials file'
+                            : claudeAuthStatus.method === 'cli_authenticated'
+                              ? 'Using Claude CLI authentication'
+                              : `Using ${
+                                  claudeAuthStatus.method || 'detected'
+                                } authentication`}
                   </span>
                 </div>
               </>

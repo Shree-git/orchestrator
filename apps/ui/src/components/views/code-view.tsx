@@ -1,9 +1,8 @@
-
-import { useEffect, useState, useCallback } from "react";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState, useCallback } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   File,
   Folder,
@@ -12,8 +11,8 @@ import {
   ChevronDown,
   RefreshCw,
   Code,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface FileTreeNode {
   name: string;
@@ -24,18 +23,18 @@ interface FileTreeNode {
 }
 
 const IGNORE_PATTERNS = [
-  "node_modules",
-  ".git",
-  ".next",
-  "dist",
-  "build",
-  ".DS_Store",
-  "*.log",
+  'node_modules',
+  '.git',
+  '.next',
+  'dist',
+  'build',
+  '.DS_Store',
+  '*.log',
 ];
 
 const shouldIgnore = (name: string) => {
   return IGNORE_PATTERNS.some((pattern) => {
-    if (pattern.startsWith("*")) {
+    if (pattern.startsWith('*')) {
       return name.endsWith(pattern.slice(1));
     }
     return name === pattern;
@@ -46,7 +45,7 @@ export function CodeView() {
   const { currentProject } = useAppStore();
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [fileContent, setFileContent] = useState<string>("");
+  const [fileContent, setFileContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set()
@@ -79,7 +78,7 @@ export function CodeView() {
         setFileTree(entries);
       }
     } catch (error) {
-      console.error("Failed to load file tree:", error);
+      console.error('Failed to load file tree:', error);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +109,7 @@ export function CodeView() {
           }));
       }
     } catch (error) {
-      console.error("Failed to load subdirectory:", error);
+      console.error('Failed to load subdirectory:', error);
     }
     return [];
   };
@@ -126,7 +125,7 @@ export function CodeView() {
         setSelectedFile(path);
       }
     } catch (error) {
-      console.error("Failed to load file:", error);
+      console.error('Failed to load file:', error);
     }
   };
 
@@ -170,8 +169,8 @@ export function CodeView() {
       <div key={node.path}>
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-muted/50",
-            isSelected && "bg-muted"
+            'flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-muted/50',
+            isSelected && 'bg-muted'
           )}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
           onClick={() => {
@@ -275,7 +274,7 @@ export function CodeView() {
             <div className="h-full flex flex-col">
               <div className="px-4 py-2 border-b bg-muted/30">
                 <p className="text-sm font-mono text-muted-foreground truncate">
-                  {selectedFile.replace(currentProject.path, "")}
+                  {selectedFile.replace(currentProject.path, '')}
                 </p>
               </div>
               <Card className="flex-1 m-4 overflow-hidden">

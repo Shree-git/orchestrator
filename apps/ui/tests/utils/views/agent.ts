@@ -1,5 +1,5 @@
-import { Page, Locator } from "@playwright/test";
-import { waitForElement } from "../core/waiting";
+import { Page, Locator } from '@playwright/test';
+import { waitForElement } from '../core/waiting';
 
 /**
  * Get the session list element
@@ -61,7 +61,7 @@ export async function waitForNoSessionPlaceholder(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "no-session-placeholder", options);
+  return await waitForElement(page, 'no-session-placeholder', options);
 }
 
 /**
@@ -93,6 +93,6 @@ export async function waitForNewSession(
   const sessionItem = page.locator('[data-testid^="session-item-"]').first();
   await sessionItem.waitFor({
     timeout: options?.timeout ?? 5000,
-    state: "visible",
+    state: 'visible',
   });
 }

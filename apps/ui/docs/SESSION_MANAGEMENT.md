@@ -7,24 +7,28 @@ The Automaker Agent Chat now supports multiple concurrent sessions, allowing you
 ## Features
 
 ### ✨ Multiple Sessions
+
 - Create unlimited agent sessions per project
 - Each session has its own conversation history
 - Switch between sessions instantly
 - Sessions persist across app restarts
 
 ### 📋 Session Organization
+
 - Custom names for easy identification
 - Last message preview
 - Message count tracking
 - Sort by most recently updated
 
 ### 🗄️ Archive & Delete
+
 - Archive old sessions to declutter
 - Unarchive when needed
 - Permanently delete sessions
 - Confirm before destructive actions
 
 ### 💾 Automatic Persistence
+
 - All sessions auto-save to disk
 - Survive Next.js restarts
 - Survive Electron app restarts
@@ -67,6 +71,7 @@ Click the panel icon in the header to show/hide the session manager.
 4. The new session is immediately active
 
 **Example session names:**
+
 - "Feature: Dark Mode"
 - "Bug: Login redirect"
 - "Refactor: API layer"
@@ -93,6 +98,7 @@ Click the **"Clear"** button in the chat header to delete all messages from the 
 3. Toggle **"Show Archived"** to view archived sessions
 
 **When to archive:**
+
 - Completed features
 - Resolved bugs
 - Old experiments
@@ -117,16 +123,19 @@ Click the **"Clear"** button in the chat header to delete all messages from the 
 Sessions are stored in your user data directory:
 
 **macOS:**
+
 ```
 ~/Library/Application Support/automaker/agent-sessions/
 ```
 
 **Windows:**
+
 ```
 %APPDATA%/automaker/agent-sessions/
 ```
 
 **Linux:**
+
 ```
 ~/.config/automaker/agent-sessions/
 ```
@@ -215,12 +224,14 @@ Use prefixes to organize sessions by type:
 ### When to Create Multiple Sessions
 
 **Do create separate sessions for:**
+
 - ✅ Different features
 - ✅ Unrelated bugs
 - ✅ Experimental work
 - ✅ Different contexts or approaches
 
 **Don't create separate sessions for:**
+
 - ❌ Same feature, different iterations
 - ❌ Related bug fixes
 - ❌ Continuation of previous work
@@ -272,7 +283,7 @@ Use prefixes to organize sessions by type:
 
 ## Keyboard Shortcuts
 
-*(Coming soon)*
+_(Coming soon)_
 
 - `Cmd/Ctrl + K` - Create new session
 - `Cmd/Ctrl + [` - Previous session
@@ -284,11 +295,13 @@ Use prefixes to organize sessions by type:
 ### Session Not Saving
 
 **Check:**
+
 - Electron has write permissions
 - Disk space available
 - Check Electron console for errors
 
 **Solution:**
+
 ```bash
 # macOS - Check permissions
 ls -la ~/Library/Application\ Support/automaker/
@@ -300,11 +313,13 @@ chmod -R u+w ~/Library/Application\ Support/automaker/
 ### Can't Switch Sessions
 
 **Check:**
+
 - Session is not archived
 - No errors in console
 - Agent is not currently processing
 
 **Solution:**
+
 - Wait for current message to complete
 - Check for error messages
 - Try clearing and reloading
@@ -312,11 +327,13 @@ chmod -R u+w ~/Library/Application\ Support/automaker/
 ### Session Disappeared
 
 **Check:**
+
 - Not filtered by archive status
 - Not accidentally deleted
 - Check backup files
 
 **Recovery:**
+
 - Toggle "Show Archived"
 - Check filesystem for `.json` files
 - Restore from backup if available
@@ -326,15 +343,17 @@ chmod -R u+w ~/Library/Application\ Support/automaker/
 For developers integrating session management:
 
 ### Create Session
+
 ```typescript
 const result = await window.electronAPI.sessions.create(
-  "Session Name",
-  "/project/path",
-  "/working/directory"
+  'Session Name',
+  '/project/path',
+  '/working/directory'
 );
 ```
 
 ### List Sessions
+
 ```typescript
 const { sessions } = await window.electronAPI.sessions.list(
   false // includeArchived
@@ -342,21 +361,23 @@ const { sessions } = await window.electronAPI.sessions.list(
 ```
 
 ### Update Session
+
 ```typescript
-await window.electronAPI.sessions.update(
-  sessionId,
-  "New Name",
-  ["tag1", "tag2"]
-);
+await window.electronAPI.sessions.update(sessionId, 'New Name', [
+  'tag1',
+  'tag2',
+]);
 ```
 
 ### Archive/Unarchive
+
 ```typescript
 await window.electronAPI.sessions.archive(sessionId);
 await window.electronAPI.sessions.unarchive(sessionId);
 ```
 
 ### Delete Session
+
 ```typescript
 await window.electronAPI.sessions.delete(sessionId);
 ```

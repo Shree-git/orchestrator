@@ -4,29 +4,29 @@
 
 // Theme modes (matching UI ThemeMode type)
 export type ThemeMode =
-  | "light"
-  | "dark"
-  | "system"
-  | "retro"
-  | "dracula"
-  | "nord"
-  | "monokai"
-  | "tokyonight"
-  | "solarized"
-  | "gruvbox"
-  | "catppuccin"
-  | "onedark"
-  | "synthwave"
-  | "red"
-  | "cream"
-  | "sunset"
-  | "gray";
+  | 'light'
+  | 'dark'
+  | 'system'
+  | 'retro'
+  | 'dracula'
+  | 'nord'
+  | 'monokai'
+  | 'tokyonight'
+  | 'solarized'
+  | 'gruvbox'
+  | 'catppuccin'
+  | 'onedark'
+  | 'synthwave'
+  | 'red'
+  | 'cream'
+  | 'sunset'
+  | 'gray';
 
-export type KanbanCardDetailLevel = "minimal" | "standard" | "detailed";
-export type AgentModel = "opus" | "sonnet" | "haiku";
-export type PlanningMode = "skip" | "lite" | "spec" | "full";
-export type ThinkingLevel = "none" | "low" | "medium" | "high" | "ultrathink";
-export type ModelProvider = "claude";
+export type KanbanCardDetailLevel = 'minimal' | 'standard' | 'detailed';
+export type AgentModel = 'opus' | 'sonnet' | 'haiku';
+export type PlanningMode = 'skip' | 'lite' | 'spec' | 'full';
+export type ThinkingLevel = 'none' | 'low' | 'medium' | 'high' | 'ultrathink';
+export type ModelProvider = 'claude';
 
 // Keyboard Shortcuts
 export interface KeyboardShortcuts {
@@ -201,44 +201,44 @@ export interface ProjectSettings {
 
 // Default values
 export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
-  board: "K",
-  agent: "A",
-  spec: "D",
-  context: "C",
-  settings: "S",
-  profiles: "M",
-  terminal: "T",
-  toggleSidebar: "`",
-  addFeature: "N",
-  addContextFile: "N",
-  startNext: "G",
-  newSession: "N",
-  openProject: "O",
-  projectPicker: "P",
-  cyclePrevProject: "Q",
-  cycleNextProject: "E",
-  addProfile: "N",
-  splitTerminalRight: "Alt+D",
-  splitTerminalDown: "Alt+S",
-  closeTerminal: "Alt+W",
+  board: 'K',
+  agent: 'A',
+  spec: 'D',
+  context: 'C',
+  settings: 'S',
+  profiles: 'M',
+  terminal: 'T',
+  toggleSidebar: '`',
+  addFeature: 'N',
+  addContextFile: 'N',
+  startNext: 'G',
+  newSession: 'N',
+  openProject: 'O',
+  projectPicker: 'P',
+  cyclePrevProject: 'Q',
+  cycleNextProject: 'E',
+  addProfile: 'N',
+  splitTerminalRight: 'Alt+D',
+  splitTerminalDown: 'Alt+S',
+  closeTerminal: 'Alt+W',
 };
 
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   version: 1,
-  theme: "dark",
+  theme: 'dark',
   sidebarOpen: true,
   chatHistoryOpen: false,
-  kanbanCardDetailLevel: "standard",
+  kanbanCardDetailLevel: 'standard',
   maxConcurrency: 3,
   defaultSkipTests: true,
   enableDependencyBlocking: true,
   useWorktrees: false,
   showProfilesOnly: false,
-  defaultPlanningMode: "skip",
+  defaultPlanningMode: 'skip',
   defaultRequirePlanApproval: false,
   defaultAIProfileId: null,
   muteDoneSound: false,
-  enhancementModel: "sonnet",
+  enhancementModel: 'sonnet',
   keyboardShortcuts: DEFAULT_KEYBOARD_SHORTCUTS,
   aiProfiles: [],
   projects: [],
@@ -254,9 +254,9 @@ export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
 export const DEFAULT_CREDENTIALS: Credentials = {
   version: 1,
   apiKeys: {
-    anthropic: "",
-    google: "",
-    openai: "",
+    anthropic: '',
+    google: '',
+    openai: '',
   },
 };
 

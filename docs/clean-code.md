@@ -24,10 +24,10 @@ This document serves as a comprehensive guide for writing clean, maintainable, a
 
 ```typescript
 // Repeated validation logic
-if (email.includes("@") && email.length > 5) {
+if (email.includes('@') && email.length > 5) {
   // ...
 }
-if (email.includes("@") && email.length > 5) {
+if (email.includes('@') && email.length > 5) {
   // ...
 }
 ```
@@ -36,7 +36,7 @@ if (email.includes("@") && email.length > 5) {
 
 ```typescript
 function isValidEmail(email: string): boolean {
-  return email.includes("@") && email.length > 5;
+  return email.includes('@') && email.length > 5;
 }
 
 if (isValidEmail(email)) {
@@ -101,8 +101,8 @@ function calculateUserTotal(userId: string) {
 ```typescript
 function processPayment(amount: number, cardNumber: string, cvv: string) {
   // Direct implementation tied to specific payment processor
-  fetch("https://stripe.com/api/charge", {
-    method: "POST",
+  fetch('https://stripe.com/api/charge', {
+    method: 'POST',
     body: JSON.stringify({ amount, cardNumber, cvv }),
   });
 }
@@ -156,9 +156,9 @@ function processPayment(
 
 ```typescript
 function sendNotification(user: User, type: string) {
-  if (type === "email") {
+  if (type === 'email') {
     sendEmail(user.email);
-  } else if (type === "sms") {
+  } else if (type === 'sms') {
     sendSMS(user.phone);
   }
   // Adding new notification types requires modifying this function
@@ -219,7 +219,7 @@ setTimeout(() => {
   // What does 3000 mean?
 }, 3000);
 
-if (status === "active") {
+if (status === 'active') {
   // What are the valid statuses?
 }
 ```
@@ -231,9 +231,9 @@ const MINIMUM_AGE_FOR_ADULTS = 18;
 const SESSION_TIMEOUT_MS = 3000;
 
 enum UserStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  SUSPENDED = "suspended",
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
 }
 
 if (user.age >= MINIMUM_AGE_FOR_ADULTS) {
@@ -340,7 +340,7 @@ function divide(a: number, b: number) {
 // Good
 function divide(a: number, b: number): number {
   if (b === 0) {
-    throw new Error("Division by zero is not allowed");
+    throw new Error('Division by zero is not allowed');
   }
   return a / b;
 }
@@ -418,7 +418,7 @@ function processUser(user: User): string {
 
 ```typescript
 // Bad
-const apiUrl = "https://api.example.com";
+const apiUrl = 'https://api.example.com';
 const timeout = 5000;
 
 // Good
@@ -429,9 +429,9 @@ interface Config {
 }
 
 const config: Config = {
-  apiUrl: process.env.API_URL || "https://api.example.com",
-  timeout: parseInt(process.env.TIMEOUT || "5000"),
-  maxRetries: parseInt(process.env.MAX_RETRIES || "3"),
+  apiUrl: process.env.API_URL || 'https://api.example.com',
+  timeout: parseInt(process.env.TIMEOUT || '5000'),
+  maxRetries: parseInt(process.env.MAX_RETRIES || '3'),
 };
 ```
 

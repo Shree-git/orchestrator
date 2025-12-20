@@ -5,17 +5,17 @@
  * Creates the necessary test fixture directories and files before running Playwright tests
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import { fileURLToPath } from "url";
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Resolve workspace root (apps/ui/scripts -> workspace root)
-const WORKSPACE_ROOT = path.resolve(__dirname, "../../..");
-const FIXTURE_PATH = path.join(WORKSPACE_ROOT, "test/fixtures/projectA");
-const SPEC_FILE_PATH = path.join(FIXTURE_PATH, ".automaker/app_spec.txt");
+const WORKSPACE_ROOT = path.resolve(__dirname, '../../..');
+const FIXTURE_PATH = path.join(WORKSPACE_ROOT, 'test/fixtures/projectA');
+const SPEC_FILE_PATH = path.join(FIXTURE_PATH, '.automaker/app_spec.txt');
 
 const SPEC_CONTENT = `<app_spec>
   <name>Test Project A</name>
@@ -28,7 +28,7 @@ const SPEC_CONTENT = `<app_spec>
 `;
 
 function setupFixtures() {
-  console.log("Setting up E2E test fixtures...");
+  console.log('Setting up E2E test fixtures...');
   console.log(`Workspace root: ${WORKSPACE_ROOT}`);
   console.log(`Fixture path: ${FIXTURE_PATH}`);
 
@@ -43,7 +43,7 @@ function setupFixtures() {
   fs.writeFileSync(SPEC_FILE_PATH, SPEC_CONTENT);
   console.log(`Created fixture file: ${SPEC_FILE_PATH}`);
 
-  console.log("E2E test fixtures setup complete!");
+  console.log('E2E test fixtures setup complete!');
 }
 
 setupFixtures();

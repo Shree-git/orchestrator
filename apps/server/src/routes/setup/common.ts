@@ -2,15 +2,15 @@
  * Common utilities and state for setup routes
  */
 
-import { createLogger } from "../../lib/logger.js";
-import path from "path";
-import fs from "fs/promises";
+import { createLogger } from '../../lib/logger.js';
+import path from 'path';
+import fs from 'fs/promises';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
-const logger = createLogger("Setup");
+const logger = createLogger('Setup');
 
 // Storage for API keys (in-memory cache) - private
 const apiKeys: Record<string, string> = {};
@@ -43,18 +43,18 @@ export async function persistApiKeyToEnv(
   key: string,
   value: string
 ): Promise<void> {
-  const envPath = path.join(process.cwd(), ".env");
+  const envPath = path.join(process.cwd(), '.env');
 
   try {
-    let envContent = "";
+    let envContent = '';
     try {
-      envContent = await fs.readFile(envPath, "utf-8");
+      envContent = await fs.readFile(envPath, 'utf-8');
     } catch {
       // .env file doesn't exist, we'll create it
     }
 
     // Parse existing env content
-    const lines = envContent.split("\n");
+    const lines = envContent.split('\n');
     const keyRegex = new RegExp(`^${key}=`);
     let found = false;
     const newLines = lines.map((line) => {
@@ -70,7 +70,7 @@ export async function persistApiKeyToEnv(
       newLines.push(`${key}=${value}`);
     }
 
-    await fs.writeFile(envPath, newLines.join("\n"));
+    await fs.writeFile(envPath, newLines.join('\n'));
     logger.info(`[Setup] Persisted ${key} to .env file`);
   } catch (error) {
     logger.error(`[Setup] Failed to persist ${key} to .env:`, error);

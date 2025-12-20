@@ -1,22 +1,20 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { createCreateHandler } from "@/routes/worktree/routes/create.js";
-import { AUTOMAKER_INITIAL_COMMIT_MESSAGE } from "@/routes/worktree/common.js";
-import { exec } from "child_process";
-import { promisify } from "util";
-import * as fs from "fs/promises";
-import * as os from "os";
-import * as path from "path";
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { createCreateHandler } from '@/routes/worktree/routes/create.js';
+import { AUTOMAKER_INITIAL_COMMIT_MESSAGE } from '@/routes/worktree/common.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
 
 const execAsync = promisify(exec);
 
-describe("worktree create route - repositories without commits", () => {
+describe('worktree create route - repositories without commits', () => {
   let repoPath: string | null = null;
 
   async function initRepoWithoutCommit() {
-    repoPath = await fs.mkdtemp(
-      path.join(os.tmpdir(), "automaker-no-commit-")
-    );
-    await execAsync("git init", { cwd: repoPath });
+    repoPath = await fs.mkdtemp(path.join(os.tmpdir(), 'automaker-no-commit-'));
+    await execAsync('git init', { cwd: repoPath });
     await execAsync('git config user.email "test@example.com"', {
       cwd: repoPath,
     });
@@ -32,14 +30,14 @@ describe("worktree create route - repositories without commits", () => {
     repoPath = null;
   });
 
-  it("creates an initial commit before adding a worktree when HEAD is missing", async () => {
+  it('creates an initial commit before adding a worktree when HEAD is missing', async () => {
     await initRepoWithoutCommit();
     const handler = createCreateHandler();
 
     const json = vi.fn();
     const status = vi.fn().mockReturnThis();
     const req = {
-      body: { projectPath: repoPath, branchName: "feature/no-head" },
+      body: { projectPath: repoPath, branchName: 'feature/no-head' },
     } as any;
     const res = {
       json,
@@ -54,16 +52,15 @@ describe("worktree create route - repositories without commits", () => {
     expect(payload.success).toBe(true);
 
     const { stdout: commitCount } = await execAsync(
-      "git rev-list --count HEAD",
+      'git rev-list --count HEAD',
       { cwd: repoPath! }
     );
     expect(Number(commitCount.trim())).toBeGreaterThan(0);
 
     const { stdout: latestMessage } = await execAsync(
-      "git log -1 --pretty=%B",
+      'git log -1 --pretty=%B',
       { cwd: repoPath! }
     );
     expect(latestMessage.trim()).toBe(AUTOMAKER_INITIAL_COMMIT_MESSAGE);
   });
 });
-

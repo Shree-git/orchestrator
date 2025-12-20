@@ -1,11 +1,12 @@
-
-import { useState, useCallback } from "react";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
-import type { WorktreeInfo } from "../types";
+import { useState, useCallback } from 'react';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
+import type { WorktreeInfo } from '../types';
 
 interface UseWorktreeActionsOptions {
-  fetchWorktrees: () => Promise<Array<{ path: string; branch: string }> | undefined>;
+  fetchWorktrees: () => Promise<
+    Array<{ path: string; branch: string }> | undefined
+  >;
   fetchBranches: (worktreePath: string) => Promise<void>;
 }
 
@@ -25,19 +26,22 @@ export function useWorktreeActions({
       try {
         const api = getElectronAPI();
         if (!api?.worktree?.switchBranch) {
-          toast.error("Switch branch API not available");
+          toast.error('Switch branch API not available');
           return;
         }
-        const result = await api.worktree.switchBranch(worktree.path, branchName);
+        const result = await api.worktree.switchBranch(
+          worktree.path,
+          branchName
+        );
         if (result.success && result.result) {
           toast.success(result.result.message);
           fetchWorktrees();
         } else {
-          toast.error(result.error || "Failed to switch branch");
+          toast.error(result.error || 'Failed to switch branch');
         }
       } catch (error) {
-        console.error("Switch branch failed:", error);
-        toast.error("Failed to switch branch");
+        console.error('Switch branch failed:', error);
+        toast.error('Failed to switch branch');
       } finally {
         setIsSwitching(false);
       }
@@ -52,7 +56,7 @@ export function useWorktreeActions({
       try {
         const api = getElectronAPI();
         if (!api?.worktree?.pull) {
-          toast.error("Pull API not available");
+          toast.error('Pull API not available');
           return;
         }
         const result = await api.worktree.pull(worktree.path);
@@ -60,11 +64,11 @@ export function useWorktreeActions({
           toast.success(result.result.message);
           fetchWorktrees();
         } else {
-          toast.error(result.error || "Failed to pull latest changes");
+          toast.error(result.error || 'Failed to pull latest changes');
         }
       } catch (error) {
-        console.error("Pull failed:", error);
-        toast.error("Failed to pull latest changes");
+        console.error('Pull failed:', error);
+        toast.error('Failed to pull latest changes');
       } finally {
         setIsPulling(false);
       }
@@ -79,7 +83,7 @@ export function useWorktreeActions({
       try {
         const api = getElectronAPI();
         if (!api?.worktree?.push) {
-          toast.error("Push API not available");
+          toast.error('Push API not available');
           return;
         }
         const result = await api.worktree.push(worktree.path);
@@ -88,11 +92,11 @@ export function useWorktreeActions({
           fetchBranches(worktree.path);
           fetchWorktrees();
         } else {
-          toast.error(result.error || "Failed to push changes");
+          toast.error(result.error || 'Failed to push changes');
         }
       } catch (error) {
-        console.error("Push failed:", error);
-        toast.error("Failed to push changes");
+        console.error('Push failed:', error);
+        toast.error('Failed to push changes');
       } finally {
         setIsPushing(false);
       }
@@ -104,7 +108,7 @@ export function useWorktreeActions({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.openInEditor) {
-        console.warn("Open in editor API not available");
+        console.warn('Open in editor API not available');
         return;
       }
       const result = await api.worktree.openInEditor(worktree.path);
@@ -114,7 +118,7 @@ export function useWorktreeActions({
         toast.error(result.error);
       }
     } catch (error) {
-      console.error("Open in editor failed:", error);
+      console.error('Open in editor failed:', error);
     }
   }, []);
 

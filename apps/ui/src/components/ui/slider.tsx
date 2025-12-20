@@ -1,36 +1,42 @@
-
-import * as React from "react";
-import * as SliderPrimitive from "@radix-ui/react-slider";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import * as SliderPrimitive from '@radix-ui/react-slider';
+import { cn } from '@/lib/utils';
 
 // Type-safe wrappers for Radix UI primitives (React 19 compatibility)
-const SliderRootPrimitive = SliderPrimitive.Root as React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
-    children?: React.ReactNode;
-    className?: string;
-  } & React.RefAttributes<HTMLSpanElement>
->;
+const SliderRootPrimitive =
+  SliderPrimitive.Root as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
+      children?: React.ReactNode;
+      className?: string;
+    } & React.RefAttributes<HTMLSpanElement>
+  >;
 
-const SliderTrackPrimitive = SliderPrimitive.Track as React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Track> & {
-    children?: React.ReactNode;
-    className?: string;
-  } & React.RefAttributes<HTMLSpanElement>
->;
+const SliderTrackPrimitive =
+  SliderPrimitive.Track as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof SliderPrimitive.Track> & {
+      children?: React.ReactNode;
+      className?: string;
+    } & React.RefAttributes<HTMLSpanElement>
+  >;
 
-const SliderRangePrimitive = SliderPrimitive.Range as React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Range> & {
-    className?: string;
-  } & React.RefAttributes<HTMLSpanElement>
->;
+const SliderRangePrimitive =
+  SliderPrimitive.Range as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof SliderPrimitive.Range> & {
+      className?: string;
+    } & React.RefAttributes<HTMLSpanElement>
+  >;
 
-const SliderThumbPrimitive = SliderPrimitive.Thumb as React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Thumb> & {
-    className?: string;
-  } & React.RefAttributes<HTMLSpanElement>
->;
+const SliderThumbPrimitive =
+  SliderPrimitive.Thumb as React.ForwardRefExoticComponent<
+    React.ComponentPropsWithoutRef<typeof SliderPrimitive.Thumb> & {
+      className?: string;
+    } & React.RefAttributes<HTMLSpanElement>
+  >;
 
-interface SliderProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "defaultValue" | "dir"> {
+interface SliderProps extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  'defaultValue' | 'dir'
+> {
   value?: number[];
   defaultValue?: number[];
   onValueChange?: (value: number[]) => void;
@@ -39,8 +45,8 @@ interface SliderProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "defau
   max?: number;
   step?: number;
   disabled?: boolean;
-  orientation?: "horizontal" | "vertical";
-  dir?: "ltr" | "rtl";
+  orientation?: 'horizontal' | 'vertical';
+  dir?: 'ltr' | 'rtl';
   inverted?: boolean;
   minStepsBetweenThumbs?: number;
 }
@@ -50,7 +56,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
     <SliderRootPrimitive
       ref={ref}
       className={cn(
-        "relative flex w-full touch-none select-none items-center",
+        'relative flex w-full touch-none select-none items-center',
         className
       )}
       {...props}

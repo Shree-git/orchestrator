@@ -1,25 +1,18 @@
-import { RefreshCw } from "lucide-react";
-import { useAppStore } from "@/store/app-store";
+import { RefreshCw } from 'lucide-react';
+import { useAppStore } from '@/store/app-store';
 
 // Extracted hooks
 import {
   useSpecLoading,
   useSpecSave,
   useSpecGeneration,
-} from "./spec-view/hooks";
+} from './spec-view/hooks';
 
 // Extracted components
-import {
-  SpecHeader,
-  SpecEditor,
-  SpecEmptyState,
-} from "./spec-view/components";
+import { SpecHeader, SpecEditor, SpecEmptyState } from './spec-view/components';
 
 // Extracted dialogs
-import {
-  CreateSpecDialog,
-  RegenerateSpecDialog,
-} from "./spec-view/dialogs";
+import { CreateSpecDialog, RegenerateSpecDialog } from './spec-view/dialogs';
 
 export function SpecView() {
   const { currentProject, appSpec } = useAppStore();

@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,10 +6,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Folder, Loader2, FolderOpen, AlertCircle } from "lucide-react";
-import { getHttpApiClient } from "@/lib/http-api-client";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Folder, Loader2, FolderOpen, AlertCircle } from 'lucide-react';
+import { getHttpApiClient } from '@/lib/http-api-client';
 
 interface WorkspaceDirectory {
   name: string;
@@ -43,10 +42,12 @@ export function WorkspacePickerModal({
       if (result.success && result.directories) {
         setDirectories(result.directories);
       } else {
-        setError(result.error || "Failed to load directories");
+        setError(result.error || 'Failed to load directories');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load directories");
+      setError(
+        err instanceof Error ? err.message : 'Failed to load directories'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +81,9 @@ export function WorkspacePickerModal({
           {isLoading && (
             <div className="flex flex-col items-center justify-center h-full gap-3">
               <Loader2 className="w-8 h-8 text-brand-500 animate-spin" />
-              <p className="text-sm text-muted-foreground">Loading projects...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading projects...
+              </p>
             </div>
           )}
 

@@ -1,6 +1,5 @@
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,16 +7,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   GitBranch,
   RefreshCw,
   GitBranchPlus,
   Check,
   Search,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { WorktreeInfo, BranchInfo } from "../types";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { WorktreeInfo, BranchInfo } from '../types';
 
 interface BranchSwitchDropdownProps {
   worktree: WorktreeInfo;
@@ -49,12 +48,12 @@ export function BranchSwitchDropdown({
     <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant={isSelected ? "default" : "outline"}
+          variant={isSelected ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            "h-7 w-7 p-0 rounded-none border-r-0",
-            isSelected && "bg-primary text-primary-foreground",
-            !isSelected && "bg-secondary/50 hover:bg-secondary"
+            'h-7 w-7 p-0 rounded-none border-r-0',
+            isSelected && 'bg-primary text-primary-foreground',
+            !isSelected && 'bg-secondary/50 hover:bg-secondary'
           )}
           title="Switch branch"
         >
@@ -88,7 +87,7 @@ export function BranchSwitchDropdown({
             </DropdownMenuItem>
           ) : filteredBranches.length === 0 ? (
             <DropdownMenuItem disabled className="text-xs">
-              {branchFilter ? "No matching branches" : "No branches found"}
+              {branchFilter ? 'No matching branches' : 'No branches found'}
             </DropdownMenuItem>
           ) : (
             filteredBranches.map((branch) => (

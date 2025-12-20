@@ -5,12 +5,12 @@
  * can switch between branches even after worktrees are removed.
  */
 
-import { readFile, writeFile } from "fs/promises";
-import path from "path";
+import { readFile, writeFile } from 'fs/promises';
+import path from 'path';
 import {
   getBranchTrackingPath,
   ensureAutomakerDir,
-} from "../../../lib/automaker-paths.js";
+} from '../../../lib/automaker-paths.js';
 
 export interface TrackedBranch {
   name: string;
@@ -30,14 +30,14 @@ export async function getTrackedBranches(
 ): Promise<TrackedBranch[]> {
   try {
     const filePath = getBranchTrackingPath(projectPath);
-    const content = await readFile(filePath, "utf-8");
+    const content = await readFile(filePath, 'utf-8');
     const data: BranchTrackingData = JSON.parse(content);
     return data.branches || [];
   } catch (error: any) {
-    if (error.code === "ENOENT") {
+    if (error.code === 'ENOENT') {
       return [];
     }
-    console.warn("[branch-tracking] Failed to read tracked branches:", error);
+    console.warn('[branch-tracking] Failed to read tracked branches:', error);
     return [];
   }
 }
@@ -50,9 +50,9 @@ async function saveTrackedBranches(
   branches: TrackedBranch[]
 ): Promise<void> {
   const automakerDir = await ensureAutomakerDir(projectPath);
-  const filePath = path.join(automakerDir, "active-branches.json");
+  const filePath = path.join(automakerDir, 'active-branches.json');
   const data: BranchTrackingData = { branches };
-  await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  await writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 /**

@@ -1,6 +1,6 @@
-import { Page, Locator } from "@playwright/test";
-import { clickElement } from "../core/interactions";
-import { waitForElement, waitForElementHidden } from "../core/waiting";
+import { Page, Locator } from '@playwright/test';
+import { clickElement } from '../core/interactions';
+import { waitForElement, waitForElementHidden } from '../core/waiting';
 
 /**
  * Check if the add feature dialog is visible
@@ -33,7 +33,7 @@ export async function waitForEditFeatureDialog(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "edit-feature-dialog", options);
+  return await waitForElement(page, 'edit-feature-dialog', options);
 }
 
 /**
@@ -53,7 +53,7 @@ export async function isEditFeatureDescriptionTextarea(
 ): Promise<boolean> {
   const element = page.locator('[data-testid="edit-feature-description"]');
   const tagName = await element.evaluate((el) => el.tagName.toLowerCase());
-  return tagName === "textarea";
+  return tagName === 'textarea';
 }
 
 /**
@@ -82,7 +82,7 @@ export async function fillEditFeatureDescription(
  * Click the confirm edit feature button
  */
 export async function confirmEditFeature(page: Page): Promise<void> {
-  await clickElement(page, "confirm-edit-feature");
+  await clickElement(page, 'confirm-edit-feature');
 }
 
 /**
@@ -111,7 +111,7 @@ export async function waitForDeleteConfirmationDialog(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "delete-confirmation-dialog", options);
+  return await waitForElement(page, 'delete-confirmation-dialog', options);
 }
 
 /**
@@ -121,21 +121,21 @@ export async function waitForDeleteConfirmationDialogHidden(
   page: Page,
   options?: { timeout?: number }
 ): Promise<void> {
-  await waitForElementHidden(page, "delete-confirmation-dialog", options);
+  await waitForElementHidden(page, 'delete-confirmation-dialog', options);
 }
 
 /**
  * Click the confirm delete button in the delete confirmation dialog
  */
 export async function clickConfirmDeleteButton(page: Page): Promise<void> {
-  await clickElement(page, "confirm-delete-button");
+  await clickElement(page, 'confirm-delete-button');
 }
 
 /**
  * Click the cancel delete button in the delete confirmation dialog
  */
 export async function clickCancelDeleteButton(page: Page): Promise<void> {
-  await clickElement(page, "cancel-delete-button");
+  await clickElement(page, 'cancel-delete-button');
 }
 
 /**
@@ -153,7 +153,7 @@ export async function waitForFollowUpDialog(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "follow-up-dialog", options);
+  return await waitForElement(page, 'follow-up-dialog', options);
 }
 
 /**
@@ -163,14 +163,14 @@ export async function waitForFollowUpDialogHidden(
   page: Page,
   options?: { timeout?: number }
 ): Promise<void> {
-  await waitForElementHidden(page, "follow-up-dialog", options);
+  await waitForElementHidden(page, 'follow-up-dialog', options);
 }
 
 /**
  * Click the confirm follow-up button in the follow-up dialog
  */
 export async function clickConfirmFollowUp(page: Page): Promise<void> {
-  await clickElement(page, "confirm-follow-up");
+  await clickElement(page, 'confirm-follow-up');
 }
 
 /**
@@ -188,7 +188,7 @@ export async function waitForProjectInitDialog(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "project-init-dialog", options);
+  return await waitForElement(page, 'project-init-dialog', options);
 }
 
 /**

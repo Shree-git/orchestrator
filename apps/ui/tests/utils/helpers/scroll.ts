@@ -1,4 +1,4 @@
-import { Locator } from "@playwright/test";
+import { Locator } from '@playwright/test';
 
 /**
  * Check if an element is scrollable (has scrollable content)

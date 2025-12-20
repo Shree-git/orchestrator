@@ -2,10 +2,10 @@
  * POST /readdir endpoint - Read directory
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import { validatePath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import { validatePath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createReaddirHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -13,7 +13,7 @@ export function createReaddirHandler() {
       const { dirPath } = req.body as { dirPath: string };
 
       if (!dirPath) {
-        res.status(400).json({ success: false, error: "dirPath is required" });
+        res.status(400).json({ success: false, error: 'dirPath is required' });
         return;
       }
 
@@ -28,7 +28,7 @@ export function createReaddirHandler() {
 
       res.json({ success: true, entries: result });
     } catch (error) {
-      logError(error, "Read directory failed");
+      logError(error, 'Read directory failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

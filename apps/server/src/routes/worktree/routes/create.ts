@@ -7,19 +7,19 @@
  * 3. Only creates a new worktree if none exists for the branch
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import path from "path";
-import { mkdir } from "fs/promises";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import path from 'path';
+import { mkdir } from 'fs/promises';
 import {
   isGitRepo,
   getErrorMessage,
   logError,
   normalizePath,
   ensureInitialCommit,
-} from "../common.js";
-import { trackBranch } from "./branch-tracking.js";
+} from '../common.js';
+import { trackBranch } from './branch-tracking.js';
 
 const execAsync = promisify(exec);
 
@@ -31,20 +31,20 @@ async function findExistingWorktreeForBranch(
   branchName: string
 ): Promise<{ path: string; branch: string } | null> {
   try {
-    const { stdout } = await execAsync("git worktree list --porcelain", {
+    const { stdout } = await execAsync('git worktree list --porcelain', {
       cwd: projectPath,
     });
 
-    const lines = stdout.split("\n");
+    const lines = stdout.split('\n');
     let currentPath: string | null = null;
     let currentBranch: string | null = null;
 
     for (const line of lines) {
-      if (line.startsWith("worktree ")) {
+      if (line.startsWith('worktree ')) {
         currentPath = line.slice(9);
-      } else if (line.startsWith("branch ")) {
-        currentBranch = line.slice(7).replace("refs/heads/", "");
-      } else if (line === "" && currentPath && currentBranch) {
+      } else if (line.startsWith('branch ')) {
+        currentBranch = line.slice(7).replace('refs/heads/', '');
+      } else if (line === '' && currentPath && currentBranch) {
         // End of a worktree entry
         if (currentBranch === branchName) {
           // Resolve to absolute path - git may return relative paths
@@ -86,7 +86,7 @@ export function createCreateHandler() {
       if (!projectPath || !branchName) {
         res.status(400).json({
           success: false,
-          error: "projectPath and branchName required",
+          error: 'projectPath and branchName required',
         });
         return;
       }
@@ -94,7 +94,7 @@ export function createCreateHandler() {
       if (!(await isGitRepo(projectPath))) {
         res.status(400).json({
           success: false,
-          error: "Not a git repository",
+          error: 'Not a git repository',
         });
         return;
       }
@@ -103,11 +103,16 @@ export function createCreateHandler() {
       await ensureInitialCommit(projectPath);
 
       // First, check if git already has a worktree for this branch (anywhere)
-      const existingWorktree = await findExistingWorktreeForBranch(projectPath, branchName);
+      const existingWorktree = await findExistingWorktreeForBranch(
+        projectPath,
+        branchName
+      );
       if (existingWorktree) {
         // Worktree already exists, return it as success (not an error)
         // This handles manually created worktrees or worktrees from previous runs
-        console.log(`[Worktree] Found existing worktree for branch "${branchName}" at: ${existingWorktree.path}`);
+        console.log(
+          `[Worktree] Found existing worktree for branch "${branchName}" at: ${existingWorktree.path}`
+        );
 
         // Track the branch so it persists in the UI
         await trackBranch(projectPath, branchName);
@@ -124,8 +129,8 @@ export function createCreateHandler() {
       }
 
       // Sanitize branch name for directory usage
-      const sanitizedName = branchName.replace(/[^a-zA-Z0-9_-]/g, "-");
-      const worktreesDir = path.join(projectPath, ".worktrees");
+      const sanitizedName = branchName.replace(/[^a-zA-Z0-9_-]/g, '-');
+      const worktreesDir = path.join(projectPath, '.worktrees');
       const worktreePath = path.join(worktreesDir, sanitizedName);
 
       // Create worktrees directory if it doesn't exist
@@ -149,7 +154,7 @@ export function createCreateHandler() {
         createCmd = `git worktree add "${worktreePath}" ${branchName}`;
       } else {
         // Create new branch from base or HEAD
-        const base = baseBranch || "HEAD";
+        const base = baseBranch || 'HEAD';
         createCmd = `git worktree add -b ${branchName} "${worktreePath}" ${base}`;
       }
 
@@ -174,7 +179,7 @@ export function createCreateHandler() {
         },
       });
     } catch (error) {
-      logError(error, "Create worktree failed");
+      logError(error, 'Create worktree failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

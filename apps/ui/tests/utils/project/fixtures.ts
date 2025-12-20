@@ -1,22 +1,22 @@
-import { Page } from "@playwright/test";
-import * as fs from "fs";
-import * as path from "path";
+import { Page } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Resolve the workspace root - handle both running from apps/ui and from root
  */
 export function getWorkspaceRoot(): string {
   const cwd = process.cwd();
-  if (cwd.includes("apps/ui")) {
-    return path.resolve(cwd, "../..");
+  if (cwd.includes('apps/ui')) {
+    return path.resolve(cwd, '../..');
   }
   return cwd;
 }
 
 const WORKSPACE_ROOT = getWorkspaceRoot();
-const FIXTURE_PATH = path.join(WORKSPACE_ROOT, "test/fixtures/projectA");
-const SPEC_FILE_PATH = path.join(FIXTURE_PATH, ".automaker/app_spec.txt");
-const CONTEXT_PATH = path.join(FIXTURE_PATH, ".automaker/context");
+const FIXTURE_PATH = path.join(WORKSPACE_ROOT, 'test/fixtures/projectA');
+const SPEC_FILE_PATH = path.join(FIXTURE_PATH, '.automaker/app_spec.txt');
+const CONTEXT_PATH = path.join(FIXTURE_PATH, '.automaker/context');
 
 // Original spec content for resetting between tests
 const ORIGINAL_SPEC_CONTENT = `<app_spec>
@@ -53,7 +53,10 @@ export function resetContextDirectory(): void {
 /**
  * Create a context file directly on disk (for test setup)
  */
-export function createContextFileOnDisk(filename: string, content: string): void {
+export function createContextFileOnDisk(
+  filename: string,
+  content: string
+): void {
   const filePath = path.join(CONTEXT_PATH, filename);
   fs.writeFileSync(filePath, content);
 }
@@ -76,8 +79,8 @@ export async function setupProjectWithFixture(
 ): Promise<void> {
   await page.addInitScript((pathArg: string) => {
     const mockProject = {
-      id: "test-project-fixture",
-      name: "projectA",
+      id: 'test-project-fixture',
+      name: 'projectA',
       path: pathArg,
       lastOpened: new Date().toISOString(),
     };
@@ -86,10 +89,10 @@ export async function setupProjectWithFixture(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        currentView: "board",
-        theme: "dark",
+        currentView: 'board',
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
@@ -97,19 +100,19 @@ export async function setupProjectWithFixture(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
     // Also mark setup as complete (fallback for when NEXT_PUBLIC_SKIP_SETUP isn't set)
     const setupState = {
       state: {
         isFirstRun: false,
         setupComplete: true,
-        currentStep: "complete",
+        currentStep: 'complete',
         skipClaudeSetup: false,
       },
       version: 2, // Must match app-store.ts persist version
     };
-    localStorage.setItem("automaker-setup", JSON.stringify(setupState));
+    localStorage.setItem('automaker-setup', JSON.stringify(setupState));
   }, projectPath);
 }
 

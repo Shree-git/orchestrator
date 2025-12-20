@@ -2,11 +2,11 @@
  * POST /merge endpoint - Merge feature (merge worktree branch into main)
  */
 
-import type { Request, Response } from "express";
-import { exec } from "child_process";
-import { promisify } from "util";
-import path from "path";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import path from 'path';
+import { getErrorMessage, logError } from '../common.js';
 
 const execAsync = promisify(exec);
 
@@ -20,22 +20,20 @@ export function createMergeHandler() {
       };
 
       if (!projectPath || !featureId) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            error: "projectPath and featureId required",
-          });
+        res.status(400).json({
+          success: false,
+          error: 'projectPath and featureId required',
+        });
         return;
       }
 
       const branchName = `feature/${featureId}`;
       // Git worktrees are stored in project directory
-      const worktreePath = path.join(projectPath, ".worktrees", featureId);
+      const worktreePath = path.join(projectPath, '.worktrees', featureId);
 
       // Get current branch
       const { stdout: currentBranch } = await execAsync(
-        "git rev-parse --abbrev-ref HEAD",
+        'git rev-parse --abbrev-ref HEAD',
         { cwd: projectPath }
       );
 
@@ -70,7 +68,7 @@ export function createMergeHandler() {
 
       res.json({ success: true, mergedBranch: branchName });
     } catch (error) {
-      logError(error, "Merge worktree failed");
+      logError(error, 'Merge worktree failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

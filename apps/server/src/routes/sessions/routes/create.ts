@@ -2,9 +2,9 @@
  * POST / endpoint - Create a new session
  */
 
-import type { Request, Response } from "express";
-import { AgentService } from "../../../services/agent-service.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { AgentService } from '../../../services/agent-service.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createCreateHandler(agentService: AgentService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -17,7 +17,7 @@ export function createCreateHandler(agentService: AgentService) {
       };
 
       if (!name) {
-        res.status(400).json({ success: false, error: "name is required" });
+        res.status(400).json({ success: false, error: 'name is required' });
         return;
       }
 
@@ -29,7 +29,7 @@ export function createCreateHandler(agentService: AgentService) {
       );
       res.json({ success: true, session });
     } catch (error) {
-      logError(error, "Create session failed");
+      logError(error, 'Create session failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

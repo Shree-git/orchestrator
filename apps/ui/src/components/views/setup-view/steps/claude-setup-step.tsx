@@ -1,24 +1,23 @@
-
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useSetupStore } from "@/store/setup-store";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
+} from '@/components/ui/accordion';
+import { useSetupStore } from '@/store/setup-store';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
 import {
   CheckCircle2,
   Loader2,
@@ -35,10 +34,10 @@ import {
   ShieldCheck,
   XCircle,
   Trash2,
-} from "lucide-react";
-import { toast } from "sonner";
-import { StatusBadge, TerminalOutput } from "../components";
-import { useCliStatus, useCliInstallation, useTokenSave } from "../hooks";
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { StatusBadge, TerminalOutput } from '../components';
+import { useCliStatus, useCliInstallation, useTokenSave } from '../hooks';
 
 interface ClaudeSetupStepProps {
   onNext: () => void;
@@ -46,7 +45,7 @@ interface ClaudeSetupStepProps {
   onSkip: () => void;
 }
 
-type VerificationStatus = "idle" | "verifying" | "verified" | "error";
+type VerificationStatus = 'idle' | 'verifying' | 'verified' | 'error';
 
 // Claude Setup Step
 // Users can either:
@@ -66,18 +65,18 @@ export function ClaudeSetupStep({
   } = useSetupStore();
   const { setApiKeys, apiKeys } = useAppStore();
 
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState('');
 
   // CLI Verification state
   const [cliVerificationStatus, setCliVerificationStatus] =
-    useState<VerificationStatus>("idle");
+    useState<VerificationStatus>('idle');
   const [cliVerificationError, setCliVerificationError] = useState<
     string | null
   >(null);
 
   // API Key Verification state
   const [apiKeyVerificationStatus, setApiKeyVerificationStatus] =
-    useState<VerificationStatus>("idle");
+    useState<VerificationStatus>('idle');
   const [apiKeyVerificationError, setApiKeyVerificationError] = useState<
     string | null
   >(null);
@@ -103,7 +102,7 @@ export function ClaudeSetupStep({
 
   // Use custom hooks
   const { isChecking, checkStatus } = useCliStatus({
-    cliType: "claude",
+    cliType: 'claude',
     statusApi,
     setCliStatus: setClaudeCliStatus,
     setAuthStatus: setClaudeAuthStatus,
@@ -114,7 +113,7 @@ export function ClaudeSetupStep({
   }, [checkStatus]);
 
   const { isInstalling, installProgress, install } = useCliInstallation({
-    cliType: "claude",
+    cliType: 'claude',
     installApi,
     onProgressEvent: getElectronAPI().setup?.onInstallProgress,
     onSuccess: onInstallSuccess,
@@ -123,73 +122,73 @@ export function ClaudeSetupStep({
 
   const { isSaving: isSavingApiKey, saveToken: saveApiKeyToken } = useTokenSave(
     {
-      provider: "anthropic",
+      provider: 'anthropic',
       onSuccess: () => {
         setClaudeAuthStatus({
           authenticated: true,
-          method: "api_key",
+          method: 'api_key',
           hasCredentialsFile: false,
           apiKeyValid: true,
         });
         setApiKeys({ ...apiKeys, anthropic: apiKey });
-        toast.success("API key saved successfully!");
+        toast.success('API key saved successfully!');
       },
     }
   );
 
   // Verify CLI authentication by running a test query (uses CLI credentials only, not API key)
   const verifyCliAuth = useCallback(async () => {
-    setCliVerificationStatus("verifying");
+    setCliVerificationStatus('verifying');
     setCliVerificationError(null);
 
     try {
       const api = getElectronAPI();
       if (!api.setup?.verifyClaudeAuth) {
-        setCliVerificationStatus("error");
-        setCliVerificationError("Verification API not available");
+        setCliVerificationStatus('error');
+        setCliVerificationError('Verification API not available');
         return;
       }
 
       // Pass "cli" to verify CLI authentication only (ignores any API key)
-      const result = await api.setup.verifyClaudeAuth("cli");
+      const result = await api.setup.verifyClaudeAuth('cli');
 
       // Check for "Limit reached" error - treat as unverified
       const hasLimitReachedError =
-        result.error?.toLowerCase().includes("limit reached") ||
-        result.error?.toLowerCase().includes("rate limit");
+        result.error?.toLowerCase().includes('limit reached') ||
+        result.error?.toLowerCase().includes('rate limit');
 
       if (result.authenticated && !hasLimitReachedError) {
-        setCliVerificationStatus("verified");
+        setCliVerificationStatus('verified');
         setClaudeAuthStatus({
           authenticated: true,
-          method: "cli_authenticated",
+          method: 'cli_authenticated',
           hasCredentialsFile: claudeAuthStatus?.hasCredentialsFile || false,
         });
-        toast.success("Claude CLI authentication verified!");
+        toast.success('Claude CLI authentication verified!');
       } else {
-        setCliVerificationStatus("error");
+        setCliVerificationStatus('error');
         setCliVerificationError(
           hasLimitReachedError
-            ? "Rate limit reached. Please try again later."
-            : result.error || "Authentication failed"
+            ? 'Rate limit reached. Please try again later.'
+            : result.error || 'Authentication failed'
         );
         setClaudeAuthStatus({
           authenticated: false,
-          method: "none",
+          method: 'none',
           hasCredentialsFile: claudeAuthStatus?.hasCredentialsFile || false,
         });
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Verification failed";
+        error instanceof Error ? error.message : 'Verification failed';
       // Also check for limit reached in caught errors
       const isLimitError =
-        errorMessage.toLowerCase().includes("limit reached") ||
-        errorMessage.toLowerCase().includes("rate limit");
-      setCliVerificationStatus("error");
+        errorMessage.toLowerCase().includes('limit reached') ||
+        errorMessage.toLowerCase().includes('rate limit');
+      setCliVerificationStatus('error');
       setCliVerificationError(
         isLimitError
-          ? "Rate limit reached. Please try again later."
+          ? 'Rate limit reached. Please try again later.'
           : errorMessage
       );
     }
@@ -197,37 +196,37 @@ export function ClaudeSetupStep({
 
   // Verify API Key authentication (uses API key only)
   const verifyApiKeyAuth = useCallback(async () => {
-    setApiKeyVerificationStatus("verifying");
+    setApiKeyVerificationStatus('verifying');
     setApiKeyVerificationError(null);
 
     try {
       const api = getElectronAPI();
       if (!api.setup?.verifyClaudeAuth) {
-        setApiKeyVerificationStatus("error");
-        setApiKeyVerificationError("Verification API not available");
+        setApiKeyVerificationStatus('error');
+        setApiKeyVerificationError('Verification API not available');
         return;
       }
 
       // Pass "api_key" to verify API key authentication only
-      const result = await api.setup.verifyClaudeAuth("api_key");
+      const result = await api.setup.verifyClaudeAuth('api_key');
 
       if (result.authenticated) {
-        setApiKeyVerificationStatus("verified");
+        setApiKeyVerificationStatus('verified');
         setClaudeAuthStatus({
           authenticated: true,
-          method: "api_key",
+          method: 'api_key',
           hasCredentialsFile: false,
           apiKeyValid: true,
         });
-        toast.success("API key authentication verified!");
+        toast.success('API key authentication verified!');
       } else {
-        setApiKeyVerificationStatus("error");
-        setApiKeyVerificationError(result.error || "Authentication failed");
+        setApiKeyVerificationStatus('error');
+        setApiKeyVerificationError(result.error || 'Authentication failed');
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Verification failed";
-      setApiKeyVerificationStatus("error");
+        error instanceof Error ? error.message : 'Verification failed';
+      setApiKeyVerificationStatus('error');
       setApiKeyVerificationError(errorMessage);
     }
   }, [setClaudeAuthStatus]);
@@ -238,29 +237,29 @@ export function ClaudeSetupStep({
     try {
       const api = getElectronAPI();
       if (!api.setup?.deleteApiKey) {
-        toast.error("Delete API not available");
+        toast.error('Delete API not available');
         return;
       }
 
-      const result = await api.setup.deleteApiKey("anthropic");
+      const result = await api.setup.deleteApiKey('anthropic');
       if (result.success) {
         // Clear local state
-        setApiKey("");
-        setApiKeys({ ...apiKeys, anthropic: "" });
-        setApiKeyVerificationStatus("idle");
+        setApiKey('');
+        setApiKeys({ ...apiKeys, anthropic: '' });
+        setApiKeyVerificationStatus('idle');
         setApiKeyVerificationError(null);
         setClaudeAuthStatus({
           authenticated: false,
-          method: "none",
+          method: 'none',
           hasCredentialsFile: claudeAuthStatus?.hasCredentialsFile || false,
         });
-        toast.success("API key deleted successfully");
+        toast.success('API key deleted successfully');
       } else {
-        toast.error(result.error || "Failed to delete API key");
+        toast.error(result.error || 'Failed to delete API key');
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete API key";
+        error instanceof Error ? error.message : 'Failed to delete API key';
       toast.error(errorMessage);
     } finally {
       setIsDeletingApiKey(false);
@@ -282,30 +281,30 @@ export function ClaudeSetupStep({
 
   const copyCommand = (command: string) => {
     navigator.clipboard.writeText(command);
-    toast.success("Command copied to clipboard");
+    toast.success('Command copied to clipboard');
   };
 
   // User is ready if either method is verified
   const hasApiKey =
     !!apiKeys.anthropic ||
-    claudeAuthStatus?.method === "api_key" ||
-    claudeAuthStatus?.method === "api_key_env";
-  const isCliVerified = cliVerificationStatus === "verified";
-  const isApiKeyVerified = apiKeyVerificationStatus === "verified";
+    claudeAuthStatus?.method === 'api_key' ||
+    claudeAuthStatus?.method === 'api_key_env';
+  const isCliVerified = cliVerificationStatus === 'verified';
+  const isApiKeyVerified = apiKeyVerificationStatus === 'verified';
   const isReady = isCliVerified || isApiKeyVerified;
 
   const getAuthMethodLabel = () => {
-    if (isApiKeyVerified) return "API Key";
-    if (isCliVerified) return "Claude CLI";
+    if (isApiKeyVerified) return 'API Key';
+    if (isCliVerified) return 'Claude CLI';
     return null;
   };
 
   // Helper to get status badge for CLI
   const getCliStatusBadge = () => {
-    if (cliVerificationStatus === "verified") {
+    if (cliVerificationStatus === 'verified') {
       return <StatusBadge status="authenticated" label="Verified" />;
     }
-    if (cliVerificationStatus === "error") {
+    if (cliVerificationStatus === 'error') {
       return <StatusBadge status="error" label="Error" />;
     }
     if (isChecking) {
@@ -320,10 +319,10 @@ export function ClaudeSetupStep({
 
   // Helper to get status badge for API Key
   const getApiKeyStatusBadge = () => {
-    if (apiKeyVerificationStatus === "verified") {
+    if (apiKeyVerificationStatus === 'verified') {
       return <StatusBadge status="authenticated" label="Verified" />;
     }
-    if (apiKeyVerificationStatus === "error") {
+    if (apiKeyVerificationStatus === 'error') {
       return <StatusBadge status="error" label="Error" />;
     }
     if (hasApiKey) {
@@ -360,7 +359,7 @@ export function ClaudeSetupStep({
               disabled={isChecking}
             >
               <RefreshCw
-                className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
+                className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`}
               />
             </Button>
           </div>
@@ -377,9 +376,9 @@ export function ClaudeSetupStep({
                   <div className="flex items-center gap-3">
                     <Terminal
                       className={`w-5 h-5 ${
-                        cliVerificationStatus === "verified"
-                          ? "text-green-500"
-                          : "text-muted-foreground"
+                        cliVerificationStatus === 'verified'
+                          ? 'text-green-500'
+                          : 'text-muted-foreground'
                       }`}
                     />
                     <div className="text-left">
@@ -416,7 +415,7 @@ export function ClaudeSetupStep({
                           size="icon"
                           onClick={() =>
                             copyCommand(
-                              "curl -fsSL https://claude.ai/install.sh | bash"
+                              'curl -fsSL https://claude.ai/install.sh | bash'
                             )
                           }
                         >
@@ -438,7 +437,7 @@ export function ClaudeSetupStep({
                           size="icon"
                           onClick={() =>
                             copyCommand(
-                              "irm https://claude.ai/install.ps1 | iex"
+                              'irm https://claude.ai/install.ps1 | iex'
                             )
                           }
                         >
@@ -480,7 +479,7 @@ export function ClaudeSetupStep({
                 )}
 
                 {/* CLI Verification Status */}
-                {cliVerificationStatus === "verifying" && (
+                {cliVerificationStatus === 'verifying' && (
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                     <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
                     <div>
@@ -494,7 +493,7 @@ export function ClaudeSetupStep({
                   </div>
                 )}
 
-                {cliVerificationStatus === "verified" && (
+                {cliVerificationStatus === 'verified' && (
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <div>
@@ -508,7 +507,7 @@ export function ClaudeSetupStep({
                   </div>
                 )}
 
-                {cliVerificationStatus === "error" && cliVerificationError && (
+                {cliVerificationStatus === 'error' && cliVerificationError && (
                   <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                     <XCircle className="w-5 h-5 text-red-500 shrink-0" />
                     <div className="flex-1">
@@ -518,7 +517,7 @@ export function ClaudeSetupStep({
                       <p className="text-sm text-red-400 mt-1">
                         {cliVerificationError}
                       </p>
-                      {cliVerificationError.includes("login") && (
+                      {cliVerificationError.includes('login') && (
                         <div className="mt-3 p-3 rounded bg-muted/50">
                           <p className="text-sm text-muted-foreground mb-2">
                             Run this command in your terminal:
@@ -530,7 +529,7 @@ export function ClaudeSetupStep({
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => copyCommand("claude login")}
+                              onClick={() => copyCommand('claude login')}
                             >
                               <Copy className="w-4 h-4" />
                             </Button>
@@ -542,22 +541,22 @@ export function ClaudeSetupStep({
                 )}
 
                 {/* CLI Verify Button - Hide if CLI is verified */}
-                {cliVerificationStatus !== "verified" && (
+                {cliVerificationStatus !== 'verified' && (
                   <Button
                     onClick={verifyCliAuth}
                     disabled={
-                      cliVerificationStatus === "verifying" ||
+                      cliVerificationStatus === 'verifying' ||
                       !claudeCliStatus?.installed
                     }
                     className="w-full bg-brand-500 hover:bg-brand-600 text-white"
                     data-testid="verify-cli-button"
                   >
-                    {cliVerificationStatus === "verifying" ? (
+                    {cliVerificationStatus === 'verifying' ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Verifying...
                       </>
-                    ) : cliVerificationStatus === "error" ? (
+                    ) : cliVerificationStatus === 'error' ? (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Retry Verification
@@ -580,9 +579,9 @@ export function ClaudeSetupStep({
                   <div className="flex items-center gap-3">
                     <Key
                       className={`w-5 h-5 ${
-                        apiKeyVerificationStatus === "verified"
-                          ? "text-green-500"
-                          : "text-muted-foreground"
+                        apiKeyVerificationStatus === 'verified'
+                          ? 'text-green-500'
+                          : 'text-muted-foreground'
                       }`}
                     />
                     <div className="text-left">
@@ -614,7 +613,7 @@ export function ClaudeSetupStep({
                       data-testid="anthropic-api-key-input"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Don&apos;t have an API key?{" "}
+                      Don&apos;t have an API key?{' '}
                       <a
                         href="https://console.anthropic.com/settings/keys"
                         target="_blank"
@@ -640,7 +639,7 @@ export function ClaudeSetupStep({
                           Saving...
                         </>
                       ) : (
-                        "Save API Key"
+                        'Save API Key'
                       )}
                     </Button>
                     {hasApiKey && (
@@ -662,7 +661,7 @@ export function ClaudeSetupStep({
                 </div>
 
                 {/* API Key Verification Status */}
-                {apiKeyVerificationStatus === "verifying" && (
+                {apiKeyVerificationStatus === 'verifying' && (
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                     <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
                     <div>
@@ -676,7 +675,7 @@ export function ClaudeSetupStep({
                   </div>
                 )}
 
-                {apiKeyVerificationStatus === "verified" && (
+                {apiKeyVerificationStatus === 'verified' && (
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <div>
@@ -690,7 +689,7 @@ export function ClaudeSetupStep({
                   </div>
                 )}
 
-                {apiKeyVerificationStatus === "error" &&
+                {apiKeyVerificationStatus === 'error' &&
                   apiKeyVerificationError && (
                     <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                       <XCircle className="w-5 h-5 text-red-500 shrink-0" />
@@ -706,21 +705,21 @@ export function ClaudeSetupStep({
                   )}
 
                 {/* API Key Verify Button - Hide if API key is verified */}
-                {apiKeyVerificationStatus !== "verified" && (
+                {apiKeyVerificationStatus !== 'verified' && (
                   <Button
                     onClick={verifyApiKeyAuth}
                     disabled={
-                      apiKeyVerificationStatus === "verifying" || !hasApiKey
+                      apiKeyVerificationStatus === 'verifying' || !hasApiKey
                     }
                     className="w-full bg-brand-500 hover:bg-brand-600 text-white"
                     data-testid="verify-api-key-button"
                   >
-                    {apiKeyVerificationStatus === "verifying" ? (
+                    {apiKeyVerificationStatus === 'verifying' ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Verifying...
                       </>
-                    ) : apiKeyVerificationStatus === "error" ? (
+                    ) : apiKeyVerificationStatus === 'error' ? (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Retry Verification

@@ -3,7 +3,7 @@ name: Test Suite
 on:
   pull_request:
     branches:
-      - "*"
+      - '*'
   push:
     branches:
       - main
@@ -20,8 +20,8 @@ jobs:
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
-          check-lockfile: "true"
-          rebuild-node-pty-path: "apps/server"
+          check-lockfile: 'true'
+          rebuild-node-pty-path: 'apps/server'
 
       - name: Run server tests with coverage
         run: npm run test:server:coverage

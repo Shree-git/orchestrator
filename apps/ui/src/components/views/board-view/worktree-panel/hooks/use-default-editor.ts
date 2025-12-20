@@ -1,9 +1,8 @@
-
-import { useState, useEffect, useCallback } from "react";
-import { getElectronAPI } from "@/lib/electron";
+import { useState, useEffect, useCallback } from 'react';
+import { getElectronAPI } from '@/lib/electron';
 
 export function useDefaultEditor() {
-  const [defaultEditorName, setDefaultEditorName] = useState<string>("Editor");
+  const [defaultEditorName, setDefaultEditorName] = useState<string>('Editor');
 
   const fetchDefaultEditor = useCallback(async () => {
     try {
@@ -16,7 +15,7 @@ export function useDefaultEditor() {
         setDefaultEditorName(result.result.editorName);
       }
     } catch (error) {
-      console.error("Failed to fetch default editor:", error);
+      console.error('Failed to fetch default editor:', error);
     }
   }, []);
 

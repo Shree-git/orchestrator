@@ -12,7 +12,7 @@ export interface ImageAttachment {
 
 export interface Message {
   id: string;
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
   timestamp: string;
   isError?: boolean;
@@ -26,31 +26,31 @@ export interface ToolUse {
 
 export type StreamEvent =
   | {
-      type: "message";
+      type: 'message';
       sessionId: string;
       message: Message;
     }
   | {
-      type: "stream";
+      type: 'stream';
       sessionId: string;
       messageId: string;
       content: string;
       isComplete: boolean;
     }
   | {
-      type: "tool_use";
+      type: 'tool_use';
       sessionId: string;
       tool: ToolUse;
     }
   | {
-      type: "complete";
+      type: 'complete';
       sessionId: string;
       messageId?: string;
       content: string;
       toolUses: ToolUse[];
     }
   | {
-      type: "error";
+      type: 'error';
       sessionId: string;
       error: string;
       message?: Message;
@@ -161,21 +161,21 @@ export interface SessionsAPI {
 
 export type AutoModeEvent =
   | {
-      type: "auto_mode_feature_start";
+      type: 'auto_mode_feature_start';
       featureId: string;
       projectId?: string;
       projectPath?: string;
       feature: unknown;
     }
   | {
-      type: "auto_mode_progress";
+      type: 'auto_mode_progress';
       featureId: string;
       projectId?: string;
       projectPath?: string;
       content: string;
     }
   | {
-      type: "auto_mode_tool";
+      type: 'auto_mode_tool';
       featureId: string;
       projectId?: string;
       projectPath?: string;
@@ -183,7 +183,7 @@ export type AutoModeEvent =
       input: unknown;
     }
   | {
-      type: "auto_mode_feature_complete";
+      type: 'auto_mode_feature_complete';
       featureId: string;
       projectId?: string;
       projectPath?: string;
@@ -191,23 +191,23 @@ export type AutoModeEvent =
       message: string;
     }
   | {
-      type: "auto_mode_error";
+      type: 'auto_mode_error';
       error: string;
-      errorType?: "authentication" | "cancellation" | "abort" | "execution";
+      errorType?: 'authentication' | 'cancellation' | 'abort' | 'execution';
       featureId?: string;
       projectId?: string;
       projectPath?: string;
     }
   | {
-      type: "auto_mode_phase";
+      type: 'auto_mode_phase';
       featureId: string;
       projectId?: string;
       projectPath?: string;
-      phase: "planning" | "action" | "verification";
+      phase: 'planning' | 'action' | 'verification';
       message: string;
     }
   | {
-      type: "auto_mode_ultrathink_preparation";
+      type: 'auto_mode_ultrathink_preparation';
       featureId: string;
       projectPath?: string;
       warnings: string[];
@@ -216,35 +216,35 @@ export type AutoModeEvent =
       estimatedTime?: string;
     }
   | {
-      type: "plan_approval_required";
+      type: 'plan_approval_required';
       featureId: string;
       projectPath?: string;
       planContent: string;
-      planningMode: "lite" | "spec" | "full";
+      planningMode: 'lite' | 'spec' | 'full';
       planVersion?: number;
     }
   | {
-      type: "plan_auto_approved";
+      type: 'plan_auto_approved';
       featureId: string;
       projectPath?: string;
       planContent: string;
-      planningMode: "lite" | "spec" | "full";
+      planningMode: 'lite' | 'spec' | 'full';
     }
   | {
-      type: "plan_approved";
+      type: 'plan_approved';
       featureId: string;
       projectPath?: string;
       hasEdits: boolean;
       planVersion?: number;
     }
   | {
-      type: "plan_rejected";
+      type: 'plan_rejected';
       featureId: string;
       projectPath?: string;
       feedback?: string;
     }
   | {
-      type: "plan_revision_requested";
+      type: 'plan_revision_requested';
       featureId: string;
       projectPath?: string;
       feedback?: string;
@@ -252,13 +252,13 @@ export type AutoModeEvent =
       planVersion?: number;
     }
   | {
-      type: "planning_started";
+      type: 'planning_started';
       featureId: string;
-      mode: "lite" | "spec" | "full";
+      mode: 'lite' | 'spec' | 'full';
       message: string;
     }
   | {
-      type: "auto_mode_task_started";
+      type: 'auto_mode_task_started';
       featureId: string;
       projectPath?: string;
       taskId: string;
@@ -267,7 +267,7 @@ export type AutoModeEvent =
       tasksTotal: number;
     }
   | {
-      type: "auto_mode_task_complete";
+      type: 'auto_mode_task_complete';
       featureId: string;
       projectPath?: string;
       taskId: string;
@@ -275,7 +275,7 @@ export type AutoModeEvent =
       tasksTotal: number;
     }
   | {
-      type: "auto_mode_phase_complete";
+      type: 'auto_mode_phase_complete';
       featureId: string;
       projectPath?: string;
       phaseNumber: number;
@@ -283,23 +283,23 @@ export type AutoModeEvent =
 
 export type SpecRegenerationEvent =
   | {
-      type: "spec_regeneration_progress";
+      type: 'spec_regeneration_progress';
       content: string;
       projectPath: string;
     }
   | {
-      type: "spec_regeneration_tool";
+      type: 'spec_regeneration_tool';
       tool: string;
       input: unknown;
       projectPath: string;
     }
   | {
-      type: "spec_regeneration_complete";
+      type: 'spec_regeneration_complete';
       message: string;
       projectPath: string;
     }
   | {
-      type: "spec_regeneration_error";
+      type: 'spec_regeneration_error';
       error: string;
       projectPath: string;
     };
@@ -960,15 +960,15 @@ export interface ModelDefinition {
   id: string;
   name: string;
   modelString: string;
-  provider: "claude";
+  provider: 'claude';
   description?: string;
-  tier?: "basic" | "standard" | "premium";
+  tier?: 'basic' | 'standard' | 'premium';
   default?: boolean;
 }
 
 // Provider status type
 export interface ProviderStatus {
-  status: "installed" | "not_installed" | "api_key_only";
+  status: 'installed' | 'not_installed' | 'api_key_only';
   method?: string;
   version?: string;
   path?: string;

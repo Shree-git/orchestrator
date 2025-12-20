@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   FolderOpen,
   Folder,
@@ -10,7 +9,7 @@ import {
   CornerDownLeft,
   Clock,
   X,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,9 +17,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface DirectoryEntry {
   name: string;
@@ -46,11 +45,11 @@ interface FileBrowserDialogProps {
   initialPath?: string;
 }
 
-const RECENT_FOLDERS_KEY = "file-browser-recent-folders";
+const RECENT_FOLDERS_KEY = 'file-browser-recent-folders';
 const MAX_RECENT_FOLDERS = 5;
 
 function getRecentFolders(): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
     const stored = localStorage.getItem(RECENT_FOLDERS_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -60,7 +59,7 @@ function getRecentFolders(): string[] {
 }
 
 function addRecentFolder(path: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     const recent = getRecentFolders();
     // Remove if already exists, then add to front
@@ -73,7 +72,7 @@ function addRecentFolder(path: string): void {
 }
 
 function removeRecentFolder(path: string): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
     const recent = getRecentFolders();
     const updated = recent.filter((p) => p !== path);
@@ -88,18 +87,18 @@ export function FileBrowserDialog({
   open,
   onOpenChange,
   onSelect,
-  title = "Select Project Directory",
-  description = "Navigate to your project folder or paste a path directly",
+  title = 'Select Project Directory',
+  description = 'Navigate to your project folder or paste a path directly',
   initialPath,
 }: FileBrowserDialogProps) {
-  const [currentPath, setCurrentPath] = useState<string>("");
-  const [pathInput, setPathInput] = useState<string>("");
+  const [currentPath, setCurrentPath] = useState<string>('');
+  const [pathInput, setPathInput] = useState<string>('');
   const [parentPath, setParentPath] = useState<string | null>(null);
   const [directories, setDirectories] = useState<DirectoryEntry[]>([]);
   const [drives, setDrives] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [warning, setWarning] = useState("");
+  const [error, setError] = useState('');
+  const [warning, setWarning] = useState('');
   const [recentFolders, setRecentFolders] = useState<string[]>([]);
   const pathInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,11 +109,14 @@ export function FileBrowserDialog({
     }
   }, [open]);
 
-  const handleRemoveRecent = useCallback((e: React.MouseEvent, path: string) => {
-    e.stopPropagation();
-    const updated = removeRecentFolder(path);
-    setRecentFolders(updated);
-  }, []);
+  const handleRemoveRecent = useCallback(
+    (e: React.MouseEvent, path: string) => {
+      e.stopPropagation();
+      const updated = removeRecentFolder(path);
+      setRecentFolders(updated);
+    },
+    []
+  );
 
   const handleSelectRecent = useCallback((path: string) => {
     browseDirectory(path);
@@ -122,17 +124,17 @@ export function FileBrowserDialog({
 
   const browseDirectory = async (dirPath?: string) => {
     setLoading(true);
-    setError("");
-    setWarning("");
+    setError('');
+    setWarning('');
 
     try {
       // Get server URL from environment or default
       const serverUrl =
-        import.meta.env.VITE_SERVER_URL || "http://localhost:3008";
+        import.meta.env.VITE_SERVER_URL || 'http://localhost:3008';
 
       const response = await fetch(`${serverUrl}/api/fs/browse`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dirPath }),
       });
 
@@ -144,13 +146,13 @@ export function FileBrowserDialog({
         setParentPath(result.parentPath);
         setDirectories(result.directories);
         setDrives(result.drives || []);
-        setWarning(result.warning || "");
+        setWarning(result.warning || '');
       } else {
-        setError(result.error || "Failed to browse directory");
+        setError(result.error || 'Failed to browse directory');
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to load directories"
+        err instanceof Error ? err.message : 'Failed to load directories'
       );
     } finally {
       setLoading(false);
@@ -160,12 +162,12 @@ export function FileBrowserDialog({
   // Reset current path when dialog closes
   useEffect(() => {
     if (!open) {
-      setCurrentPath("");
-      setPathInput("");
+      setCurrentPath('');
+      setPathInput('');
       setParentPath(null);
       setDirectories([]);
-      setError("");
-      setWarning("");
+      setError('');
+      setWarning('');
     }
   }, [open]);
 
@@ -202,7 +204,7 @@ export function FileBrowserDialog({
   };
 
   const handlePathInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleGoToPath();
     }
@@ -278,7 +280,9 @@ export function FileBrowserDialog({
                   title={folder}
                 >
                   <Folder className="w-3 h-3 text-brand-500 shrink-0" />
-                  <span className="truncate max-w-[120px]">{getFolderName(folder)}</span>
+                  <span className="truncate max-w-[120px]">
+                    {getFolderName(folder)}
+                  </span>
                   <button
                     onClick={(e) => handleRemoveRecent(e, folder)}
                     className="ml-0.5 opacity-0 group-hover:opacity-100 hover:text-destructive transition-opacity"
@@ -302,14 +306,14 @@ export function FileBrowserDialog({
                 <Button
                   key={drive}
                   variant={
-                    currentPath.startsWith(drive) ? "default" : "outline"
+                    currentPath.startsWith(drive) ? 'default' : 'outline'
                   }
                   size="sm"
                   onClick={() => handleSelectDrive(drive)}
                   className="h-6 px-2 text-xs"
                   disabled={loading}
                 >
-                  {drive.replace("\\", "")}
+                  {drive.replace('\\', '')}
                 </Button>
               ))}
             </div>
@@ -338,7 +342,7 @@ export function FileBrowserDialog({
               </Button>
             )}
             <div className="flex-1 font-mono text-xs truncate text-muted-foreground">
-              {currentPath || "Loading..."}
+              {currentPath || 'Loading...'}
             </div>
           </div>
 
@@ -399,7 +403,11 @@ export function FileBrowserDialog({
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSelect} disabled={!currentPath || loading}>
+          <Button
+            size="sm"
+            onClick={handleSelect}
+            disabled={!currentPath || loading}
+          >
             <FolderOpen className="w-3.5 h-3.5 mr-1.5" />
             Select Current Folder
           </Button>

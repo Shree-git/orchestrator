@@ -1,9 +1,8 @@
-
-import * as React from "react";
-import { useEffect, useCallback, useRef } from "react";
-import { Button, buttonVariants } from "./button";
-import { cn } from "@/lib/utils";
-import type { VariantProps } from "class-variance-authority";
+import * as React from 'react';
+import { useEffect, useCallback, useRef } from 'react';
+import { Button, buttonVariants } from './button';
+import { cn } from '@/lib/utils';
+import type { VariantProps } from 'class-variance-authority';
 
 export interface HotkeyConfig {
   /** The key to trigger the hotkey (e.g., "Enter", "s", "n") */
@@ -19,8 +18,7 @@ export interface HotkeyConfig {
 }
 
 export interface HotkeyButtonProps
-  extends React.ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
+  extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /** Hotkey configuration - can be a simple key string or a full config object */
   hotkey?: string | HotkeyConfig;
   /** Whether to show the hotkey indicator badge */
@@ -39,14 +37,14 @@ export interface HotkeyButtonProps
  * Get the modifier key symbol based on platform
  */
 function getModifierSymbol(isMac: boolean): string {
-  return isMac ? "⌘" : "Ctrl";
+  return isMac ? '⌘' : 'Ctrl';
 }
 
 /**
  * Parse hotkey config into a normalized format
  */
 function parseHotkeyConfig(hotkey: string | HotkeyConfig): HotkeyConfig {
-  if (typeof hotkey === "string") {
+  if (typeof hotkey === 'string') {
     return { key: hotkey };
   }
   return hotkey;
@@ -87,7 +85,7 @@ function getHotkeyDisplayLabel(
   if (config.alt) {
     parts.push(
       <span key="alt" className="leading-none flex items-center justify-center">
-        {isMac ? "⌥" : "Alt"}
+        {isMac ? '⌥' : 'Alt'}
       </span>
     );
   }
@@ -95,36 +93,36 @@ function getHotkeyDisplayLabel(
   // Convert key to display format
   let keyDisplay = config.key;
   switch (config.key.toLowerCase()) {
-    case "enter":
-      keyDisplay = "↵";
+    case 'enter':
+      keyDisplay = '↵';
       break;
-    case "escape":
-    case "esc":
-      keyDisplay = "Esc";
+    case 'escape':
+    case 'esc':
+      keyDisplay = 'Esc';
       break;
-    case "arrowup":
-      keyDisplay = "↑";
+    case 'arrowup':
+      keyDisplay = '↑';
       break;
-    case "arrowdown":
-      keyDisplay = "↓";
+    case 'arrowdown':
+      keyDisplay = '↓';
       break;
-    case "arrowleft":
-      keyDisplay = "←";
+    case 'arrowleft':
+      keyDisplay = '←';
       break;
-    case "arrowright":
-      keyDisplay = "→";
+    case 'arrowright':
+      keyDisplay = '→';
       break;
-    case "backspace":
-      keyDisplay = "⌫";
+    case 'backspace':
+      keyDisplay = '⌫';
       break;
-    case "delete":
-      keyDisplay = "⌦";
+    case 'delete':
+      keyDisplay = '⌦';
       break;
-    case "tab":
-      keyDisplay = "⇥";
+    case 'tab':
+      keyDisplay = '⇥';
       break;
-    case " ":
-      keyDisplay = "Space";
+    case ' ':
+      keyDisplay = 'Space';
       break;
     default:
       // Capitalize single letters
@@ -149,16 +147,16 @@ function isInputElement(element: Element | null): boolean {
   if (!element) return false;
 
   const tagName = element.tagName.toLowerCase();
-  if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+  if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
     return true;
   }
 
-  if (element.getAttribute("contenteditable") === "true") {
+  if (element.getAttribute('contenteditable') === 'true') {
     return true;
   }
 
-  const role = element.getAttribute("role");
-  if (role === "textbox" || role === "searchbox" || role === "combobox") {
+  const role = element.getAttribute('role');
+  if (role === 'textbox' || role === 'searchbox' || role === 'combobox') {
     return true;
   }
 
@@ -195,7 +193,7 @@ export function HotkeyButton({
 
   // Detect platform on mount
   useEffect(() => {
-    setIsMac(navigator.platform.toLowerCase().includes("mac"));
+    setIsMac(navigator.platform.toLowerCase().includes('mac'));
   }, []);
 
   const config = hotkey ? parseHotkeyConfig(hotkey) : null;
@@ -235,7 +233,7 @@ export function HotkeyButton({
         const scopeEl = scopeRef.current;
         const isVisible =
           scopeEl.offsetParent !== null ||
-          getComputedStyle(scopeEl).display !== "none";
+          getComputedStyle(scopeEl).display !== 'none';
         if (!isVisible) return;
       }
 
@@ -258,9 +256,9 @@ export function HotkeyButton({
   useEffect(() => {
     if (!config || !hotkeyActive) return;
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [config, hotkeyActive, handleKeyDown]);
 
@@ -286,7 +284,7 @@ export function HotkeyButton({
       asChild={asChild}
       {...props}
     >
-      {typeof children === "string" ? (
+      {typeof children === 'string' ? (
         <>
           {children}
           {hotkeyIndicator}

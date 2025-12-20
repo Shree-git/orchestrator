@@ -2,7 +2,7 @@
  * POST /pr-info endpoint - Get PR info and comments for a branch
  */
 
-import type { Request, Response } from "express";
+import type { Request, Response } from 'express';
 import {
   getErrorMessage,
   logError,
@@ -10,7 +10,7 @@ import {
   execEnv,
   isValidBranchName,
   isGhCliAvailable,
-} from "../common.js";
+} from '../common.js';
 
 export interface PRComment {
   id: number;
@@ -44,7 +44,7 @@ export function createPRInfoHandler() {
       if (!worktreePath || !branchName) {
         res.status(400).json({
           success: false,
-          error: "worktreePath and branchName required",
+          error: 'worktreePath and branchName required',
         });
         return;
       }
@@ -53,7 +53,7 @@ export function createPRInfoHandler() {
       if (!isValidBranchName(branchName)) {
         res.status(400).json({
           success: false,
-          error: "Invalid branch name contains unsafe characters",
+          error: 'Invalid branch name contains unsafe characters',
         });
         return;
       }
@@ -67,7 +67,7 @@ export function createPRInfoHandler() {
           result: {
             hasPR: false,
             ghCliAvailable: false,
-            error: "gh CLI not available",
+            error: 'gh CLI not available',
           },
         });
         return;
@@ -79,7 +79,7 @@ export function createPRInfoHandler() {
       let originRepo: string | null = null;
 
       try {
-        const { stdout: remotes } = await execAsync("git remote -v", {
+        const { stdout: remotes } = await execAsync('git remote -v', {
           cwd: worktreePath,
           env: execEnv,
         });
@@ -99,9 +99,9 @@ export function createPRInfoHandler() {
 
           if (match) {
             const [, remoteName, owner, repo] = match;
-            if (remoteName === "upstream") {
+            if (remoteName === 'upstream') {
               upstreamRepo = `${owner}/${repo}`;
-            } else if (remoteName === "origin") {
+            } else if (remoteName === 'origin') {
               originOwner = owner;
               originRepo = repo;
             }
@@ -114,7 +114,7 @@ export function createPRInfoHandler() {
       if (!originOwner || !originRepo) {
         try {
           const { stdout: originUrl } = await execAsync(
-            "git config --get remote.origin.url",
+            'git config --get remote.origin.url',
             {
               cwd: worktreePath,
               env: execEnv,
@@ -137,21 +137,22 @@ export function createPRInfoHandler() {
       }
 
       const targetRepo =
-        upstreamRepo || (originOwner && originRepo
-          ? `${originOwner}/${originRepo}`
-          : null);
-      const repoFlag = targetRepo ? ` --repo "${targetRepo}"` : "";
+        upstreamRepo ||
+        (originOwner && originRepo ? `${originOwner}/${originRepo}` : null);
+      const repoFlag = targetRepo ? ` --repo "${targetRepo}"` : '';
       const headRef =
-        upstreamRepo && originOwner ? `${originOwner}:${branchName}` : branchName;
+        upstreamRepo && originOwner
+          ? `${originOwner}:${branchName}`
+          : branchName;
 
       // Get PR info for the branch using gh CLI
       try {
         // First, find the PR associated with this branch
         const listCmd = `gh pr list${repoFlag} --head "${headRef}" --json number,title,url,state,author,body --limit 1`;
-        const { stdout: prListOutput } = await execAsync(
-          listCmd,
-          { cwd: worktreePath, env: execEnv }
-        );
+        const { stdout: prListOutput } = await execAsync(listCmd, {
+          cwd: worktreePath,
+          env: execEnv,
+        });
 
         const prList = JSON.parse(prListOutput);
 
@@ -173,25 +174,27 @@ export function createPRInfoHandler() {
         let comments: PRComment[] = [];
         try {
           const viewCmd = `gh pr view ${prNumber}${repoFlag} --json comments`;
-          const { stdout: commentsOutput } = await execAsync(
-            viewCmd,
-            { cwd: worktreePath, env: execEnv }
-          );
+          const { stdout: commentsOutput } = await execAsync(viewCmd, {
+            cwd: worktreePath,
+            env: execEnv,
+          });
           const commentsData = JSON.parse(commentsOutput);
-          comments = (commentsData.comments || []).map((c: {
-            id: number;
-            author: { login: string };
-            body: string;
-            createdAt: string;
-          }) => ({
-            id: c.id,
-            author: c.author?.login || "unknown",
-            body: c.body,
-            createdAt: c.createdAt,
-            isReviewComment: false,
-          }));
+          comments = (commentsData.comments || []).map(
+            (c: {
+              id: number;
+              author: { login: string };
+              body: string;
+              createdAt: string;
+            }) => ({
+              id: c.id,
+              author: c.author?.login || 'unknown',
+              body: c.body,
+              createdAt: c.createdAt,
+              isReviewComment: false,
+            })
+          );
         } catch (error) {
-          console.warn("[PRInfo] Failed to fetch PR comments:", error);
+          console.warn('[PRInfo] Failed to fetch PR comments:', error);
         }
 
         // Get review comments (inline code comments)
@@ -201,33 +204,37 @@ export function createPRInfoHandler() {
           try {
             const reviewsEndpoint = `repos/${targetRepo}/pulls/${prNumber}/comments`;
             const reviewsCmd = `gh api ${reviewsEndpoint}`;
-            const { stdout: reviewsOutput } = await execAsync(
-              reviewsCmd,
-              { cwd: worktreePath, env: execEnv }
-            );
+            const { stdout: reviewsOutput } = await execAsync(reviewsCmd, {
+              cwd: worktreePath,
+              env: execEnv,
+            });
             const reviewsData = JSON.parse(reviewsOutput);
-            reviewComments = reviewsData.map((c: {
-              id: number;
-              user: { login: string };
-              body: string;
-              path: string;
-              line?: number;
-              original_line?: number;
-              created_at: string;
-            }) => ({
-              id: c.id,
-              author: c.user?.login || "unknown",
-              body: c.body,
-              path: c.path,
-              line: c.line || c.original_line,
-              createdAt: c.created_at,
-              isReviewComment: true,
-            }));
+            reviewComments = reviewsData.map(
+              (c: {
+                id: number;
+                user: { login: string };
+                body: string;
+                path: string;
+                line?: number;
+                original_line?: number;
+                created_at: string;
+              }) => ({
+                id: c.id,
+                author: c.user?.login || 'unknown',
+                body: c.body,
+                path: c.path,
+                line: c.line || c.original_line,
+                createdAt: c.created_at,
+                isReviewComment: true,
+              })
+            );
           } catch (error) {
-            console.warn("[PRInfo] Failed to fetch review comments:", error);
+            console.warn('[PRInfo] Failed to fetch review comments:', error);
           }
         } else {
-          console.warn("[PRInfo] Cannot fetch review comments: repository info not available");
+          console.warn(
+            '[PRInfo] Cannot fetch review comments: repository info not available'
+          );
         }
 
         const prInfo: PRInfo = {
@@ -235,8 +242,8 @@ export function createPRInfoHandler() {
           title: pr.title,
           url: pr.url,
           state: pr.state,
-          author: pr.author?.login || "unknown",
-          body: pr.body || "",
+          author: pr.author?.login || 'unknown',
+          body: pr.body || '',
           comments,
           reviewComments,
         };
@@ -251,7 +258,7 @@ export function createPRInfoHandler() {
         });
       } catch (error) {
         // gh CLI failed - might not be authenticated or no remote
-        logError(error, "Failed to get PR info");
+        logError(error, 'Failed to get PR info');
         res.json({
           success: true,
           result: {
@@ -262,7 +269,7 @@ export function createPRInfoHandler() {
         });
       }
     } catch (error) {
-      logError(error, "PR info handler failed");
+      logError(error, 'PR info handler failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

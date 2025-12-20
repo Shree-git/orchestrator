@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
-import type { ProviderConfigParams } from "@/config/api-providers";
+import { useState, useEffect } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
+import type { ProviderConfigParams } from '@/config/api-providers';
 
 interface TestResult {
   success: boolean;
@@ -62,7 +62,7 @@ export function useApiKeyManagement() {
             });
           }
         } catch (error) {
-          console.error("Failed to check API key status:", error);
+          console.error('Failed to check API key status:', error);
         }
       }
     };
@@ -76,23 +76,23 @@ export function useApiKeyManagement() {
 
     try {
       const api = getElectronAPI();
-      const data = await api.setup.verifyClaudeAuth("api_key");
+      const data = await api.setup.verifyClaudeAuth('api_key');
 
       if (data.success && data.authenticated) {
         setTestResult({
           success: true,
-          message: "Connection successful! Claude responded.",
+          message: 'Connection successful! Claude responded.',
         });
       } else {
         setTestResult({
           success: false,
-          message: data.error || "Failed to connect to Claude API.",
+          message: data.error || 'Failed to connect to Claude API.',
         });
       }
     } catch {
       setTestResult({
         success: false,
-        message: "Network error. Please check your connection.",
+        message: 'Network error. Please check your connection.',
       });
     } finally {
       setTestingConnection(false);
@@ -109,7 +109,7 @@ export function useApiKeyManagement() {
     if (!googleKey || googleKey.trim().length < 10) {
       setGeminiTestResult({
         success: false,
-        message: "Please enter a valid API key.",
+        message: 'Please enter a valid API key.',
       });
       setTestingGeminiConnection(false);
       return;
@@ -119,7 +119,7 @@ export function useApiKeyManagement() {
     // Full verification requires a backend endpoint
     setGeminiTestResult({
       success: true,
-      message: "API key saved. Connection test not yet available.",
+      message: 'API key saved. Connection test not yet available.',
     });
     setTestingGeminiConnection(false);
   };

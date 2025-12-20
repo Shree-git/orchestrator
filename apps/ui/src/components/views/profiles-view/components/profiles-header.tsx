@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { UserCircle, Plus, RefreshCw } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { UserCircle, Plus, RefreshCw } from 'lucide-react';
 
 interface ProfilesHeaderProps {
   onResetProfiles: () => void;
@@ -55,4 +55,3 @@ export function ProfilesHeader({
     </div>
   );
 }
-

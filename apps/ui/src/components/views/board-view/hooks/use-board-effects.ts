@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { getElectronAPI } from "@/lib/electron";
-import { useAppStore } from "@/store/app-store";
+import { useEffect } from 'react';
+import { getElectronAPI } from '@/lib/electron';
+import { useAppStore } from '@/store/app-store';
 
 interface UseBoardEffectsProps {
   currentProject: { path: string; id: string } | null;
@@ -43,11 +43,11 @@ export function useBoardEffects({
     if (!api?.suggestions) return;
 
     const unsubscribe = api.suggestions.onEvent((event) => {
-      if (event.type === "suggestions_complete" && event.suggestions) {
+      if (event.type === 'suggestions_complete' && event.suggestions) {
         setSuggestionsCount(event.suggestions.length);
         setFeatureSuggestions(event.suggestions);
         setIsGeneratingSuggestions(false);
-      } else if (event.type === "suggestions_error") {
+      } else if (event.type === 'suggestions_error') {
         setIsGeneratingSuggestions(false);
       }
     });
@@ -64,9 +64,9 @@ export function useBoardEffects({
 
     const unsubscribe = api.specRegeneration.onEvent((event) => {
       console.log(
-        "[BoardView] Spec regeneration event:",
+        '[BoardView] Spec regeneration event:',
         event.type,
-        "for project:",
+        'for project:',
         event.projectPath
       );
 
@@ -74,9 +74,9 @@ export function useBoardEffects({
         return;
       }
 
-      if (event.type === "spec_regeneration_complete") {
+      if (event.type === 'spec_regeneration_complete') {
         setSpecCreatingForProject(null);
-      } else if (event.type === "spec_regeneration_error") {
+      } else if (event.type === 'spec_regeneration_error') {
         setSpecCreatingForProject(null);
       }
     });
@@ -102,7 +102,7 @@ export function useBoardEffects({
 
           if (status.runningFeatures) {
             console.log(
-              "[Board] Syncing running tasks from backend:",
+              '[Board] Syncing running tasks from backend:',
               status.runningFeatures
             );
 
@@ -114,7 +114,7 @@ export function useBoardEffects({
           }
         }
       } catch (error) {
-        console.error("[Board] Failed to sync running tasks:", error);
+        console.error('[Board] Failed to sync running tasks:', error);
       }
     };
 
@@ -126,9 +126,9 @@ export function useBoardEffects({
     const checkAllContexts = async () => {
       const featuresWithPotentialContext = features.filter(
         (f) =>
-          f.status === "in_progress" ||
-          f.status === "waiting_approval" ||
-          f.status === "verified"
+          f.status === 'in_progress' ||
+          f.status === 'waiting_approval' ||
+          f.status === 'verified'
       );
       const contextChecks = await Promise.all(
         featuresWithPotentialContext.map(async (f) => ({

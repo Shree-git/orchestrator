@@ -2,12 +2,12 @@
  * POST /update endpoint - Update a feature
  */
 
-import type { Request, Response } from "express";
+import type { Request, Response } from 'express';
 import {
   FeatureLoader,
   type Feature,
-} from "../../../services/feature-loader.js";
-import { getErrorMessage, logError } from "../common.js";
+} from '../../../services/feature-loader.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createUpdateHandler(featureLoader: FeatureLoader) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -21,7 +21,7 @@ export function createUpdateHandler(featureLoader: FeatureLoader) {
       if (!projectPath || !featureId || !updates) {
         res.status(400).json({
           success: false,
-          error: "projectPath, featureId, and updates are required",
+          error: 'projectPath, featureId, and updates are required',
         });
         return;
       }
@@ -33,7 +33,7 @@ export function createUpdateHandler(featureLoader: FeatureLoader) {
       );
       res.json({ success: true, feature: updated });
     } catch (error) {
-      logError(error, "Update feature failed");
+      logError(error, 'Update feature failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

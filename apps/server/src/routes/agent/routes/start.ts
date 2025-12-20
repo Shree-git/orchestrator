@@ -2,12 +2,12 @@
  * POST /start endpoint - Start a conversation
  */
 
-import type { Request, Response } from "express";
-import { AgentService } from "../../../services/agent-service.js";
-import { createLogger } from "../../../lib/logger.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import { AgentService } from '../../../services/agent-service.js';
+import { createLogger } from '../../../lib/logger.js';
+import { getErrorMessage, logError } from '../common.js';
 
-const logger = createLogger("Agent");
+const logger = createLogger('Agent');
 
 export function createStartHandler(agentService: AgentService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -20,7 +20,7 @@ export function createStartHandler(agentService: AgentService) {
       if (!sessionId) {
         res
           .status(400)
-          .json({ success: false, error: "sessionId is required" });
+          .json({ success: false, error: 'sessionId is required' });
         return;
       }
 
@@ -31,7 +31,7 @@ export function createStartHandler(agentService: AgentService) {
 
       res.json(result);
     } catch (error) {
-      logError(error, "Start conversation failed");
+      logError(error, 'Start conversation failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

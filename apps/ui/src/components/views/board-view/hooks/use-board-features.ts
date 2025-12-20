@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useAppStore, Feature } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useAppStore, Feature } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
 
 interface UseBoardFeaturesProps {
   currentProject: { path: string; id: string } | null;
@@ -51,7 +51,7 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
     try {
       const api = getElectronAPI();
       if (!api.features) {
-        console.error("[BoardView] Features API not available");
+        console.error('[BoardView] Features API not available');
         // Keep cached features if API is unavailable
         return;
       }
@@ -63,11 +63,11 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
           (f: any, index: number) => ({
             ...f,
             id: f.id || `feature-${index}-${Date.now()}`,
-            status: f.status || "backlog",
+            status: f.status || 'backlog',
             startedAt: f.startedAt, // Preserve startedAt timestamp
             // Ensure model and thinkingLevel are set for backward compatibility
-            model: f.model || "opus",
-            thinkingLevel: f.thinkingLevel || "none",
+            model: f.model || 'opus',
+            thinkingLevel: f.thinkingLevel || 'none',
           })
         );
         // Successfully loaded features - now safe to set them
@@ -78,7 +78,7 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
           setPersistedCategories([]);
         }
       } else if (!result.success && result.error) {
-        console.error("[BoardView] API returned error:", result.error);
+        console.error('[BoardView] API returned error:', result.error);
         // If it's a new project or the error indicates no features found,
         // that's expected - start with empty array
         if (isProjectSwitch) {
@@ -88,7 +88,7 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
         // Otherwise keep cached features
       }
     } catch (error) {
-      console.error("Failed to load features:", error);
+      console.error('Failed to load features:', error);
       // On error, keep existing cached features for the current project
       // Only clear on project switch if we have no features from server
       if (isProjectSwitch && cachedFeatures.length === 0) {
@@ -122,7 +122,7 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
         setPersistedCategories([]);
       }
     } catch (error) {
-      console.error("Failed to load categories:", error);
+      console.error('Failed to load categories:', error);
       // If file doesn't exist, ensure categories are cleared
       setPersistedCategories([]);
     }
@@ -154,7 +154,7 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
           setPersistedCategories(categories);
         }
       } catch (error) {
-        console.error("Failed to save category:", error);
+        console.error('Failed to save category:', error);
       }
     },
     [currentProject, persistedCategories]
@@ -168,12 +168,12 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
     const unsubscribe = api.specRegeneration.onEvent((event) => {
       // Refresh the kanban board when spec regeneration completes for the current project
       if (
-        event.type === "spec_regeneration_complete" &&
+        event.type === 'spec_regeneration_complete' &&
         currentProject &&
         event.projectPath === currentProject.path
       ) {
         console.log(
-          "[BoardView] Spec regeneration complete, refreshing features"
+          '[BoardView] Spec regeneration complete, refreshing features'
         );
         loadFeatures();
       }
@@ -196,29 +196,29 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
       // Use event's projectPath or projectId if available, otherwise use current project
       // Board view only reacts to events for the currently selected project
       const eventProjectId =
-        ("projectId" in event && event.projectId) || projectId;
+        ('projectId' in event && event.projectId) || projectId;
 
-      if (event.type === "auto_mode_feature_complete") {
+      if (event.type === 'auto_mode_feature_complete') {
         // Reload features when a feature is completed
-        console.log("[Board] Feature completed, reloading features...");
+        console.log('[Board] Feature completed, reloading features...');
         loadFeatures();
         // Play ding sound when feature is done (unless muted)
         const { muteDoneSound } = useAppStore.getState();
         if (!muteDoneSound) {
-          const audio = new Audio("/sounds/ding.mp3");
+          const audio = new Audio('/sounds/ding.mp3');
           audio
             .play()
-            .catch((err) => console.warn("Could not play ding sound:", err));
+            .catch((err) => console.warn('Could not play ding sound:', err));
         }
-      } else if (event.type === "plan_approval_required") {
+      } else if (event.type === 'plan_approval_required') {
         // Reload features when plan is generated and requires approval
         // This ensures the feature card shows the "Approve Plan" button
-        console.log("[Board] Plan approval required, reloading features...");
+        console.log('[Board] Plan approval required, reloading features...');
         loadFeatures();
-      } else if (event.type === "auto_mode_error") {
+      } else if (event.type === 'auto_mode_error') {
         // Reload features when an error occurs (feature moved to waiting_approval)
         console.log(
-          "[Board] Feature error, reloading features...",
+          '[Board] Feature error, reloading features...',
           event.error
         );
 
@@ -231,20 +231,20 @@ export function useBoardFeatures({ currentProject }: UseBoardFeaturesProps) {
 
         // Check for authentication errors and show a more helpful message
         const isAuthError =
-          event.errorType === "authentication" ||
+          event.errorType === 'authentication' ||
           (event.error &&
-            (event.error.includes("Authentication failed") ||
-              event.error.includes("Invalid API key")));
+            (event.error.includes('Authentication failed') ||
+              event.error.includes('Invalid API key')));
 
         if (isAuthError) {
-          toast.error("Authentication Failed", {
+          toast.error('Authentication Failed', {
             description:
               "Your API key is invalid or expired. Please check Settings or run 'claude login' in terminal.",
             duration: 10000,
           });
         } else {
-          toast.error("Agent encountered an error", {
-            description: event.error || "Check the logs for details",
+          toast.error('Agent encountered an error', {
+            description: event.error || 'Check the logs for details',
           });
         }
       }

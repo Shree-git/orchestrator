@@ -2,13 +2,13 @@
  * Common utilities for running-agents routes
  */
 
-import { createLogger } from "../../lib/logger.js";
+import { createLogger } from '../../lib/logger.js';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
+} from '../common.js';
 
-const logger = createLogger("RunningAgents");
+const logger = createLogger('RunningAgents');
 
 // Re-export shared utilities
 export { getErrorMessageShared as getErrorMessage };

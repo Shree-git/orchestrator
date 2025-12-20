@@ -11,9 +11,9 @@
  * settings are persisted to files that survive app updates.
  */
 
-import { useEffect, useState, useRef } from "react";
-import { getHttpApiClient } from "@/lib/http-api-client";
-import { isElectron } from "@/lib/electron";
+import { useEffect, useState, useRef } from 'react';
+import { getHttpApiClient } from '@/lib/http-api-client';
+import { isElectron } from '@/lib/electron';
 
 interface MigrationState {
   checked: boolean;
@@ -23,22 +23,22 @@ interface MigrationState {
 
 // localStorage keys to migrate
 const LOCALSTORAGE_KEYS = [
-  "automaker-storage",
-  "automaker-setup",
-  "worktree-panel-collapsed",
-  "file-browser-recent-folders",
-  "automaker:lastProjectDir",
+  'automaker-storage',
+  'automaker-setup',
+  'worktree-panel-collapsed',
+  'file-browser-recent-folders',
+  'automaker:lastProjectDir',
 ] as const;
 
 // Keys to clear after migration (not automaker-storage as it's still used by Zustand)
 const KEYS_TO_CLEAR_AFTER_MIGRATION = [
-  "worktree-panel-collapsed",
-  "file-browser-recent-folders",
-  "automaker:lastProjectDir",
+  'worktree-panel-collapsed',
+  'file-browser-recent-folders',
+  'automaker:lastProjectDir',
   // Legacy keys
-  "automaker_projects",
-  "automaker_current_project",
-  "automaker_trashed_projects",
+  'automaker_projects',
+  'automaker_current_project',
+  'automaker_trashed_projects',
 ] as const;
 
 /**
@@ -71,11 +71,11 @@ export function useSettingsMigration(): MigrationState {
         const status = await api.settings.getStatus();
 
         if (!status.success) {
-          console.error("[Settings Migration] Failed to get status:", status);
+          console.error('[Settings Migration] Failed to get status:', status);
           setState({
             checked: true,
             migrated: false,
-            error: "Failed to check settings status",
+            error: 'Failed to check settings status',
           });
           return;
         }
@@ -83,23 +83,21 @@ export function useSettingsMigration(): MigrationState {
         // If settings files already exist, no migration needed
         if (!status.needsMigration) {
           console.log(
-            "[Settings Migration] Settings files exist, no migration needed"
+            '[Settings Migration] Settings files exist, no migration needed'
           );
           setState({ checked: true, migrated: false, error: null });
           return;
         }
 
         // Check if we have localStorage data to migrate
-        const automakerStorage = localStorage.getItem("automaker-storage");
+        const automakerStorage = localStorage.getItem('automaker-storage');
         if (!automakerStorage) {
-          console.log(
-            "[Settings Migration] No localStorage data to migrate"
-          );
+          console.log('[Settings Migration] No localStorage data to migrate');
           setState({ checked: true, migrated: false, error: null });
           return;
         }
 
-        console.log("[Settings Migration] Starting migration...");
+        console.log('[Settings Migration] Starting migration...');
 
         // Collect all localStorage data
         const localStorageData: Record<string, string> = {};
@@ -114,7 +112,7 @@ export function useSettingsMigration(): MigrationState {
         const result = await api.settings.migrate(localStorageData);
 
         if (result.success) {
-          console.log("[Settings Migration] Migration successful:", {
+          console.log('[Settings Migration] Migration successful:', {
             globalSettings: result.migratedGlobalSettings,
             credentials: result.migratedCredentials,
             projects: result.migratedProjectCount,
@@ -128,21 +126,21 @@ export function useSettingsMigration(): MigrationState {
           setState({ checked: true, migrated: true, error: null });
         } else {
           console.warn(
-            "[Settings Migration] Migration had errors:",
+            '[Settings Migration] Migration had errors:',
             result.errors
           );
           setState({
             checked: true,
             migrated: false,
-            error: result.errors.join(", "),
+            error: result.errors.join(', '),
           });
         }
       } catch (error) {
-        console.error("[Settings Migration] Migration failed:", error);
+        console.error('[Settings Migration] Migration failed:', error);
         setState({
           checked: true,
           migrated: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -162,7 +160,7 @@ export async function syncSettingsToServer(): Promise<boolean> {
 
   try {
     const api = getHttpApiClient();
-    const automakerStorage = localStorage.getItem("automaker-storage");
+    const automakerStorage = localStorage.getItem('automaker-storage');
 
     if (!automakerStorage) {
       return false;
@@ -199,7 +197,7 @@ export async function syncSettingsToServer(): Promise<boolean> {
     const result = await api.settings.updateGlobal(updates);
     return result.success;
   } catch (error) {
-    console.error("[Settings Sync] Failed to sync settings:", error);
+    console.error('[Settings Sync] Failed to sync settings:', error);
     return false;
   }
 }
@@ -220,7 +218,7 @@ export async function syncCredentialsToServer(apiKeys: {
     const result = await api.settings.updateCredentials({ apiKeys });
     return result.success;
   } catch (error) {
-    console.error("[Settings Sync] Failed to sync credentials:", error);
+    console.error('[Settings Sync] Failed to sync credentials:', error);
     return false;
   }
 }
@@ -252,10 +250,7 @@ export async function syncProjectSettingsToServer(
     const result = await api.settings.updateProject(projectPath, updates);
     return result.success;
   } catch (error) {
-    console.error(
-      "[Settings Sync] Failed to sync project settings:",
-      error
-    );
+    console.error('[Settings Sync] Failed to sync project settings:', error);
     return false;
   }
 }

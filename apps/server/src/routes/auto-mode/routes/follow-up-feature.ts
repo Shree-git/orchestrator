@@ -2,12 +2,12 @@
  * POST /follow-up-feature endpoint - Follow up on a feature
  */
 
-import type { Request, Response } from "express";
-import type { AutoModeService } from "../../../services/auto-mode-service.js";
-import { createLogger } from "../../../lib/logger.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import type { AutoModeService } from '../../../services/auto-mode-service.js';
+import { createLogger } from '../../../lib/logger.js';
+import { getErrorMessage, logError } from '../common.js';
 
-const logger = createLogger("AutoMode");
+const logger = createLogger('AutoMode');
 
 export function createFollowUpFeatureHandler(autoModeService: AutoModeService) {
   return async (req: Request, res: Response): Promise<void> => {
@@ -24,7 +24,7 @@ export function createFollowUpFeatureHandler(autoModeService: AutoModeService) {
       if (!projectPath || !featureId || !prompt) {
         res.status(400).json({
           success: false,
-          error: "projectPath, featureId, and prompt are required",
+          error: 'projectPath, featureId, and prompt are required',
         });
         return;
       }
@@ -52,7 +52,7 @@ export function createFollowUpFeatureHandler(autoModeService: AutoModeService) {
 
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Follow up feature failed");
+      logError(error, 'Follow up feature failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

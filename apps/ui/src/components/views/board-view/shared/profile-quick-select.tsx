@@ -1,9 +1,8 @@
-
-import { Label } from "@/components/ui/label";
-import { Brain, UserCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { AgentModel, ThinkingLevel, AIProfile } from "@/store/app-store";
-import { PROFILE_ICONS } from "./model-constants";
+import { Label } from '@/components/ui/label';
+import { Brain, UserCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { AgentModel, ThinkingLevel, AIProfile } from '@/store/app-store';
+import { PROFILE_ICONS } from './model-constants';
 
 interface ProfileQuickSelectProps {
   profiles: AIProfile[];
@@ -20,7 +19,7 @@ export function ProfileQuickSelect({
   selectedModel,
   selectedThinkingLevel,
   onSelect,
-  testIdPrefix = "profile-quick-select",
+  testIdPrefix = 'profile-quick-select',
   showManageLink = false,
   onManageLinkClick,
 }: ProfileQuickSelectProps) {
@@ -53,10 +52,10 @@ export function ProfileQuickSelect({
               type="button"
               onClick={() => onSelect(profile.model, profile.thinkingLevel)}
               className={cn(
-                "flex items-center gap-2 p-2 rounded-lg border text-left transition-all",
+                'flex items-center gap-2 p-2 rounded-lg border text-left transition-all',
                 isSelected
-                  ? "bg-brand-500/10 border-brand-500 text-foreground"
-                  : "bg-background hover:bg-accent border-input"
+                  ? 'bg-brand-500/10 border-brand-500 text-foreground'
+                  : 'bg-background hover:bg-accent border-input'
               )}
               data-testid={`${testIdPrefix}-${profile.id}`}
             >
@@ -69,7 +68,7 @@ export function ProfileQuickSelect({
                 <p className="text-sm font-medium truncate">{profile.name}</p>
                 <p className="text-[10px] text-muted-foreground truncate">
                   {profile.model}
-                  {profile.thinkingLevel !== "none" &&
+                  {profile.thinkingLevel !== 'none' &&
                     ` + ${profile.thinkingLevel}`}
                 </p>
               </div>
@@ -81,8 +80,8 @@ export function ProfileQuickSelect({
         Or customize below.
         {showManageLink && onManageLinkClick && (
           <>
-            {" "}
-            Manage profiles in{" "}
+            {' '}
+            Manage profiles in{' '}
             <button
               type="button"
               onClick={onManageLinkClick}

@@ -1,10 +1,6 @@
-import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  FilePlus2,
-  Loader2,
-} from "lucide-react";
-import { PHASE_LABELS } from "../constants";
+import { Button } from '@/components/ui/button';
+import { FileText, FilePlus2, Loader2 } from 'lucide-react';
+import { PHASE_LABELS } from '../constants';
 
 interface SpecEmptyStateProps {
   projectPath: string;
@@ -51,8 +47,8 @@ export function SpecEmptyState({
             <div className="flex flex-col gap-1 min-w-0">
               <span className="text-sm font-semibold text-primary leading-tight tracking-tight">
                 {isCreating
-                  ? "Generating Specification"
-                  : "Regenerating Specification"}
+                  ? 'Generating Specification'
+                  : 'Regenerating Specification'}
               </span>
               {currentPhase && (
                 <span className="text-xs text-muted-foreground/90 leading-tight font-medium">
@@ -96,13 +92,13 @@ export function SpecEmptyState({
                 )}
               </>
             ) : (
-              "No App Specification Found"
+              'No App Specification Found'
             )}
           </h2>
           <p className="text-muted-foreground mb-6">
             {isCreating
-              ? currentPhase === "feature_generation"
-                ? "The app specification has been created! Now generating features from the implementation roadmap..."
+              ? currentPhase === 'feature_generation'
+                ? 'The app specification has been created! Now generating features from the implementation roadmap...'
                 : "We're analyzing your project and generating a comprehensive specification. This may take a few moments..."
               : "Create an app specification to help our system understand your project. We'll analyze your codebase and generate a comprehensive spec based on your description."}
           </p>

@@ -1,21 +1,20 @@
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { cn, modelSupportsThinking } from "@/lib/utils";
-import { DialogFooter } from "@/components/ui/dialog";
-import { Brain } from "lucide-react";
-import { toast } from "sonner";
-import type { AIProfile, AgentModel, ThinkingLevel } from "@/store/app-store";
-import { CLAUDE_MODELS, THINKING_LEVELS, ICON_OPTIONS } from "../constants";
-import { getProviderFromModel } from "../utils";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { cn, modelSupportsThinking } from '@/lib/utils';
+import { DialogFooter } from '@/components/ui/dialog';
+import { Brain } from 'lucide-react';
+import { toast } from 'sonner';
+import type { AIProfile, AgentModel, ThinkingLevel } from '@/store/app-store';
+import { CLAUDE_MODELS, THINKING_LEVELS, ICON_OPTIONS } from '../constants';
+import { getProviderFromModel } from '../utils';
 
 interface ProfileFormProps {
   profile: Partial<AIProfile>;
-  onSave: (profile: Omit<AIProfile, "id">) => void;
+  onSave: (profile: Omit<AIProfile, 'id'>) => void;
   onCancel: () => void;
   isEditing: boolean;
   hotkeyActive: boolean;
@@ -29,11 +28,11 @@ export function ProfileForm({
   hotkeyActive,
 }: ProfileFormProps) {
   const [formData, setFormData] = useState({
-    name: profile.name || "",
-    description: profile.description || "",
-    model: profile.model || ("opus" as AgentModel),
-    thinkingLevel: profile.thinkingLevel || ("none" as ThinkingLevel),
-    icon: profile.icon || "Brain",
+    name: profile.name || '',
+    description: profile.description || '',
+    model: profile.model || ('opus' as AgentModel),
+    thinkingLevel: profile.thinkingLevel || ('none' as ThinkingLevel),
+    icon: profile.icon || 'Brain',
   });
 
   const provider = getProviderFromModel(formData.model);
@@ -48,7 +47,7 @@ export function ProfileForm({
 
   const handleSubmit = () => {
     if (!formData.name.trim()) {
-      toast.error("Please enter a profile name");
+      toast.error('Please enter a profile name');
       return;
     }
 
@@ -56,7 +55,7 @@ export function ProfileForm({
       name: formData.name.trim(),
       description: formData.description.trim(),
       model: formData.model,
-      thinkingLevel: supportsThinking ? formData.thinkingLevel : "none",
+      thinkingLevel: supportsThinking ? formData.thinkingLevel : 'none',
       provider,
       isBuiltIn: false,
       icon: formData.icon,
@@ -103,10 +102,10 @@ export function ProfileForm({
                 type="button"
                 onClick={() => setFormData({ ...formData, icon: name })}
                 className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center border transition-colors",
+                  'w-10 h-10 rounded-lg flex items-center justify-center border transition-colors',
                   formData.icon === name
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background hover:bg-accent border-border"
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background hover:bg-accent border-border'
                 )}
                 data-testid={`icon-select-${name}`}
               >
@@ -129,14 +128,14 @@ export function ProfileForm({
                 type="button"
                 onClick={() => handleModelChange(id)}
                 className={cn(
-                  "flex-1 min-w-[100px] px-3 py-2 rounded-md border text-sm font-medium transition-colors",
+                  'flex-1 min-w-[100px] px-3 py-2 rounded-md border text-sm font-medium transition-colors',
                   formData.model === id
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background hover:bg-accent border-border"
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background hover:bg-accent border-border'
                 )}
                 data-testid={`model-select-${id}`}
               >
-                {label.replace("Claude ", "")}
+                {label.replace('Claude ', '')}
               </button>
             ))}
           </div>
@@ -156,19 +155,19 @@ export function ProfileForm({
                   type="button"
                   onClick={() => {
                     setFormData({ ...formData, thinkingLevel: id });
-                    if (id === "ultrathink") {
-                      toast.warning("Ultrathink uses extensive reasoning", {
+                    if (id === 'ultrathink') {
+                      toast.warning('Ultrathink uses extensive reasoning', {
                         description:
-                          "Best for complex architecture, migrations, or deep debugging (~$0.48/task).",
+                          'Best for complex architecture, migrations, or deep debugging (~$0.48/task).',
                         duration: 4000,
                       });
                     }
                   }}
                   className={cn(
-                    "flex-1 min-w-[70px] px-3 py-2 rounded-md border text-sm font-medium transition-colors",
+                    'flex-1 min-w-[70px] px-3 py-2 rounded-md border text-sm font-medium transition-colors',
                     formData.thinkingLevel === id
-                      ? "bg-amber-500 text-white border-amber-400"
-                      : "bg-background hover:bg-accent border-border"
+                      ? 'bg-amber-500 text-white border-amber-400'
+                      : 'bg-background hover:bg-accent border-border'
                   )}
                   data-testid={`thinking-select-${id}`}
                 >
@@ -190,14 +189,13 @@ export function ProfileForm({
         </Button>
         <HotkeyButton
           onClick={handleSubmit}
-          hotkey={{ key: "Enter", cmdCtrl: true }}
+          hotkey={{ key: 'Enter', cmdCtrl: true }}
           hotkeyActive={hotkeyActive}
           data-testid="save-profile-button"
         >
-          {isEditing ? "Save Changes" : "Create Profile"}
+          {isEditing ? 'Save Changes' : 'Create Profile'}
         </HotkeyButton>
       </DialogFooter>
     </>
   );
 }
-

@@ -1,9 +1,8 @@
+import * as React from 'react';
+import { Check, ChevronsUpDown, LucideIcon } from 'lucide-react';
 
-import * as React from "react";
-import { Check, ChevronsUpDown, LucideIcon } from "lucide-react";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -11,12 +10,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 
 export interface AutocompleteOption {
   value: string;
@@ -38,12 +37,12 @@ interface AutocompleteProps {
   icon?: LucideIcon;
   allowCreate?: boolean;
   createLabel?: (value: string) => string;
-  "data-testid"?: string;
+  'data-testid'?: string;
   itemTestIdPrefix?: string;
 }
 
 function normalizeOption(opt: string | AutocompleteOption): AutocompleteOption {
-  if (typeof opt === "string") {
+  if (typeof opt === 'string') {
     return { value: opt, label: opt };
   }
   return { ...opt, label: opt.label ?? opt.value };
@@ -53,20 +52,20 @@ export function Autocomplete({
   value,
   onChange,
   options,
-  placeholder = "Select an option...",
-  searchPlaceholder = "Search...",
-  emptyMessage = "No results found.",
+  placeholder = 'Select an option...',
+  searchPlaceholder = 'Search...',
+  emptyMessage = 'No results found.',
   className,
   disabled = false,
   error = false,
   icon: Icon,
   allowCreate = false,
   createLabel = (v) => `Create "${v}"`,
-  "data-testid": testId,
-  itemTestIdPrefix = "option",
+  'data-testid': testId,
+  itemTestIdPrefix = 'option',
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = React.useState('');
   const [triggerWidth, setTriggerWidth] = React.useState<number>(0);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
@@ -129,9 +128,9 @@ export function Autocomplete({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            "w-full justify-between",
-            Icon && "font-mono text-sm",
-            error && "border-destructive focus-visible:ring-destructive",
+            'w-full justify-between',
+            Icon && 'font-mono text-sm',
+            error && 'border-destructive focus-visible:ring-destructive',
             className
           )}
           data-testid={testId}
@@ -163,7 +162,7 @@ export function Autocomplete({
             <CommandEmpty>
               {isNewValue ? (
                 <div className="py-2 px-3 text-sm">
-                  Press enter to create{" "}
+                  Press enter to create{' '}
                   <code className="bg-muted px-1 rounded">{inputValue}</code>
                 </div>
               ) : (
@@ -177,7 +176,7 @@ export function Autocomplete({
                   value={inputValue}
                   onSelect={() => {
                     onChange(inputValue);
-                    setInputValue("");
+                    setInputValue('');
                     setOpen(false);
                   }}
                   className="text-[var(--status-success)]"
@@ -195,18 +194,18 @@ export function Autocomplete({
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue);
-                    setInputValue("");
+                    onChange(currentValue === value ? '' : currentValue);
+                    setInputValue('');
                     setOpen(false);
                   }}
-                  data-testid={`${itemTestIdPrefix}-${option.value.toLowerCase().replace(/[\s/\\]+/g, "-")}`}
+                  data-testid={`${itemTestIdPrefix}-${option.value.toLowerCase().replace(/[\s/\\]+/g, '-')}`}
                 >
                   {Icon && <Icon className="w-4 h-4 mr-2" />}
                   {option.label}
                   <Check
                     className={cn(
-                      "ml-auto",
-                      value === option.value ? "opacity-100" : "opacity-0"
+                      'ml-auto',
+                      value === option.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   {option.badge && (

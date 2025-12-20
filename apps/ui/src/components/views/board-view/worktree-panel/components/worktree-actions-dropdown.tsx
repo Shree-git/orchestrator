@@ -1,5 +1,4 @@
-
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Trash2,
   MoreHorizontal,
@@ -21,9 +20,9 @@ import {
   Globe,
   MessageSquare,
   GitMerge,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { WorktreeInfo, DevServerInfo, PRInfo } from "../types";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { WorktreeInfo, DevServerInfo, PRInfo } from '../types';
 
 interface WorktreeActionsDropdownProps {
   worktree: WorktreeInfo;
@@ -81,12 +80,12 @@ export function WorktreeActionsDropdown({
     <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant={isSelected ? "default" : "outline"}
+          variant={isSelected ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            "h-7 w-7 p-0 rounded-l-none",
-            isSelected && "bg-primary text-primary-foreground",
-            !isSelected && "bg-secondary/50 hover:bg-secondary"
+            'h-7 w-7 p-0 rounded-l-none',
+            isSelected && 'bg-primary text-primary-foreground',
+            !isSelected && 'bg-secondary/50 hover:bg-secondary'
           )}
         >
           <MoreHorizontal className="w-3 h-3" />
@@ -124,11 +123,11 @@ export function WorktreeActionsDropdown({
             >
               <Play
                 className={cn(
-                  "w-3.5 h-3.5 mr-2",
-                  isStartingDevServer && "animate-pulse"
+                  'w-3.5 h-3.5 mr-2',
+                  isStartingDevServer && 'animate-pulse'
                 )}
               />
-              {isStartingDevServer ? "Starting..." : "Start Dev Server"}
+              {isStartingDevServer ? 'Starting...' : 'Start Dev Server'}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -139,9 +138,9 @@ export function WorktreeActionsDropdown({
           className="text-xs"
         >
           <Download
-            className={cn("w-3.5 h-3.5 mr-2", isPulling && "animate-pulse")}
+            className={cn('w-3.5 h-3.5 mr-2', isPulling && 'animate-pulse')}
           />
-          {isPulling ? "Pulling..." : "Pull"}
+          {isPulling ? 'Pulling...' : 'Pull'}
           {behindCount > 0 && (
             <span className="ml-auto text-[10px] bg-muted px-1.5 py-0.5 rounded">
               {behindCount} behind
@@ -154,9 +153,9 @@ export function WorktreeActionsDropdown({
           className="text-xs"
         >
           <Upload
-            className={cn("w-3.5 h-3.5 mr-2", isPushing && "animate-pulse")}
+            className={cn('w-3.5 h-3.5 mr-2', isPushing && 'animate-pulse')}
           />
-          {isPushing ? "Pushing..." : "Push"}
+          {isPushing ? 'Pushing...' : 'Push'}
           {aheadCount > 0 && (
             <span className="ml-auto text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded">
               {aheadCount} ahead
@@ -182,14 +181,20 @@ export function WorktreeActionsDropdown({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {worktree.hasChanges && (
-          <DropdownMenuItem onClick={() => onCommit(worktree)} className="text-xs">
+          <DropdownMenuItem
+            onClick={() => onCommit(worktree)}
+            className="text-xs"
+          >
             <GitCommit className="w-3.5 h-3.5 mr-2" />
             Commit Changes
           </DropdownMenuItem>
         )}
         {/* Show PR option for non-primary worktrees, or primary worktree with changes */}
         {(!worktree.isMain || worktree.hasChanges) && !hasPR && (
-          <DropdownMenuItem onClick={() => onCreatePR(worktree)} className="text-xs">
+          <DropdownMenuItem
+            onClick={() => onCreatePR(worktree)}
+            className="text-xs"
+          >
             <GitPullRequest className="w-3.5 h-3.5 mr-2" />
             Create Pull Request
           </DropdownMenuItem>
@@ -199,7 +204,7 @@ export function WorktreeActionsDropdown({
           <>
             <DropdownMenuItem
               onClick={() => {
-                window.open(worktree.pr!.url, "_blank");
+                window.open(worktree.pr!.url, '_blank');
               }}
               className="text-xs"
             >
@@ -218,8 +223,8 @@ export function WorktreeActionsDropdown({
                   title: worktree.pr!.title,
                   url: worktree.pr!.url,
                   state: worktree.pr!.state,
-                  author: "", // Will be fetched
-                  body: "",   // Will be fetched
+                  author: '', // Will be fetched
+                  body: '', // Will be fetched
                   comments: [],
                   reviewComments: [],
                 };

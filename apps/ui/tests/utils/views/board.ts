@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Get a kanban card by feature ID
@@ -40,14 +40,14 @@ export async function hasKanbanColumnMasonryLayout(
   columnId: string
 ): Promise<boolean> {
   const column = page.locator(`[data-testid="kanban-column-${columnId}"]`);
-  const contentDiv = column.locator("> div").nth(1); // Second child is the content area
+  const contentDiv = column.locator('> div').nth(1); // Second child is the content area
 
   const columnCount = await contentDiv.evaluate((el) => {
     const style = window.getComputedStyle(el);
     return style.columnCount;
   });
 
-  return columnCount === "2";
+  return columnCount === '2';
 }
 
 /**
@@ -145,22 +145,22 @@ export async function fillAddFeatureDialog(
     const otherBranchRadio = page
       .locator('[data-testid="feature-radio-group"]')
       .locator('[id="feature-other"]');
-    await otherBranchRadio.waitFor({ state: "visible", timeout: 5000 });
+    await otherBranchRadio.waitFor({ state: 'visible', timeout: 5000 });
     await otherBranchRadio.click();
     // Wait for the branch input to appear
     await page.waitForTimeout(300);
 
     // Now click on the branch input (autocomplete)
     const branchInput = page.locator('[data-testid="feature-input"]');
-    await branchInput.waitFor({ state: "visible", timeout: 5000 });
+    await branchInput.waitFor({ state: 'visible', timeout: 5000 });
     await branchInput.click();
     // Wait for the popover to open
     await page.waitForTimeout(300);
     // Type in the command input
-    const commandInput = page.locator("[cmdk-input]");
+    const commandInput = page.locator('[cmdk-input]');
     await commandInput.fill(options.branch);
     // Press Enter to select/create the branch
-    await commandInput.press("Enter");
+    await commandInput.press('Enter');
     // Wait for popover to close
     await page.waitForTimeout(200);
   }
@@ -172,9 +172,9 @@ export async function fillAddFeatureDialog(
     );
     await categoryButton.click();
     await page.waitForTimeout(300);
-    const commandInput = page.locator("[cmdk-input]");
+    const commandInput = page.locator('[cmdk-input]');
     await commandInput.fill(options.category);
-    await commandInput.press("Enter");
+    await commandInput.press('Enter');
     await page.waitForTimeout(200);
   }
 }
@@ -222,8 +222,8 @@ export async function selectWorktreeBranch(
   page: Page,
   branchName: string
 ): Promise<void> {
-  const branchButton = page.getByRole("button", {
-    name: new RegExp(branchName, "i"),
+  const branchButton = page.getByRole('button', {
+    name: new RegExp(branchName, 'i'),
   });
   await branchButton.click();
   await page.waitForTimeout(500); // Wait for UI to update
@@ -250,8 +250,8 @@ export async function isWorktreeBranchVisible(
   page: Page,
   branchName: string
 ): Promise<boolean> {
-  const branchButton = page.getByRole("button", {
-    name: new RegExp(branchName, "i"),
+  const branchButton = page.getByRole('button', {
+    name: new RegExp(branchName, 'i'),
   });
   return await branchButton.isVisible().catch(() => false);
 }

@@ -7,7 +7,14 @@
  */
 
 import { execSync } from 'child_process';
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+  readFileSync,
+} from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -37,14 +44,16 @@ cpSync(join(SERVER_DIR, 'dist'), join(BUNDLE_DIR, 'dist'), { recursive: true });
 
 // Step 4: Create a minimal package.json for the server
 console.log('📝 Creating server package.json...');
-const serverPkg = JSON.parse(readFileSync(join(SERVER_DIR, 'package.json'), 'utf-8'));
+const serverPkg = JSON.parse(
+  readFileSync(join(SERVER_DIR, 'package.json'), 'utf-8')
+);
 
 const bundlePkg = {
   name: '@automaker/server-bundle',
   version: serverPkg.version,
   type: 'module',
   main: 'dist/index.js',
-  dependencies: serverPkg.dependencies
+  dependencies: serverPkg.dependencies,
 };
 
 writeFileSync(
@@ -60,8 +69,8 @@ execSync('npm install --omit=dev', {
   env: {
     ...process.env,
     // Prevent npm from using workspace resolution
-    npm_config_workspace: ''
-  }
+    npm_config_workspace: '',
+  },
 });
 
 // Step 6: Rebuild native modules for current architecture
@@ -70,11 +79,13 @@ console.log('🔨 Rebuilding native modules for current architecture...');
 try {
   execSync('npm rebuild', {
     cwd: BUNDLE_DIR,
-    stdio: 'inherit'
+    stdio: 'inherit',
   });
   console.log('✅ Native modules rebuilt successfully');
 } catch (error) {
-  console.warn('⚠️  Warning: Failed to rebuild native modules. Terminal functionality may not work.');
+  console.warn(
+    '⚠️  Warning: Failed to rebuild native modules. Terminal functionality may not work.'
+  );
   console.warn('   Error:', error.message);
 }
 

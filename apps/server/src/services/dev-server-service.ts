@@ -7,10 +7,10 @@
  * Developers should configure their projects to use the PORT environment variable.
  */
 
-import { spawn, execSync, type ChildProcess } from "child_process";
-import { existsSync } from "fs";
-import path from "path";
-import net from "net";
+import { spawn, execSync, type ChildProcess } from 'child_process';
+import { existsSync } from 'fs';
+import path from 'path';
+import net from 'net';
 
 export interface DevServerInfo {
   worktreePath: string;
@@ -40,12 +40,12 @@ class DevServerService {
     // Then check if the system has it in use
     return new Promise((resolve) => {
       const server = net.createServer();
-      server.once("error", () => resolve(false));
-      server.once("listening", () => {
+      server.once('error', () => resolve(false));
+      server.once('listening', () => {
         server.close();
         resolve(true);
       });
-      server.listen(port, "127.0.0.1");
+      server.listen(port, '127.0.0.1');
     });
   }
 
@@ -54,22 +54,26 @@ class DevServerService {
    */
   private killProcessOnPort(port: number): void {
     try {
-      if (process.platform === "win32") {
+      if (process.platform === 'win32') {
         // Windows: find and kill process on port
-        const result = execSync(`netstat -ano | findstr :${port}`, { encoding: "utf-8" });
-        const lines = result.trim().split("\n");
+        const result = execSync(`netstat -ano | findstr :${port}`, {
+          encoding: 'utf-8',
+        });
+        const lines = result.trim().split('\n');
         const pids = new Set<string>();
         for (const line of lines) {
           const parts = line.trim().split(/\s+/);
           const pid = parts[parts.length - 1];
-          if (pid && pid !== "0") {
+          if (pid && pid !== '0') {
             pids.add(pid);
           }
         }
         for (const pid of pids) {
           try {
-            execSync(`taskkill /F /PID ${pid}`, { stdio: "ignore" });
-            console.log(`[DevServerService] Killed process ${pid} on port ${port}`);
+            execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
+            console.log(
+              `[DevServerService] Killed process ${pid} on port ${port}`
+            );
           } catch {
             // Process may have already exited
           }
@@ -77,12 +81,14 @@ class DevServerService {
       } else {
         // macOS/Linux: use lsof to find and kill process
         try {
-          const result = execSync(`lsof -ti:${port}`, { encoding: "utf-8" });
-          const pids = result.trim().split("\n").filter(Boolean);
+          const result = execSync(`lsof -ti:${port}`, { encoding: 'utf-8' });
+          const pids = result.trim().split('\n').filter(Boolean);
           for (const pid of pids) {
             try {
-              execSync(`kill -9 ${pid}`, { stdio: "ignore" });
-              console.log(`[DevServerService] Killed process ${pid} on port ${port}`);
+              execSync(`kill -9 ${pid}`, { stdio: 'ignore' });
+              console.log(
+                `[DevServerService] Killed process ${pid} on port ${port}`
+              );
             } catch {
               // Process may have already exited
             }
@@ -124,7 +130,9 @@ class DevServerService {
       port++;
     }
 
-    throw new Error(`No available ports found between ${BASE_PORT} and ${MAX_PORT}`);
+    throw new Error(
+      `No available ports found between ${BASE_PORT} and ${MAX_PORT}`
+    );
   }
 
   /**
@@ -132,12 +140,12 @@ class DevServerService {
    */
   private detectPackageManager(
     dir: string
-  ): "npm" | "yarn" | "pnpm" | "bun" | null {
-    if (existsSync(path.join(dir, "bun.lockb"))) return "bun";
-    if (existsSync(path.join(dir, "pnpm-lock.yaml"))) return "pnpm";
-    if (existsSync(path.join(dir, "yarn.lock"))) return "yarn";
-    if (existsSync(path.join(dir, "package-lock.json"))) return "npm";
-    if (existsSync(path.join(dir, "package.json"))) return "npm"; // Default
+  ): 'npm' | 'yarn' | 'pnpm' | 'bun' | null {
+    if (existsSync(path.join(dir, 'bun.lockb'))) return 'bun';
+    if (existsSync(path.join(dir, 'pnpm-lock.yaml'))) return 'pnpm';
+    if (existsSync(path.join(dir, 'yarn.lock'))) return 'yarn';
+    if (existsSync(path.join(dir, 'package-lock.json'))) return 'npm';
+    if (existsSync(path.join(dir, 'package.json'))) return 'npm'; // Default
     return null;
   }
 
@@ -149,15 +157,15 @@ class DevServerService {
     if (!pm) return null;
 
     switch (pm) {
-      case "bun":
-        return { cmd: "bun", args: ["run", "dev"] };
-      case "pnpm":
-        return { cmd: "pnpm", args: ["run", "dev"] };
-      case "yarn":
-        return { cmd: "yarn", args: ["dev"] };
-      case "npm":
+      case 'bun':
+        return { cmd: 'bun', args: ['run', 'dev'] };
+      case 'pnpm':
+        return { cmd: 'pnpm', args: ['run', 'dev'] };
+      case 'yarn':
+        return { cmd: 'yarn', args: ['dev'] };
+      case 'npm':
       default:
-        return { cmd: "npm", args: ["run", "dev"] };
+        return { cmd: 'npm', args: ['run', 'dev'] };
     }
   }
 
@@ -200,7 +208,7 @@ class DevServerService {
     }
 
     // Check for package.json
-    const packageJsonPath = path.join(worktreePath, "package.json");
+    const packageJsonPath = path.join(worktreePath, 'package.json');
     if (!existsSync(packageJsonPath)) {
       return {
         success: false,
@@ -224,7 +232,8 @@ class DevServerService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Port allocation failed",
+        error:
+          error instanceof Error ? error.message : 'Port allocation failed',
       };
     }
 
@@ -241,14 +250,10 @@ class DevServerService {
     // Small delay to ensure related ports are freed
     await new Promise((resolve) => setTimeout(resolve, 100));
 
+    console.log(`[DevServerService] Starting dev server on port ${port}`);
+    console.log(`[DevServerService] Working directory (cwd): ${worktreePath}`);
     console.log(
-      `[DevServerService] Starting dev server on port ${port}`
-    );
-    console.log(
-      `[DevServerService] Working directory (cwd): ${worktreePath}`
-    );
-    console.log(
-      `[DevServerService] Command: ${devCommand.cmd} ${devCommand.args.join(" ")} with PORT=${port}`
+      `[DevServerService] Command: ${devCommand.cmd} ${devCommand.args.join(' ')} with PORT=${port}`
     );
 
     // Spawn the dev process with PORT environment variable
@@ -260,7 +265,7 @@ class DevServerService {
     const devProcess = spawn(devCommand.cmd, devCommand.args, {
       cwd: worktreePath,
       env,
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: ['ignore', 'pipe', 'pipe'],
       detached: false,
     });
 
@@ -269,26 +274,26 @@ class DevServerService {
 
     // Log output for debugging
     if (devProcess.stdout) {
-      devProcess.stdout.on("data", (data: Buffer) => {
+      devProcess.stdout.on('data', (data: Buffer) => {
         console.log(`[DevServer:${port}] ${data.toString().trim()}`);
       });
     }
 
     if (devProcess.stderr) {
-      devProcess.stderr.on("data", (data: Buffer) => {
+      devProcess.stderr.on('data', (data: Buffer) => {
         const msg = data.toString().trim();
         console.error(`[DevServer:${port}] ${msg}`);
       });
     }
 
-    devProcess.on("error", (error) => {
+    devProcess.on('error', (error) => {
       console.error(`[DevServerService] Process error:`, error);
       status.error = error.message;
       this.allocatedPorts.delete(port);
       this.runningServers.delete(worktreePath);
     });
 
-    devProcess.on("exit", (code) => {
+    devProcess.on('exit', (code) => {
       console.log(
         `[DevServerService] Process for ${worktreePath} exited with code ${code}`
       );
@@ -348,7 +353,9 @@ class DevServerService {
     // If we don't have a record of this server, it may have crashed/exited on its own
     // Return success so the frontend can clear its state
     if (!server) {
-      console.log(`[DevServerService] No server record for ${worktreePath}, may have already stopped`);
+      console.log(
+        `[DevServerService] No server record for ${worktreePath}, may have already stopped`
+      );
       return {
         success: true,
         result: {
@@ -362,7 +369,7 @@ class DevServerService {
 
     // Kill the process
     if (server.process && !server.process.killed) {
-      server.process.kill("SIGTERM");
+      server.process.kill('SIGTERM');
     }
 
     // Free the port
@@ -428,7 +435,9 @@ class DevServerService {
    * Stop all running dev servers (for cleanup)
    */
   async stopAll(): Promise<void> {
-    console.log(`[DevServerService] Stopping all ${this.runningServers.size} dev servers`);
+    console.log(
+      `[DevServerService] Stopping all ${this.runningServers.size} dev servers`
+    );
 
     for (const [worktreePath] of this.runningServers) {
       await this.stopDevServer(worktreePath);
@@ -447,13 +456,13 @@ export function getDevServerService(): DevServerService {
 }
 
 // Cleanup on process exit
-process.on("SIGTERM", async () => {
+process.on('SIGTERM', async () => {
   if (devServerServiceInstance) {
     await devServerServiceInstance.stopAll();
   }
 });
 
-process.on("SIGINT", async () => {
+process.on('SIGINT', async () => {
   if (devServerServiceInstance) {
     await devServerServiceInstance.stopAll();
   }

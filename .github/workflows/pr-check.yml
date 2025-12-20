@@ -3,7 +3,7 @@ name: PR Build Check
 on:
   pull_request:
     branches:
-      - "*"
+      - '*'
   push:
     branches:
       - main
@@ -20,7 +20,7 @@ jobs:
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
-          check-lockfile: "true"
+          check-lockfile: 'true'
 
       - name: Run build:electron (dir only - faster CI)
         run: npm run build:electron:dir

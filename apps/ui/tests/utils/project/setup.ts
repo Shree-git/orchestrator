@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page } from '@playwright/test';
 
 /**
  * Set up a mock project in localStorage to bypass the welcome screen
@@ -7,9 +7,9 @@ import { Page } from "@playwright/test";
 export async function setupMockProject(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -17,9 +17,9 @@ export async function setupMockProject(page: Page): Promise<void> {
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
@@ -27,7 +27,7 @@ export async function setupMockProject(page: Page): Promise<void> {
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   });
 }
 
@@ -40,9 +40,9 @@ export async function setupMockProjectWithConcurrency(
 ): Promise<void> {
   await page.addInitScript((maxConcurrency: number) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -50,9 +50,9 @@ export async function setupMockProjectWithConcurrency(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: maxConcurrency,
@@ -60,7 +60,7 @@ export async function setupMockProjectWithConcurrency(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   }, concurrency);
 }
 
@@ -70,7 +70,7 @@ export async function setupMockProjectWithConcurrency(
 export async function setupMockProjectAtConcurrencyLimit(
   page: Page,
   maxConcurrency: number = 1,
-  runningTasks: string[] = ["running-task-1"]
+  runningTasks: string[] = ['running-task-1']
 ): Promise<void> {
   await page.addInitScript(
     ({
@@ -81,9 +81,9 @@ export async function setupMockProjectAtConcurrencyLimit(
       runningTasks: string[];
     }) => {
       const mockProject = {
-        id: "test-project-1",
-        name: "Test Project",
-        path: "/mock/test-project",
+        id: 'test-project-1',
+        name: 'Test Project',
+        path: '/mock/test-project',
         lastOpened: new Date().toISOString(),
       };
 
@@ -91,9 +91,9 @@ export async function setupMockProjectAtConcurrencyLimit(
         state: {
           projects: [mockProject],
           currentProject: mockProject,
-          theme: "dark",
+          theme: 'dark',
           sidebarOpen: true,
-          apiKeys: { anthropic: "", google: "" },
+          apiKeys: { anthropic: '', google: '' },
           chatSessions: [],
           chatHistoryOpen: false,
           maxConcurrency: maxConcurrency,
@@ -104,7 +104,7 @@ export async function setupMockProjectAtConcurrencyLimit(
         version: 2, // Must match app-store.ts persist version
       };
 
-      localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+      localStorage.setItem('automaker-storage', JSON.stringify(mockState));
     },
     { maxConcurrency, runningTasks }
   );
@@ -122,16 +122,16 @@ export async function setupMockProjectWithFeatures(
       id: string;
       category: string;
       description: string;
-      status: "backlog" | "in_progress" | "verified";
+      status: 'backlog' | 'in_progress' | 'verified';
       steps?: string[];
     }>;
   }
 ): Promise<void> {
   await page.addInitScript((opts: typeof options) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -141,9 +141,9 @@ export async function setupMockProjectWithFeatures(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: opts?.maxConcurrency ?? 3,
@@ -155,7 +155,7 @@ export async function setupMockProjectWithFeatures(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
     // Also store features in a global variable that the mock electron API can use
     // This is needed because the board-view loads features from the file system
@@ -170,7 +170,7 @@ export async function setupMockProjectWithFeatures(
 export async function setupMockProjectWithContextFile(
   page: Page,
   featureId: string,
-  contextContent: string = "# Agent Context\n\nPrevious implementation work..."
+  contextContent: string = '# Agent Context\n\nPrevious implementation work...'
 ): Promise<void> {
   await page.addInitScript(
     ({
@@ -181,9 +181,9 @@ export async function setupMockProjectWithContextFile(
       contextContent: string;
     }) => {
       const mockProject = {
-        id: "test-project-1",
-        name: "Test Project",
-        path: "/mock/test-project",
+        id: 'test-project-1',
+        name: 'Test Project',
+        path: '/mock/test-project',
         lastOpened: new Date().toISOString(),
       };
 
@@ -191,9 +191,9 @@ export async function setupMockProjectWithContextFile(
         state: {
           projects: [mockProject],
           currentProject: mockProject,
-          theme: "dark",
+          theme: 'dark',
           sidebarOpen: true,
-          apiKeys: { anthropic: "", google: "" },
+          apiKeys: { anthropic: '', google: '' },
           chatSessions: [],
           chatHistoryOpen: false,
           maxConcurrency: 3,
@@ -201,7 +201,7 @@ export async function setupMockProjectWithContextFile(
         version: 2, // Must match app-store.ts persist version
       };
 
-      localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+      localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
       // Set up mock file system with a context file for the feature
       // This will be used by the mock electron API
@@ -228,7 +228,7 @@ export async function setupMockProjectWithInProgressFeatures(
       id: string;
       category: string;
       description: string;
-      status: "backlog" | "in_progress" | "verified";
+      status: 'backlog' | 'in_progress' | 'verified';
       steps?: string[];
       startedAt?: string;
     }>;
@@ -236,9 +236,9 @@ export async function setupMockProjectWithInProgressFeatures(
 ): Promise<void> {
   await page.addInitScript((opts: typeof options) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -248,9 +248,9 @@ export async function setupMockProjectWithInProgressFeatures(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: opts?.maxConcurrency ?? 3,
@@ -262,7 +262,7 @@ export async function setupMockProjectWithInProgressFeatures(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
     // Also store features in a global variable that the mock electron API can use
     // This is needed because the board-view loads features from the file system
@@ -279,9 +279,9 @@ export async function setupMockProjectWithView(
 ): Promise<void> {
   await page.addInitScript((currentView: string) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -290,9 +290,9 @@ export async function setupMockProjectWithView(
         projects: [mockProject],
         currentProject: mockProject,
         currentView: currentView,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
@@ -300,7 +300,7 @@ export async function setupMockProjectWithView(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   }, view);
 }
 
@@ -313,17 +313,17 @@ export async function setupEmptyLocalStorage(page: Page): Promise<void> {
       state: {
         projects: [],
         currentProject: null,
-        currentView: "welcome",
-        theme: "dark",
+        currentView: 'welcome',
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
       },
       version: 2, // Must match app-store.ts persist version
     };
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   });
 }
 
@@ -336,15 +336,15 @@ export async function setupMockProjectsWithoutCurrent(
   await page.addInitScript(() => {
     const mockProjects = [
       {
-        id: "test-project-1",
-        name: "Test Project 1",
-        path: "/mock/test-project-1",
+        id: 'test-project-1',
+        name: 'Test Project 1',
+        path: '/mock/test-project-1',
         lastOpened: new Date().toISOString(),
       },
       {
-        id: "test-project-2",
-        name: "Test Project 2",
-        path: "/mock/test-project-2",
+        id: 'test-project-2',
+        name: 'Test Project 2',
+        path: '/mock/test-project-2',
         lastOpened: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
       },
     ];
@@ -353,10 +353,10 @@ export async function setupMockProjectsWithoutCurrent(
       state: {
         projects: mockProjects,
         currentProject: null,
-        currentView: "welcome",
-        theme: "dark",
+        currentView: 'welcome',
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
@@ -364,7 +364,7 @@ export async function setupMockProjectsWithoutCurrent(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   });
 }
 
@@ -380,7 +380,7 @@ export async function setupMockProjectWithSkipTestsFeatures(
       id: string;
       category: string;
       description: string;
-      status: "backlog" | "in_progress" | "verified";
+      status: 'backlog' | 'in_progress' | 'verified';
       steps?: string[];
       startedAt?: string;
       skipTests?: boolean;
@@ -389,9 +389,9 @@ export async function setupMockProjectWithSkipTestsFeatures(
 ): Promise<void> {
   await page.addInitScript((opts: typeof options) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -401,9 +401,9 @@ export async function setupMockProjectWithSkipTestsFeatures(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: opts?.maxConcurrency ?? 3,
@@ -415,7 +415,7 @@ export async function setupMockProjectWithSkipTestsFeatures(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   }, options);
 }
 
@@ -441,10 +441,10 @@ export async function setupMockMultipleProjects(
       state: {
         projects: mockProjects,
         currentProject: mockProjects[0],
-        currentView: "board",
-        theme: "dark",
+        currentView: 'board',
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
@@ -452,7 +452,7 @@ export async function setupMockMultipleProjects(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
   }, projectCount);
 }
 
@@ -473,9 +473,9 @@ export async function setupMockProjectWithAgentOutput(
       outputContent: string;
     }) => {
       const mockProject = {
-        id: "test-project-1",
-        name: "Test Project",
-        path: "/mock/test-project",
+        id: 'test-project-1',
+        name: 'Test Project',
+        path: '/mock/test-project',
         lastOpened: new Date().toISOString(),
       };
 
@@ -483,9 +483,9 @@ export async function setupMockProjectWithAgentOutput(
         state: {
           projects: [mockProject],
           currentProject: mockProject,
-          theme: "dark",
+          theme: 'dark',
           sidebarOpen: true,
-          apiKeys: { anthropic: "", google: "" },
+          apiKeys: { anthropic: '', google: '' },
           chatSessions: [],
           chatHistoryOpen: false,
           maxConcurrency: 3,
@@ -493,7 +493,7 @@ export async function setupMockProjectWithAgentOutput(
         version: 2, // Must match app-store.ts persist version
       };
 
-      localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+      localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
       // Set up mock file system with output content for the feature
       // Now uses features/{id}/agent-output.md path
@@ -519,7 +519,7 @@ export async function setupMockProjectWithWaitingApprovalFeatures(
       id: string;
       category: string;
       description: string;
-      status: "backlog" | "in_progress" | "waiting_approval" | "verified";
+      status: 'backlog' | 'in_progress' | 'waiting_approval' | 'verified';
       steps?: string[];
       startedAt?: string;
       skipTests?: boolean;
@@ -528,9 +528,9 @@ export async function setupMockProjectWithWaitingApprovalFeatures(
 ): Promise<void> {
   await page.addInitScript((opts: typeof options) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
@@ -540,9 +540,9 @@ export async function setupMockProjectWithWaitingApprovalFeatures(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: opts?.maxConcurrency ?? 3,
@@ -554,7 +554,7 @@ export async function setupMockProjectWithWaitingApprovalFeatures(
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
     // Also store features in a global variable that the mock electron API can use
     (window as any).__mockFeatures = mockFeatures;
@@ -567,20 +567,20 @@ export async function setupMockProjectWithWaitingApprovalFeatures(
 export async function setupFirstRun(page: Page): Promise<void> {
   await page.addInitScript(() => {
     // Clear any existing setup state to simulate first run
-    localStorage.removeItem("automaker-setup");
-    localStorage.removeItem("automaker-storage");
+    localStorage.removeItem('automaker-setup');
+    localStorage.removeItem('automaker-storage');
 
     // Set up the setup store state for first run
     const setupState = {
       state: {
         isFirstRun: true,
         setupComplete: false,
-        currentStep: "welcome",
+        currentStep: 'welcome',
         claudeCliStatus: null,
         claudeAuthStatus: null,
         claudeInstallProgress: {
           isInstalling: false,
-          currentStep: "",
+          currentStep: '',
           progress: 0,
           output: [],
         },
@@ -589,28 +589,28 @@ export async function setupFirstRun(page: Page): Promise<void> {
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-setup", JSON.stringify(setupState));
+    localStorage.setItem('automaker-setup', JSON.stringify(setupState));
 
     // Also set up app store to show setup view
     const appState = {
       state: {
         projects: [],
         currentProject: null,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "" },
+        apiKeys: { anthropic: '', google: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
         isAutoModeRunning: false,
         runningAutoTasks: [],
         autoModeActivityLog: [],
-        currentView: "setup",
+        currentView: 'setup',
       },
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(appState));
+    localStorage.setItem('automaker-storage', JSON.stringify(appState));
   });
 }
 
@@ -624,13 +624,13 @@ export async function setupComplete(page: Page): Promise<void> {
       state: {
         isFirstRun: false,
         setupComplete: true,
-        currentStep: "complete",
+        currentStep: 'complete',
         skipClaudeSetup: false,
       },
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-setup", JSON.stringify(setupState));
+    localStorage.setItem('automaker-setup', JSON.stringify(setupState));
   });
 }
 
@@ -647,45 +647,45 @@ export async function setupMockProjectWithProfiles(
 ): Promise<void> {
   await page.addInitScript((opts: typeof options) => {
     const mockProject = {
-      id: "test-project-1",
-      name: "Test Project",
-      path: "/mock/test-project",
+      id: 'test-project-1',
+      name: 'Test Project',
+      path: '/mock/test-project',
       lastOpened: new Date().toISOString(),
     };
 
     // Default built-in profiles (same as DEFAULT_AI_PROFILES from app-store.ts)
     const builtInProfiles = [
       {
-        id: "profile-heavy-task",
-        name: "Heavy Task",
+        id: 'profile-heavy-task',
+        name: 'Heavy Task',
         description:
-          "Claude Opus with Ultrathink for complex architecture, migrations, or deep debugging.",
-        model: "opus" as const,
-        thinkingLevel: "ultrathink" as const,
-        provider: "claude" as const,
+          'Claude Opus with Ultrathink for complex architecture, migrations, or deep debugging.',
+        model: 'opus' as const,
+        thinkingLevel: 'ultrathink' as const,
+        provider: 'claude' as const,
         isBuiltIn: true,
-        icon: "Brain",
+        icon: 'Brain',
       },
       {
-        id: "profile-balanced",
-        name: "Balanced",
+        id: 'profile-balanced',
+        name: 'Balanced',
         description:
-          "Claude Sonnet with medium thinking for typical development tasks.",
-        model: "sonnet" as const,
-        thinkingLevel: "medium" as const,
-        provider: "claude" as const,
+          'Claude Sonnet with medium thinking for typical development tasks.',
+        model: 'sonnet' as const,
+        thinkingLevel: 'medium' as const,
+        provider: 'claude' as const,
         isBuiltIn: true,
-        icon: "Scale",
+        icon: 'Scale',
       },
       {
-        id: "profile-quick-edit",
-        name: "Quick Edit",
-        description: "Claude Haiku for fast, simple edits and minor fixes.",
-        model: "haiku" as const,
-        thinkingLevel: "none" as const,
-        provider: "claude" as const,
+        id: 'profile-quick-edit',
+        name: 'Quick Edit',
+        description: 'Claude Haiku for fast, simple edits and minor fixes.',
+        model: 'haiku' as const,
+        thinkingLevel: 'none' as const,
+        provider: 'claude' as const,
         isBuiltIn: true,
-        icon: "Zap",
+        icon: 'Zap',
       },
     ];
 
@@ -697,18 +697,18 @@ export async function setupMockProjectWithProfiles(
         id: `custom-profile-${i + 1}`,
         name: `Custom Profile ${i + 1}`,
         description: `Test custom profile ${i + 1}`,
-        model: ["haiku", "sonnet", "opus"][i % 3] as
-          | "haiku"
-          | "sonnet"
-          | "opus",
-        thinkingLevel: ["none", "low", "medium", "high"][i % 4] as
-          | "none"
-          | "low"
-          | "medium"
-          | "high",
-        provider: "claude" as const,
+        model: ['haiku', 'sonnet', 'opus'][i % 3] as
+          | 'haiku'
+          | 'sonnet'
+          | 'opus',
+        thinkingLevel: ['none', 'low', 'medium', 'high'][i % 4] as
+          | 'none'
+          | 'low'
+          | 'medium'
+          | 'high',
+        provider: 'claude' as const,
         isBuiltIn: false,
-        icon: ["Brain", "Zap", "Scale", "Cpu", "Rocket", "Sparkles"][i % 6],
+        icon: ['Brain', 'Zap', 'Scale', 'Cpu', 'Rocket', 'Sparkles'][i % 6],
       });
     }
 
@@ -722,31 +722,31 @@ export async function setupMockProjectWithProfiles(
       state: {
         projects: [mockProject],
         currentProject: mockProject,
-        theme: "dark",
+        theme: 'dark',
         sidebarOpen: true,
-        apiKeys: { anthropic: "", google: "", openai: "" },
+        apiKeys: { anthropic: '', google: '', openai: '' },
         chatSessions: [],
         chatHistoryOpen: false,
         maxConcurrency: 3,
         aiProfiles: aiProfiles,
         features: [],
-        currentView: "board", // Start at board, will navigate to profiles
+        currentView: 'board', // Start at board, will navigate to profiles
       },
       version: 2, // Must match app-store.ts persist version
     };
 
-    localStorage.setItem("automaker-storage", JSON.stringify(mockState));
+    localStorage.setItem('automaker-storage', JSON.stringify(mockState));
 
     // Also mark setup as complete to skip the setup wizard
     const setupState = {
       state: {
         isFirstRun: false,
         setupComplete: true,
-        currentStep: "complete",
+        currentStep: 'complete',
         skipClaudeSetup: false,
       },
       version: 2, // Must match app-store.ts persist version
     };
-    localStorage.setItem("automaker-setup", JSON.stringify(setupState));
+    localStorage.setItem('automaker-setup', JSON.stringify(setupState));
   }, options);
 }

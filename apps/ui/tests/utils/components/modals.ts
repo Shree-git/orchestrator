@@ -1,5 +1,5 @@
-import { Page, Locator } from "@playwright/test";
-import { waitForElement, waitForElementHidden } from "../core/waiting";
+import { Page, Locator } from '@playwright/test';
+import { waitForElement, waitForElementHidden } from '../core/waiting';
 
 /**
  * Check if the agent output modal is visible
@@ -16,7 +16,7 @@ export async function waitForAgentOutputModal(
   page: Page,
   options?: { timeout?: number }
 ): Promise<Locator> {
-  return await waitForElement(page, "agent-output-modal", options);
+  return await waitForElement(page, 'agent-output-modal', options);
 }
 
 /**
@@ -26,7 +26,7 @@ export async function waitForAgentOutputModalHidden(
   page: Page,
   options?: { timeout?: number }
 ): Promise<void> {
-  await waitForElementHidden(page, "agent-output-modal", options);
+  await waitForElementHidden(page, 'agent-output-modal', options);
 }
 
 /**

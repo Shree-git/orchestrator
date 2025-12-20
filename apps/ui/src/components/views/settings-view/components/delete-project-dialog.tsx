@@ -1,6 +1,6 @@
-import { Folder, Trash2 } from "lucide-react";
-import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
-import type { Project } from "@/lib/electron";
+import { Folder, Trash2 } from 'lucide-react';
+import { DeleteConfirmDialog } from '@/components/ui/delete-confirm-dialog';
+import type { Project } from '@/lib/electron';
 
 interface DeleteProjectDialogProps {
   open: boolean;

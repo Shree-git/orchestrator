@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
-import { useAppStore } from "@/store/app-store";
-import { getElectronAPI } from "@/lib/electron";
+import { useEffect, useState, useCallback } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getElectronAPI } from '@/lib/electron';
 
 export function useSpecLoading() {
   const { currentProject, setAppSpec } = useAppStore();
@@ -22,11 +22,11 @@ export function useSpecLoading() {
         setSpecExists(true);
       } else {
         // File doesn't exist
-        setAppSpec("");
+        setAppSpec('');
         setSpecExists(false);
       }
     } catch (error) {
-      console.error("Failed to load spec:", error);
+      console.error('Failed to load spec:', error);
       setSpecExists(false);
     } finally {
       setIsLoading(false);

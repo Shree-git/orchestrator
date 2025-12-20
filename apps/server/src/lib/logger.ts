@@ -53,7 +53,7 @@ export function createLogger(context: string) {
 
     debug: (...args: unknown[]): void => {
       if (currentLogLevel >= LogLevel.DEBUG) {
-        console.log(prefix, "[DEBUG]", ...args);
+        console.log(prefix, '[DEBUG]', ...args);
       }
     },
   };
@@ -72,4 +72,3 @@ export function getLogLevel(): LogLevel {
 export function setLogLevel(level: LogLevel): void {
   currentLogLevel = level;
 }
-

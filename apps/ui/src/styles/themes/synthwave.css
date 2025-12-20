@@ -73,36 +73,49 @@
 /* Theme-specific overrides */
 
 .synthwave .animated-outline-gradient {
-    background: conic-gradient(from 90deg at 50% 50%, #f97e72 0%, #72f1b8 25%, #ff7edb 50%, #72f1b8 75%, #f97e72 100%);
-    animation: spin 2s linear infinite, synthwave-glow 1.5s ease-in-out infinite alternate;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    #f97e72 0%,
+    #72f1b8 25%,
+    #ff7edb 50%,
+    #72f1b8 75%,
+    #f97e72 100%
+  );
+  animation:
+    spin 2s linear infinite,
+    synthwave-glow 1.5s ease-in-out infinite alternate;
 }
 
 .synthwave .animated-outline-inner {
-    background: oklch(0.15 0.05 290) !important;
-    color: #f97e72 !important;
-    text-shadow: 0 0 8px #f97e72;
+  background: oklch(0.15 0.05 290) !important;
+  color: #f97e72 !important;
+  text-shadow: 0 0 8px #f97e72;
 }
 
-.synthwave [data-slot="button"][class*="animated-outline"]:hover .animated-outline-inner {
-    background: oklch(0.22 0.07 290) !important;
-    color: #72f1b8 !important;
-    text-shadow: 0 0 12px #72f1b8;
-    box-shadow: 0 0 15px rgba(114, 241, 184, 0.3);
+.synthwave
+  [data-slot='button'][class*='animated-outline']:hover
+  .animated-outline-inner {
+  background: oklch(0.22 0.07 290) !important;
+  color: #72f1b8 !important;
+  text-shadow: 0 0 12px #72f1b8;
+  box-shadow: 0 0 15px rgba(114, 241, 184, 0.3);
 }
 
 .synthwave .slider-track {
-    background: oklch(0.25 0.07 290);
+  background: oklch(0.25 0.07 290);
 }
 
 .synthwave .slider-range {
-    background: linear-gradient(to right, #f97e72, #ff7edb);
-    box-shadow: 0 0 10px #f97e72, 0 0 5px #ff7edb;
+  background: linear-gradient(to right, #f97e72, #ff7edb);
+  box-shadow:
+    0 0 10px #f97e72,
+    0 0 5px #ff7edb;
 }
 
 .synthwave .slider-thumb {
-    background: oklch(0.2 0.06 290);
-    border-color: #f97e72;
-    box-shadow: 0 0 8px #f97e72;
+  background: oklch(0.2 0.06 290);
+  border-color: #f97e72;
+  box-shadow: 0 0 8px #f97e72;
 }
 
 .synthwave .xml-highlight {

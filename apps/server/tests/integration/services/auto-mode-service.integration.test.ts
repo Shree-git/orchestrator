@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { AutoModeService } from "@/services/auto-mode-service.js";
-import { ProviderFactory } from "@/providers/provider-factory.js";
-import { FeatureLoader } from "@/services/feature-loader.js";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { AutoModeService } from '@/services/auto-mode-service.js';
+import { ProviderFactory } from '@/providers/provider-factory.js';
+import { FeatureLoader } from '@/services/feature-loader.js';
 import {
   createTestGitRepo,
   createTestFeature,
@@ -10,17 +10,17 @@ import {
   branchExists,
   worktreeExists,
   type TestRepo,
-} from "../helpers/git-test-repo.js";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { exec } from "child_process";
-import { promisify } from "util";
+} from '../helpers/git-test-repo.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-vi.mock("@/providers/provider-factory.js");
+vi.mock('@/providers/provider-factory.js');
 
-describe("auto-mode-service.ts (integration)", () => {
+describe('auto-mode-service.ts (integration)', () => {
   let service: AutoModeService;
   let testRepo: TestRepo;
   let featureLoader: FeatureLoader;
@@ -46,41 +46,44 @@ describe("auto-mode-service.ts (integration)", () => {
     }
   });
 
-  describe("worktree operations", () => {
-    it("should use existing git worktree for feature", async () => {
-      const branchName = "feature/test-feature-1";
-      
+  describe('worktree operations', () => {
+    it('should use existing git worktree for feature', async () => {
+      const branchName = 'feature/test-feature-1';
+
       // Create a test feature with branchName set
-      await createTestFeature(testRepo.path, "test-feature-1", {
-        id: "test-feature-1",
-        category: "test",
-        description: "Test feature",
-        status: "pending",
+      await createTestFeature(testRepo.path, 'test-feature-1', {
+        id: 'test-feature-1',
+        category: 'test',
+        description: 'Test feature',
+        status: 'pending',
         branchName: branchName,
       });
 
       // Create worktree before executing (worktrees are now created when features are added/edited)
-      const worktreesDir = path.join(testRepo.path, ".worktrees");
-      const worktreePath = path.join(worktreesDir, "test-feature-1");
+      const worktreesDir = path.join(testRepo.path, '.worktrees');
+      const worktreePath = path.join(worktreesDir, 'test-feature-1');
       await fs.mkdir(worktreesDir, { recursive: true });
-      await execAsync(`git worktree add -b ${branchName} "${worktreePath}" HEAD`, {
-        cwd: testRepo.path,
-      });
+      await execAsync(
+        `git worktree add -b ${branchName} "${worktreePath}" HEAD`,
+        {
+          cwd: testRepo.path,
+        }
+      );
 
       // Mock provider to complete quickly
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "Feature implemented" }],
+              role: 'assistant',
+              content: [{ type: 'text', text: 'Feature implemented' }],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -92,7 +95,7 @@ describe("auto-mode-service.ts (integration)", () => {
       // Execute feature with worktrees enabled
       await service.executeFeature(
         testRepo.path,
-        "test-feature-1",
+        'test-feature-1',
         true, // useWorktrees
         false // isAutoMode
       );
@@ -107,8 +110,8 @@ describe("auto-mode-service.ts (integration)", () => {
       const worktrees = await listWorktrees(testRepo.path);
       expect(worktrees.length).toBeGreaterThan(0);
       // Verify that at least one worktree path contains our feature ID
-      const worktreePathsMatch = worktrees.some(wt => 
-        wt.includes("test-feature-1") || wt.includes(".worktrees")
+      const worktreePathsMatch = worktrees.some(
+        (wt) => wt.includes('test-feature-1') || wt.includes('.worktrees')
       );
       expect(worktreePathsMatch).toBe(true);
 
@@ -116,19 +119,19 @@ describe("auto-mode-service.ts (integration)", () => {
       // This is expected behavior - manual cleanup is required
     }, 30000);
 
-    it("should handle error gracefully", async () => {
-      await createTestFeature(testRepo.path, "test-feature-error", {
-        id: "test-feature-error",
-        category: "test",
-        description: "Test feature that errors",
-        status: "pending",
+    it('should handle error gracefully', async () => {
+      await createTestFeature(testRepo.path, 'test-feature-error', {
+        id: 'test-feature-error',
+        category: 'test',
+        description: 'Test feature that errors',
+        status: 'pending',
       });
 
       // Mock provider that throws error
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
-          throw new Error("Provider error");
+          throw new Error('Provider error');
         },
       };
 
@@ -139,7 +142,7 @@ describe("auto-mode-service.ts (integration)", () => {
       // Execute feature (should handle error)
       await service.executeFeature(
         testRepo.path,
-        "test-feature-error",
+        'test-feature-error',
         true,
         false
       );
@@ -147,25 +150,25 @@ describe("auto-mode-service.ts (integration)", () => {
       // Verify feature status was updated to backlog (error status)
       const feature = await featureLoader.get(
         testRepo.path,
-        "test-feature-error"
+        'test-feature-error'
       );
-      expect(feature?.status).toBe("backlog");
+      expect(feature?.status).toBe('backlog');
     }, 30000);
 
-    it("should work without worktrees", async () => {
-      await createTestFeature(testRepo.path, "test-no-worktree", {
-        id: "test-no-worktree",
-        category: "test",
-        description: "Test without worktree",
-        status: "pending",
+    it('should work without worktrees', async () => {
+      await createTestFeature(testRepo.path, 'test-no-worktree', {
+        id: 'test-no-worktree',
+        category: 'test',
+        description: 'Test without worktree',
+        status: 'pending',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -177,7 +180,7 @@ describe("auto-mode-service.ts (integration)", () => {
       // Execute without worktrees
       await service.executeFeature(
         testRepo.path,
-        "test-no-worktree",
+        'test-no-worktree',
         false, // useWorktrees = false
         false
       );
@@ -185,34 +188,34 @@ describe("auto-mode-service.ts (integration)", () => {
       // Feature should be updated successfully
       const feature = await featureLoader.get(
         testRepo.path,
-        "test-no-worktree"
+        'test-no-worktree'
       );
-      expect(feature?.status).toBe("waiting_approval");
+      expect(feature?.status).toBe('waiting_approval');
     }, 30000);
   });
 
-  describe("feature execution", () => {
-    it("should execute feature and update status", async () => {
-      await createTestFeature(testRepo.path, "feature-exec-1", {
-        id: "feature-exec-1",
-        category: "ui",
-        description: "Execute this feature",
-        status: "pending",
+  describe('feature execution', () => {
+    it('should execute feature and update status', async () => {
+      await createTestFeature(testRepo.path, 'feature-exec-1', {
+        id: 'feature-exec-1',
+        category: 'ui',
+        description: 'Execute this feature',
+        status: 'pending',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "Implemented the feature" }],
+              role: 'assistant',
+              content: [{ type: 'text', text: 'Implemented the feature' }],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -223,31 +226,31 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "feature-exec-1",
+        'feature-exec-1',
         false, // Don't use worktrees so agent output is saved to main project
         false
       );
 
       // Check feature status was updated
-      const feature = await featureLoader.get(testRepo.path, "feature-exec-1");
-      expect(feature?.status).toBe("waiting_approval");
+      const feature = await featureLoader.get(testRepo.path, 'feature-exec-1');
+      expect(feature?.status).toBe('waiting_approval');
 
       // Check agent output was saved
       const agentOutput = await featureLoader.getAgentOutput(
         testRepo.path,
-        "feature-exec-1"
+        'feature-exec-1'
       );
       expect(agentOutput).toBeTruthy();
-      expect(agentOutput).toContain("Implemented the feature");
+      expect(agentOutput).toContain('Implemented the feature');
     }, 30000);
 
-    it("should handle feature not found", async () => {
+    it('should handle feature not found', async () => {
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -259,7 +262,7 @@ describe("auto-mode-service.ts (integration)", () => {
       // Try to execute non-existent feature
       await service.executeFeature(
         testRepo.path,
-        "nonexistent-feature",
+        'nonexistent-feature',
         true,
         false
       );
@@ -268,28 +271,28 @@ describe("auto-mode-service.ts (integration)", () => {
       expect(mockEvents.emit).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          featureId: "nonexistent-feature",
-          error: expect.stringContaining("not found"),
+          featureId: 'nonexistent-feature',
+          error: expect.stringContaining('not found'),
         })
       );
     }, 30000);
 
-    it("should prevent duplicate feature execution", async () => {
-      await createTestFeature(testRepo.path, "feature-dup", {
-        id: "feature-dup",
-        category: "test",
-        description: "Duplicate test",
-        status: "pending",
+    it('should prevent duplicate feature execution', async () => {
+      await createTestFeature(testRepo.path, 'feature-dup', {
+        id: 'feature-dup',
+        category: 'test',
+        description: 'Duplicate test',
+        status: 'pending',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           // Simulate slow execution
           await new Promise((resolve) => setTimeout(resolve, 500));
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -301,34 +304,34 @@ describe("auto-mode-service.ts (integration)", () => {
       // Start first execution
       const promise1 = service.executeFeature(
         testRepo.path,
-        "feature-dup",
+        'feature-dup',
         false,
         false
       );
 
       // Try to start second execution (should throw)
       await expect(
-        service.executeFeature(testRepo.path, "feature-dup", false, false)
-      ).rejects.toThrow("already running");
+        service.executeFeature(testRepo.path, 'feature-dup', false, false)
+      ).rejects.toThrow('already running');
 
       await promise1;
     }, 30000);
 
-    it("should use feature-specific model", async () => {
-      await createTestFeature(testRepo.path, "feature-model", {
-        id: "feature-model",
-        category: "test",
-        description: "Model test",
-        status: "pending",
-        model: "claude-sonnet-4-20250514",
+    it('should use feature-specific model', async () => {
+      await createTestFeature(testRepo.path, 'feature-model', {
+        id: 'feature-model',
+        category: 'test',
+        description: 'Model test',
+        status: 'pending',
+        model: 'claude-sonnet-4-20250514',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -339,20 +342,20 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "feature-model",
+        'feature-model',
         false,
         false
       );
 
       // Should have used claude-sonnet-4-20250514
       expect(ProviderFactory.getProviderForModel).toHaveBeenCalledWith(
-        "claude-sonnet-4-20250514"
+        'claude-sonnet-4-20250514'
       );
     }, 30000);
   });
 
-  describe("auto loop", () => {
-    it("should start and stop auto loop", async () => {
+  describe('auto loop', () => {
+    it('should start and stop auto loop', async () => {
       const startPromise = service.startAutoLoop(testRepo.path, 2);
 
       // Give it time to start
@@ -365,28 +368,28 @@ describe("auto-mode-service.ts (integration)", () => {
       await startPromise.catch(() => {}); // Cleanup
     }, 10000);
 
-    it("should process pending features in auto loop", async () => {
+    it('should process pending features in auto loop', async () => {
       // Create multiple pending features
-      await createTestFeature(testRepo.path, "auto-1", {
-        id: "auto-1",
-        category: "test",
-        description: "Auto feature 1",
-        status: "pending",
+      await createTestFeature(testRepo.path, 'auto-1', {
+        id: 'auto-1',
+        category: 'test',
+        description: 'Auto feature 1',
+        status: 'pending',
       });
 
-      await createTestFeature(testRepo.path, "auto-2", {
-        id: "auto-2",
-        category: "test",
-        description: "Auto feature 2",
-        status: "pending",
+      await createTestFeature(testRepo.path, 'auto-2', {
+        id: 'auto-2',
+        category: 'test',
+        description: 'Auto feature 2',
+        status: 'pending',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -406,25 +409,25 @@ describe("auto-mode-service.ts (integration)", () => {
       await startPromise.catch(() => {});
 
       // Check that features were updated
-      const feature1 = await featureLoader.get(testRepo.path, "auto-1");
-      const feature2 = await featureLoader.get(testRepo.path, "auto-2");
+      const feature1 = await featureLoader.get(testRepo.path, 'auto-1');
+      const feature2 = await featureLoader.get(testRepo.path, 'auto-2');
 
       // At least one should have been processed
       const processedCount = [feature1, feature2].filter(
-        (f) => f?.status === "waiting_approval" || f?.status === "in_progress"
+        (f) => f?.status === 'waiting_approval' || f?.status === 'in_progress'
       ).length;
 
       expect(processedCount).toBeGreaterThan(0);
     }, 15000);
 
-    it("should respect max concurrency", async () => {
+    it('should respect max concurrency', async () => {
       // Create 5 features
       for (let i = 1; i <= 5; i++) {
         await createTestFeature(testRepo.path, `concurrent-${i}`, {
           id: `concurrent-${i}`,
-          category: "test",
+          category: 'test',
           description: `Concurrent feature ${i}`,
-          status: "pending",
+          status: 'pending',
         });
       }
 
@@ -432,7 +435,7 @@ describe("auto-mode-service.ts (integration)", () => {
       let maxConcurrent = 0;
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           concurrentCount++;
           maxConcurrent = Math.max(maxConcurrent, concurrentCount);
@@ -443,8 +446,8 @@ describe("auto-mode-service.ts (integration)", () => {
           concurrentCount--;
 
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -466,7 +469,7 @@ describe("auto-mode-service.ts (integration)", () => {
       expect(maxConcurrent).toBeLessThanOrEqual(2);
     }, 15000);
 
-    it("should emit auto mode events", async () => {
+    it('should emit auto mode events', async () => {
       const startPromise = service.startAutoLoop(testRepo.path, 1);
 
       // Wait for start event
@@ -474,7 +477,7 @@ describe("auto-mode-service.ts (integration)", () => {
 
       // Check start event was emitted
       const startEvent = mockEvents.emit.mock.calls.find((call) =>
-        call[1]?.message?.includes("Auto mode started")
+        call[1]?.message?.includes('Auto mode started')
       );
       expect(startEvent).toBeTruthy();
 
@@ -484,26 +487,26 @@ describe("auto-mode-service.ts (integration)", () => {
       // Check stop event was emitted (emitted immediately by stopAutoLoop)
       const stopEvent = mockEvents.emit.mock.calls.find(
         (call) =>
-          call[1]?.type === "auto_mode_stopped" ||
-          call[1]?.message?.includes("Auto mode stopped")
+          call[1]?.type === 'auto_mode_stopped' ||
+          call[1]?.message?.includes('Auto mode stopped')
       );
       expect(stopEvent).toBeTruthy();
     }, 10000);
   });
 
-  describe("error handling", () => {
-    it("should handle provider errors gracefully", async () => {
-      await createTestFeature(testRepo.path, "error-feature", {
-        id: "error-feature",
-        category: "test",
-        description: "Error test",
-        status: "pending",
+  describe('error handling', () => {
+    it('should handle provider errors gracefully', async () => {
+      await createTestFeature(testRepo.path, 'error-feature', {
+        id: 'error-feature',
+        category: 'test',
+        description: 'Error test',
+        status: 'pending',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
-          throw new Error("Provider execution failed");
+          throw new Error('Provider execution failed');
         },
       };
 
@@ -512,39 +515,39 @@ describe("auto-mode-service.ts (integration)", () => {
       );
 
       // Should not throw
-      await service.executeFeature(testRepo.path, "error-feature", true, false);
+      await service.executeFeature(testRepo.path, 'error-feature', true, false);
 
       // Feature should be marked as backlog (error status)
-      const feature = await featureLoader.get(testRepo.path, "error-feature");
-      expect(feature?.status).toBe("backlog");
+      const feature = await featureLoader.get(testRepo.path, 'error-feature');
+      expect(feature?.status).toBe('backlog');
     }, 30000);
 
-    it("should continue auto loop after feature error", async () => {
-      await createTestFeature(testRepo.path, "fail-1", {
-        id: "fail-1",
-        category: "test",
-        description: "Will fail",
-        status: "pending",
+    it('should continue auto loop after feature error', async () => {
+      await createTestFeature(testRepo.path, 'fail-1', {
+        id: 'fail-1',
+        category: 'test',
+        description: 'Will fail',
+        status: 'pending',
       });
 
-      await createTestFeature(testRepo.path, "success-1", {
-        id: "success-1",
-        category: "test",
-        description: "Will succeed",
-        status: "pending",
+      await createTestFeature(testRepo.path, 'success-1', {
+        id: 'success-1',
+        category: 'test',
+        description: 'Will succeed',
+        status: 'pending',
       });
 
       let callCount = 0;
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           callCount++;
           if (callCount === 1) {
-            throw new Error("First feature fails");
+            throw new Error('First feature fails');
           }
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -566,29 +569,29 @@ describe("auto-mode-service.ts (integration)", () => {
     }, 15000);
   });
 
-  describe("planning mode", () => {
-    it("should execute feature with skip planning mode", async () => {
-      await createTestFeature(testRepo.path, "skip-plan-feature", {
-        id: "skip-plan-feature",
-        category: "test",
-        description: "Feature with skip planning",
-        status: "pending",
-        planningMode: "skip",
+  describe('planning mode', () => {
+    it('should execute feature with skip planning mode', async () => {
+      await createTestFeature(testRepo.path, 'skip-plan-feature', {
+        id: 'skip-plan-feature',
+        category: 'test',
+        description: 'Feature with skip planning',
+        status: 'pending',
+        planningMode: 'skip',
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "Feature implemented" }],
+              role: 'assistant',
+              content: [{ type: 'text', text: 'Feature implemented' }],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -599,38 +602,46 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "skip-plan-feature",
+        'skip-plan-feature',
         false,
         false
       );
 
-      const feature = await featureLoader.get(testRepo.path, "skip-plan-feature");
-      expect(feature?.status).toBe("waiting_approval");
+      const feature = await featureLoader.get(
+        testRepo.path,
+        'skip-plan-feature'
+      );
+      expect(feature?.status).toBe('waiting_approval');
     }, 30000);
 
-    it("should execute feature with lite planning mode without approval", async () => {
-      await createTestFeature(testRepo.path, "lite-plan-feature", {
-        id: "lite-plan-feature",
-        category: "test",
-        description: "Feature with lite planning",
-        status: "pending",
-        planningMode: "lite",
+    it('should execute feature with lite planning mode without approval', async () => {
+      await createTestFeature(testRepo.path, 'lite-plan-feature', {
+        id: 'lite-plan-feature',
+        category: 'test',
+        description: 'Feature with lite planning',
+        status: 'pending',
+        planningMode: 'lite',
         requirePlanApproval: false,
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "[PLAN_GENERATED] Planning outline complete.\n\nFeature implemented" }],
+              role: 'assistant',
+              content: [
+                {
+                  type: 'text',
+                  text: '[PLAN_GENERATED] Planning outline complete.\n\nFeature implemented',
+                },
+              ],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -641,38 +652,46 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "lite-plan-feature",
+        'lite-plan-feature',
         false,
         false
       );
 
-      const feature = await featureLoader.get(testRepo.path, "lite-plan-feature");
-      expect(feature?.status).toBe("waiting_approval");
+      const feature = await featureLoader.get(
+        testRepo.path,
+        'lite-plan-feature'
+      );
+      expect(feature?.status).toBe('waiting_approval');
     }, 30000);
 
-    it("should emit planning_started event for spec mode", async () => {
-      await createTestFeature(testRepo.path, "spec-plan-feature", {
-        id: "spec-plan-feature",
-        category: "test",
-        description: "Feature with spec planning",
-        status: "pending",
-        planningMode: "spec",
+    it('should emit planning_started event for spec mode', async () => {
+      await createTestFeature(testRepo.path, 'spec-plan-feature', {
+        id: 'spec-plan-feature',
+        category: 'test',
+        description: 'Feature with spec planning',
+        status: 'pending',
+        planningMode: 'spec',
         requirePlanApproval: false,
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "Spec generated\n\n[SPEC_GENERATED] Review the spec." }],
+              role: 'assistant',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Spec generated\n\n[SPEC_GENERATED] Review the spec.',
+                },
+              ],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -683,41 +702,46 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "spec-plan-feature",
+        'spec-plan-feature',
         false,
         false
       );
 
       // Check planning_started event was emitted
       const planningEvent = mockEvents.emit.mock.calls.find(
-        (call) => call[1]?.mode === "spec"
+        (call) => call[1]?.mode === 'spec'
       );
       expect(planningEvent).toBeTruthy();
     }, 30000);
 
-    it("should handle feature with full planning mode", async () => {
-      await createTestFeature(testRepo.path, "full-plan-feature", {
-        id: "full-plan-feature",
-        category: "test",
-        description: "Feature with full planning",
-        status: "pending",
-        planningMode: "full",
+    it('should handle feature with full planning mode', async () => {
+      await createTestFeature(testRepo.path, 'full-plan-feature', {
+        id: 'full-plan-feature',
+        category: 'test',
+        description: 'Feature with full planning',
+        status: 'pending',
+        planningMode: 'full',
         requirePlanApproval: false,
       });
 
       const mockProvider = {
-        getName: () => "claude",
+        getName: () => 'claude',
         executeQuery: async function* () {
           yield {
-            type: "assistant",
+            type: 'assistant',
             message: {
-              role: "assistant",
-              content: [{ type: "text", text: "Full spec with phases\n\n[SPEC_GENERATED] Review." }],
+              role: 'assistant',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Full spec with phases\n\n[SPEC_GENERATED] Review.',
+                },
+              ],
             },
           };
           yield {
-            type: "result",
-            subtype: "success",
+            type: 'result',
+            subtype: 'success',
           };
         },
       };
@@ -728,38 +752,38 @@ describe("auto-mode-service.ts (integration)", () => {
 
       await service.executeFeature(
         testRepo.path,
-        "full-plan-feature",
+        'full-plan-feature',
         false,
         false
       );
 
       // Check planning_started event was emitted with full mode
       const planningEvent = mockEvents.emit.mock.calls.find(
-        (call) => call[1]?.mode === "full"
+        (call) => call[1]?.mode === 'full'
       );
       expect(planningEvent).toBeTruthy();
     }, 30000);
 
-    it("should track pending approval correctly", async () => {
+    it('should track pending approval correctly', async () => {
       // Initially no pending approvals
-      expect(service.hasPendingApproval("non-existent")).toBe(false);
+      expect(service.hasPendingApproval('non-existent')).toBe(false);
     });
 
-    it("should cancel pending approval gracefully", () => {
+    it('should cancel pending approval gracefully', () => {
       // Should not throw when cancelling non-existent approval
-      expect(() => service.cancelPlanApproval("non-existent")).not.toThrow();
+      expect(() => service.cancelPlanApproval('non-existent')).not.toThrow();
     });
 
-    it("should resolve approval with error for non-existent feature", async () => {
+    it('should resolve approval with error for non-existent feature', async () => {
       const result = await service.resolvePlanApproval(
-        "non-existent",
+        'non-existent',
         true,
         undefined,
         undefined,
         undefined
       );
       expect(result.success).toBe(false);
-      expect(result.error).toContain("No pending approval");
+      expect(result.error).toContain('No pending approval');
     });
   });
 });

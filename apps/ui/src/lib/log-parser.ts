@@ -4,32 +4,40 @@
  */
 
 export type LogEntryType =
-  | "prompt"
-  | "tool_call"
-  | "tool_result"
-  | "phase"
-  | "error"
-  | "success"
-  | "info"
-  | "debug"
-  | "warning"
-  | "thinking";
+  | 'prompt'
+  | 'tool_call'
+  | 'tool_result'
+  | 'phase'
+  | 'error'
+  | 'success'
+  | 'info'
+  | 'debug'
+  | 'warning'
+  | 'thinking';
 
-export type ToolCategory = 'read' | 'edit' | 'write' | 'bash' | 'search' | 'todo' | 'task' | 'other';
+export type ToolCategory =
+  | 'read'
+  | 'edit'
+  | 'write'
+  | 'bash'
+  | 'search'
+  | 'todo'
+  | 'task'
+  | 'other';
 
 const TOOL_CATEGORIES: Record<string, ToolCategory> = {
-  'Read': 'read',
-  'Edit': 'edit',
-  'Write': 'write',
-  'Bash': 'bash',
-  'Grep': 'search',
-  'Glob': 'search',
-  'WebSearch': 'search',
-  'WebFetch': 'read',
-  'TodoWrite': 'todo',
-  'Task': 'task',
-  'NotebookEdit': 'edit',
-  'KillShell': 'bash',
+  Read: 'read',
+  Edit: 'edit',
+  Write: 'write',
+  Bash: 'bash',
+  Grep: 'search',
+  Glob: 'search',
+  WebSearch: 'search',
+  WebFetch: 'read',
+  TodoWrite: 'todo',
+  Task: 'task',
+  NotebookEdit: 'edit',
+  KillShell: 'bash',
 };
 
 /**
@@ -65,7 +73,10 @@ export interface LogEntry {
  * Uses only the first 200 characters of content to ensure stability
  * even when entries are merged (which appends content at the end)
  */
-const generateDeterministicId = (content: string, lineIndex: number): string => {
+const generateDeterministicId = (
+  content: string,
+  lineIndex: number
+): string => {
   // Use first 200 chars to ensure stability when entries are merged
   const stableContent = content.slice(0, 200);
   // Simple hash function for the content
@@ -73,7 +84,7 @@ const generateDeterministicId = (content: string, lineIndex: number): string => 
   const str = stableContent + '|' + lineIndex.toString();
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
   return 'log_' + Math.abs(hash).toString(36);
@@ -86,85 +97,91 @@ function detectEntryType(content: string): LogEntryType {
   const trimmed = content.trim();
 
   // Tool calls
-  if (trimmed.startsWith("🔧 Tool:") || trimmed.match(/^Tool:\s*/)) {
-    return "tool_call";
+  if (trimmed.startsWith('🔧 Tool:') || trimmed.match(/^Tool:\s*/)) {
+    return 'tool_call';
   }
 
   // Tool results / Input
-  if (trimmed.startsWith("Input:") || trimmed.startsWith("Result:") || trimmed.startsWith("Output:")) {
-    return "tool_result";
+  if (
+    trimmed.startsWith('Input:') ||
+    trimmed.startsWith('Result:') ||
+    trimmed.startsWith('Output:')
+  ) {
+    return 'tool_result';
   }
 
   // Phase changes
   if (
-    trimmed.startsWith("📋") ||
-    trimmed.startsWith("⚡") ||
-    trimmed.startsWith("✅") ||
+    trimmed.startsWith('📋') ||
+    trimmed.startsWith('⚡') ||
+    trimmed.startsWith('✅') ||
     trimmed.match(/^(Planning|Action|Verification)/i) ||
     trimmed.match(/\[Phase:\s*([^\]]+)\]/) ||
     trimmed.match(/Phase:\s*\w+/i)
   ) {
-    return "phase";
+    return 'phase';
   }
-  
+
   // Feature creation events
   if (
     trimmed.match(/\[Feature Creation\]/i) ||
     trimmed.match(/Feature Creation/i) ||
     trimmed.match(/Creating feature/i)
   ) {
-    return "success";
+    return 'success';
   }
 
   // Errors
-  if (trimmed.startsWith("❌") || trimmed.toLowerCase().includes("error:")) {
-    return "error";
+  if (trimmed.startsWith('❌') || trimmed.toLowerCase().includes('error:')) {
+    return 'error';
   }
 
   // Success messages and summary sections
   if (
-    trimmed.startsWith("✅") ||
-    trimmed.toLowerCase().includes("success") ||
-    trimmed.toLowerCase().includes("completed") ||
+    trimmed.startsWith('✅') ||
+    trimmed.toLowerCase().includes('success') ||
+    trimmed.toLowerCase().includes('completed') ||
     // Summary tags (preferred format from agent)
-    trimmed.startsWith("<summary>") ||
+    trimmed.startsWith('<summary>') ||
     // Markdown summary headers (fallback)
     trimmed.match(/^##\s+(Summary|Feature|Changes|Implementation)/i) ||
-    trimmed.match(/^(I've|I have) (successfully |now )?(completed|finished|implemented)/i)
+    trimmed.match(
+      /^(I've|I have) (successfully |now )?(completed|finished|implemented)/i
+    )
   ) {
-    return "success";
+    return 'success';
   }
 
   // Warnings
-  if (trimmed.startsWith("⚠️") || trimmed.toLowerCase().includes("warning:")) {
-    return "warning";
+  if (trimmed.startsWith('⚠️') || trimmed.toLowerCase().includes('warning:')) {
+    return 'warning';
   }
 
   // Thinking/Preparation info (be specific to avoid matching summary content)
   if (
-    trimmed.toLowerCase().includes("ultrathink") ||
+    trimmed.toLowerCase().includes('ultrathink') ||
     trimmed.match(/thinking level[:\s]*(low|medium|high|none|\d)/i) ||
     trimmed.match(/^thinking level\s*$/i) ||
-    trimmed.toLowerCase().includes("estimated cost") ||
-    trimmed.toLowerCase().includes("estimated time") ||
-    trimmed.toLowerCase().includes("budget tokens") ||
+    trimmed.toLowerCase().includes('estimated cost') ||
+    trimmed.toLowerCase().includes('estimated time') ||
+    trimmed.toLowerCase().includes('budget tokens') ||
     trimmed.match(/thinking.*preparation/i)
   ) {
-    return "thinking";
+    return 'thinking';
   }
 
   // Debug info (JSON, stack traces, etc.)
   if (
-    trimmed.startsWith("{") ||
-    trimmed.startsWith("[") ||
-    trimmed.includes("at ") ||
+    trimmed.startsWith('{') ||
+    trimmed.startsWith('[') ||
+    trimmed.includes('at ') ||
     trimmed.match(/^\s*\d+\s*\|/)
   ) {
-    return "debug";
+    return 'debug';
   }
 
   // Default to info
-  return "info";
+  return 'info';
 }
 
 /**
@@ -181,9 +198,9 @@ function extractToolName(content: string): string | undefined {
  * Extracts phase name from a phase entry
  */
 function extractPhase(content: string): string | undefined {
-  if (content.includes("📋")) return "planning";
-  if (content.includes("⚡")) return "action";
-  if (content.includes("✅")) return "verification";
+  if (content.includes('📋')) return 'planning';
+  if (content.includes('⚡')) return 'action';
+  if (content.includes('✅')) return 'verification';
 
   // Extract from [Phase: ...] format
   const phaseMatch = content.match(/\[Phase:\s*([^\]]+)\]/);
@@ -219,7 +236,10 @@ function extractFilePath(content: string): string | undefined {
 /**
  * Generates a smart summary for tool calls based on the tool name and input
  */
-export function generateToolSummary(toolName: string, content: string): string | undefined {
+export function generateToolSummary(
+  toolName: string,
+  content: string
+): string | undefined {
   try {
     // Try to parse JSON input
     const inputMatch = content.match(/Input:\s*([\s\S]*)/);
@@ -297,7 +317,10 @@ export function shouldCollapseByDefault(entry: LogEntry): boolean {
 
   // Collapse if contains multi-line JSON (> 5 lines)
   const lineCount = entry.content.split('\n').length;
-  if (lineCount > 5 && (entry.content.includes('{') || entry.content.includes('['))) {
+  if (
+    lineCount > 5 &&
+    (entry.content.includes('{') || entry.content.includes('['))
+  ) {
     return true;
   }
 
@@ -306,7 +329,10 @@ export function shouldCollapseByDefault(entry: LogEntry): boolean {
     try {
       const inputMatch = entry.content.match(/Input:\s*([\s\S]*)/);
       if (inputMatch) {
-        const parsed = JSON.parse(inputMatch[1].trim()) as Record<string, unknown>;
+        const parsed = JSON.parse(inputMatch[1].trim()) as Record<
+          string,
+          unknown
+        >;
         const todos = parsed.todos as unknown[] | undefined;
         if (todos && todos.length > 1) return true;
       }
@@ -316,7 +342,10 @@ export function shouldCollapseByDefault(entry: LogEntry): boolean {
   }
 
   // Collapse Edit with code blocks
-  if (entry.metadata?.toolName === 'Edit' && entry.content.includes('old_string')) {
+  if (
+    entry.metadata?.toolName === 'Edit' &&
+    entry.content.includes('old_string')
+  ) {
     return true;
   }
 
@@ -328,55 +357,64 @@ export function shouldCollapseByDefault(entry: LogEntry): boolean {
  */
 function generateTitle(type: LogEntryType, content: string): string {
   switch (type) {
-    case "tool_call": {
+    case 'tool_call': {
       const toolName = extractToolName(content);
-      return toolName ? `Tool Call: ${toolName}` : "Tool Call";
+      return toolName ? `Tool Call: ${toolName}` : 'Tool Call';
     }
-    case "tool_result":
-      return "Tool Input/Result";
-    case "phase": {
+    case 'tool_result':
+      return 'Tool Input/Result';
+    case 'phase': {
       const phase = extractPhase(content);
       if (phase) {
         // Capitalize first letter of each word
-        const formatted = phase.split(/\s+/).map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(" ");
+        const formatted = phase
+          .split(/\s+/)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
         return `Phase: ${formatted}`;
       }
-      return "Phase Change";
+      return 'Phase Change';
     }
-    case "error":
-      return "Error";
-    case "success": {
+    case 'error':
+      return 'Error';
+    case 'success': {
       // Check if it's a summary section
-      if (content.startsWith("<summary>") || content.includes("<summary>")) {
-        return "Summary";
+      if (content.startsWith('<summary>') || content.includes('<summary>')) {
+        return 'Summary';
       }
       if (content.match(/^##\s+(Summary|Feature|Changes|Implementation)/i)) {
-        return "Summary";
+        return 'Summary';
       }
-      if (content.match(/^All tasks completed/i) || content.match(/^(I've|I have) (successfully |now )?(completed|finished|implemented)/i)) {
-        return "Summary";
+      if (
+        content.match(/^All tasks completed/i) ||
+        content.match(
+          /^(I've|I have) (successfully |now )?(completed|finished|implemented)/i
+        )
+      ) {
+        return 'Summary';
       }
-      return "Success";
+      return 'Success';
     }
-    case "warning":
-      return "Warning";
-    case "thinking":
-      return "Thinking Level";
-    case "debug":
-      return "Debug Info";
-    case "prompt":
-      return "Prompt";
+    case 'warning':
+      return 'Warning';
+    case 'thinking':
+      return 'Thinking Level';
+    case 'debug':
+      return 'Debug Info';
+    case 'prompt':
+      return 'Prompt';
     default:
-      return "Info";
+      return 'Info';
   }
 }
 
 /**
  * Tracks bracket depth for JSON accumulation
  */
-function calculateBracketDepth(line: string): { braceChange: number; bracketChange: number } {
+function calculateBracketDepth(line: string): {
+  braceChange: number;
+  bracketChange: number;
+} {
   let braceChange = 0;
   let bracketChange = 0;
   let inString = false;
@@ -415,9 +453,9 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
   }
 
   const entries: LogEntry[] = [];
-  const lines = rawOutput.split("\n");
+  const lines = rawOutput.split('\n');
 
-  let currentEntry: Omit<LogEntry, 'id'> & { id?: string } | null = null;
+  let currentEntry: (Omit<LogEntry, 'id'> & { id?: string }) | null = null;
   let currentContent: string[] = [];
   let entryStartLine = 0; // Track the starting line for deterministic ID generation
 
@@ -431,7 +469,7 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
 
   const finalizeEntry = () => {
     if (currentEntry && currentContent.length > 0) {
-      currentEntry.content = currentContent.join("\n").trim();
+      currentEntry.content = currentContent.join('\n').trim();
       if (currentEntry.content) {
         // Populate enhanced metadata for tool calls
         const toolName = currentEntry.metadata?.toolName;
@@ -450,7 +488,7 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
 
         // Generate deterministic ID based on content and position
         const entryWithId: LogEntry = {
-          ...currentEntry as Omit<LogEntry, 'id'>,
+          ...(currentEntry as Omit<LogEntry, 'id'>),
           id: generateDeterministicId(currentEntry.content, entryStartLine),
         };
         entries.push(entryWithId);
@@ -494,7 +532,7 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
     if (inSummaryAccumulation) {
       currentContent.push(line);
       // Summary is complete when we see closing tag
-      if (trimmedLine.includes("</summary>")) {
+      if (trimmedLine.includes('</summary>')) {
         inSummaryAccumulation = false;
         // Don't finalize here - let normal flow handle it
       }
@@ -505,13 +543,13 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
     // Detect if this line starts a new entry
     const lineType = detectEntryType(trimmedLine);
     const isNewEntry =
-      trimmedLine.startsWith("🔧") ||
-      trimmedLine.startsWith("📋") ||
-      trimmedLine.startsWith("⚡") ||
-      trimmedLine.startsWith("✅") ||
-      trimmedLine.startsWith("❌") ||
-      trimmedLine.startsWith("⚠️") ||
-      trimmedLine.startsWith("🧠") ||
+      trimmedLine.startsWith('🔧') ||
+      trimmedLine.startsWith('📋') ||
+      trimmedLine.startsWith('⚡') ||
+      trimmedLine.startsWith('✅') ||
+      trimmedLine.startsWith('❌') ||
+      trimmedLine.startsWith('⚠️') ||
+      trimmedLine.startsWith('🧠') ||
       trimmedLine.match(/\[Phase:\s*([^\]]+)\]/) ||
       trimmedLine.match(/\[Feature Creation\]/i) ||
       trimmedLine.match(/\[Tool\]/i) ||
@@ -519,18 +557,21 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
       trimmedLine.match(/\[Complete\]/i) ||
       trimmedLine.match(/\[ERROR\]/i) ||
       trimmedLine.match(/\[Status\]/i) ||
-      trimmedLine.toLowerCase().includes("ultrathink preparation") ||
+      trimmedLine.toLowerCase().includes('ultrathink preparation') ||
       trimmedLine.match(/thinking level[:\s]*(low|medium|high|none|\d)/i) ||
       // Summary tags (preferred format from agent)
-      trimmedLine.startsWith("<summary>") ||
+      trimmedLine.startsWith('<summary>') ||
       // Agent summary sections (markdown headers - fallback)
       trimmedLine.match(/^##\s+(Summary|Feature|Changes|Implementation)/i) ||
       // Summary introduction lines
       trimmedLine.match(/^All tasks completed/i) ||
-      trimmedLine.match(/^(I've|I have) (successfully |now )?(completed|finished|implemented)/i);
+      trimmedLine.match(
+        /^(I've|I have) (successfully |now )?(completed|finished|implemented)/i
+      );
 
     // Check if this is an Input: line that should trigger JSON accumulation
-    const isInputLine = trimmedLine.startsWith("Input:") && currentEntry?.type === "tool_call";
+    const isInputLine =
+      trimmedLine.startsWith('Input:') && currentEntry?.type === 'tool_call';
 
     if (isNewEntry) {
       // Finalize previous entry
@@ -543,7 +584,7 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
       currentEntry = {
         type: lineType,
         title: generateTitle(lineType, trimmedLine),
-        content: "",
+        content: '',
         metadata: {
           toolName: extractToolName(trimmedLine),
           phase: extractPhase(trimmedLine),
@@ -552,7 +593,10 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
       currentContent.push(trimmedLine);
 
       // If this is a <summary> tag, start summary accumulation mode
-      if (trimmedLine.startsWith("<summary>") && !trimmedLine.includes("</summary>")) {
+      if (
+        trimmedLine.startsWith('<summary>') &&
+        !trimmedLine.includes('</summary>')
+      ) {
         inSummaryAccumulation = true;
       }
     } else if (isInputLine && currentEntry) {
@@ -562,7 +606,8 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
       // Check if there's JSON on the same line after "Input:"
       const inputContent = trimmedLine.replace(/^Input:\s*/, '');
       if (inputContent) {
-        const { braceChange, bracketChange } = calculateBracketDepth(inputContent);
+        const { braceChange, bracketChange } =
+          calculateBracketDepth(inputContent);
         jsonBraceDepth = braceChange;
         jsonBracketDepth = bracketChange;
 
@@ -580,7 +625,8 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
 
       // Check if this line starts a JSON block
       if (trimmedLine.startsWith('{') || trimmedLine.startsWith('[')) {
-        const { braceChange, bracketChange } = calculateBracketDepth(trimmedLine);
+        const { braceChange, bracketChange } =
+          calculateBracketDepth(trimmedLine);
         if (braceChange > 0 || bracketChange > 0) {
           jsonBraceDepth = braceChange;
           jsonBracketDepth = bracketChange;
@@ -595,9 +641,9 @@ export function parseLogOutput(rawOutput: string): LogEntry[] {
 
       // No current entry, create a default info entry
       currentEntry = {
-        type: "info",
-        title: "Info",
-        content: "",
+        type: 'info',
+        title: 'Info',
+        content: '',
       };
       currentContent.push(line);
     }
@@ -626,11 +672,11 @@ function mergeConsecutiveEntries(entries: LogEntry[]): LogEntry[] {
   for (const entry of entries) {
     if (
       current &&
-      (current.type === "debug" || current.type === "info") &&
+      (current.type === 'debug' || current.type === 'info') &&
       current.type === entry.type
     ) {
       // Merge into current - regenerate ID based on merged content
-      current.content += "\n\n" + entry.content;
+      current.content += '\n\n' + entry.content;
       current.id = generateDeterministicId(current.content, mergeIndex);
     } else {
       if (current) {
@@ -659,85 +705,85 @@ export function getLogTypeColors(type: LogEntryType): {
   badge: string;
 } {
   switch (type) {
-    case "prompt":
+    case 'prompt':
       return {
-        bg: "bg-blue-500/10",
-        border: "border-blue-500/30",
-        text: "text-blue-300",
-        icon: "text-blue-400",
-        badge: "bg-blue-500/20 text-blue-300",
+        bg: 'bg-blue-500/10',
+        border: 'border-blue-500/30',
+        text: 'text-blue-300',
+        icon: 'text-blue-400',
+        badge: 'bg-blue-500/20 text-blue-300',
       };
-    case "tool_call":
+    case 'tool_call':
       return {
-        bg: "bg-amber-500/10",
-        border: "border-amber-500/30",
-        text: "text-amber-300",
-        icon: "text-amber-400",
-        badge: "bg-amber-500/20 text-amber-300",
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-500/30',
+        text: 'text-amber-300',
+        icon: 'text-amber-400',
+        badge: 'bg-amber-500/20 text-amber-300',
       };
-    case "tool_result":
+    case 'tool_result':
       return {
-        bg: "bg-slate-500/10",
-        border: "border-slate-400/30",
-        text: "text-slate-300",
-        icon: "text-slate-400",
-        badge: "bg-slate-500/20 text-slate-300",
+        bg: 'bg-slate-500/10',
+        border: 'border-slate-400/30',
+        text: 'text-slate-300',
+        icon: 'text-slate-400',
+        badge: 'bg-slate-500/20 text-slate-300',
       };
-    case "phase":
+    case 'phase':
       return {
-        bg: "bg-cyan-500/10",
-        border: "border-cyan-500/30",
-        text: "text-cyan-300",
-        icon: "text-cyan-400",
-        badge: "bg-cyan-500/20 text-cyan-300",
+        bg: 'bg-cyan-500/10',
+        border: 'border-cyan-500/30',
+        text: 'text-cyan-300',
+        icon: 'text-cyan-400',
+        badge: 'bg-cyan-500/20 text-cyan-300',
       };
-    case "error":
+    case 'error':
       return {
-        bg: "bg-red-500/10",
-        border: "border-red-500/30",
-        text: "text-red-300",
-        icon: "text-red-400",
-        badge: "bg-red-500/20 text-red-300",
+        bg: 'bg-red-500/10',
+        border: 'border-red-500/30',
+        text: 'text-red-300',
+        icon: 'text-red-400',
+        badge: 'bg-red-500/20 text-red-300',
       };
-    case "success":
+    case 'success':
       return {
-        bg: "bg-emerald-500/10",
-        border: "border-emerald-500/30",
-        text: "text-emerald-300",
-        icon: "text-emerald-400",
-        badge: "bg-emerald-500/20 text-emerald-300",
+        bg: 'bg-emerald-500/10',
+        border: 'border-emerald-500/30',
+        text: 'text-emerald-300',
+        icon: 'text-emerald-400',
+        badge: 'bg-emerald-500/20 text-emerald-300',
       };
-    case "warning":
+    case 'warning':
       return {
-        bg: "bg-orange-500/10",
-        border: "border-orange-500/30",
-        text: "text-orange-300",
-        icon: "text-orange-400",
-        badge: "bg-orange-500/20 text-orange-300",
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-500/30',
+        text: 'text-orange-300',
+        icon: 'text-orange-400',
+        badge: 'bg-orange-500/20 text-orange-300',
       };
-    case "thinking":
+    case 'thinking':
       return {
-        bg: "bg-indigo-500/10",
-        border: "border-indigo-500/30",
-        text: "text-indigo-300",
-        icon: "text-indigo-400",
-        badge: "bg-indigo-500/20 text-indigo-300",
+        bg: 'bg-indigo-500/10',
+        border: 'border-indigo-500/30',
+        text: 'text-indigo-300',
+        icon: 'text-indigo-400',
+        badge: 'bg-indigo-500/20 text-indigo-300',
       };
-    case "debug":
+    case 'debug':
       return {
-        bg: "bg-primary/10",
-        border: "border-primary/30",
-        text: "text-primary",
-        icon: "text-primary",
-        badge: "bg-primary/20 text-primary",
+        bg: 'bg-primary/10',
+        border: 'border-primary/30',
+        text: 'text-primary',
+        icon: 'text-primary',
+        badge: 'bg-primary/20 text-primary',
       };
     default:
       return {
-        bg: "bg-zinc-500/10",
-        border: "border-zinc-500/30",
-        text: "text-zinc-300",
-        icon: "text-zinc-400",
-        badge: "bg-zinc-500/20 text-zinc-300",
+        bg: 'bg-zinc-500/10',
+        border: 'border-zinc-500/30',
+        text: 'text-zinc-300',
+        icon: 'text-zinc-400',
+        badge: 'bg-zinc-500/20 text-zinc-300',
       };
   }
 }

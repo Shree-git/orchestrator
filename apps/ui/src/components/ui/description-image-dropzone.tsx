@@ -1,10 +1,9 @@
-
-import React, { useState, useRef, useCallback } from "react";
-import { cn } from "@/lib/utils";
-import { ImageIcon, X, Loader2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { getElectronAPI } from "@/lib/electron";
-import { useAppStore } from "@/store/app-store";
+import React, { useState, useRef, useCallback } from 'react';
+import { cn } from '@/lib/utils';
+import { ImageIcon, X, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { getElectronAPI } from '@/lib/electron';
+import { useAppStore } from '@/store/app-store';
 
 export interface FeatureImagePath {
   id: string;
@@ -34,11 +33,11 @@ interface DescriptionImageDropZoneProps {
 }
 
 const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
 ];
 const DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -47,7 +46,7 @@ export function DescriptionImageDropZone({
   onChange,
   images,
   onImagesChange,
-  placeholder = "Describe the feature...",
+  placeholder = 'Describe the feature...',
   className,
   disabled = false,
   maxFiles = 5,
@@ -60,77 +59,105 @@ export function DescriptionImageDropZone({
   const [isDragOver, setIsDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   // Use parent-provided preview map if available, otherwise use local state
-  const [localPreviewImages, setLocalPreviewImages] = useState<Map<string, string>>(
-    () => new Map()
-  );
+  const [localPreviewImages, setLocalPreviewImages] = useState<
+    Map<string, string>
+  >(() => new Map());
 
   // Determine which preview map to use - prefer parent-controlled state
-  const previewImages = previewMap !== undefined ? previewMap : localPreviewImages;
-  const setPreviewImages = useCallback((updater: Map<string, string> | ((prev: Map<string, string>) => Map<string, string>)) => {
-    if (onPreviewMapChange) {
-      const currentMap = previewMap !== undefined ? previewMap : localPreviewImages;
-      const newMap = typeof updater === 'function' ? updater(currentMap) : updater;
-      onPreviewMapChange(newMap);
-    } else {
-      setLocalPreviewImages((prev) => {
-        const newMap = typeof updater === 'function' ? updater(prev) : updater;
-        return newMap;
-      });
-    }
-  }, [onPreviewMapChange, previewMap, localPreviewImages]);
+  const previewImages =
+    previewMap !== undefined ? previewMap : localPreviewImages;
+  const setPreviewImages = useCallback(
+    (
+      updater:
+        | Map<string, string>
+        | ((prev: Map<string, string>) => Map<string, string>)
+    ) => {
+      if (onPreviewMapChange) {
+        const currentMap =
+          previewMap !== undefined ? previewMap : localPreviewImages;
+        const newMap =
+          typeof updater === 'function' ? updater(currentMap) : updater;
+        onPreviewMapChange(newMap);
+      } else {
+        setLocalPreviewImages((prev) => {
+          const newMap =
+            typeof updater === 'function' ? updater(prev) : updater;
+          return newMap;
+        });
+      }
+    },
+    [onPreviewMapChange, previewMap, localPreviewImages]
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentProject = useAppStore((state) => state.currentProject);
 
   // Construct server URL for loading saved images
-  const getImageServerUrl = useCallback((imagePath: string): string => {
-    const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3008";
-    const projectPath = currentProject?.path || "";
-    return `${serverUrl}/api/fs/image?path=${encodeURIComponent(imagePath)}&projectPath=${encodeURIComponent(projectPath)}`;
-  }, [currentProject?.path]);
+  const getImageServerUrl = useCallback(
+    (imagePath: string): string => {
+      const serverUrl =
+        import.meta.env.VITE_SERVER_URL || 'http://localhost:3008';
+      const projectPath = currentProject?.path || '';
+      return `${serverUrl}/api/fs/image?path=${encodeURIComponent(imagePath)}&projectPath=${encodeURIComponent(projectPath)}`;
+    },
+    [currentProject?.path]
+  );
 
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
-        if (typeof reader.result === "string") {
+        if (typeof reader.result === 'string') {
           resolve(reader.result);
         } else {
-          reject(new Error("Failed to read file as base64"));
+          reject(new Error('Failed to read file as base64'));
         }
       };
-      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.onerror = () => reject(new Error('Failed to read file'));
       reader.readAsDataURL(file);
     });
   };
 
-  const saveImageToTemp = useCallback(async (
-    base64Data: string,
-    filename: string,
-    mimeType: string
-  ): Promise<string | null> => {
-    try {
-      const api = getElectronAPI();
-      // Check if saveImageToTemp method exists
-      if (!api.saveImageToTemp) {
-        // Fallback path when saveImageToTemp is not available
-        console.log("[DescriptionImageDropZone] Using fallback path for image");
-        return `.automaker/images/${Date.now()}_${filename}`;
-      }
+  const saveImageToTemp = useCallback(
+    async (
+      base64Data: string,
+      filename: string,
+      mimeType: string
+    ): Promise<string | null> => {
+      try {
+        const api = getElectronAPI();
+        // Check if saveImageToTemp method exists
+        if (!api.saveImageToTemp) {
+          // Fallback path when saveImageToTemp is not available
+          console.log(
+            '[DescriptionImageDropZone] Using fallback path for image'
+          );
+          return `.automaker/images/${Date.now()}_${filename}`;
+        }
 
-      // Get projectPath from the store if available
-      const projectPath = currentProject?.path;
-      const result = await api.saveImageToTemp(base64Data, filename, mimeType, projectPath);
-      if (result.success && result.path) {
-        return result.path;
+        // Get projectPath from the store if available
+        const projectPath = currentProject?.path;
+        const result = await api.saveImageToTemp(
+          base64Data,
+          filename,
+          mimeType,
+          projectPath
+        );
+        if (result.success && result.path) {
+          return result.path;
+        }
+        console.error(
+          '[DescriptionImageDropZone] Failed to save image:',
+          result.error
+        );
+        return null;
+      } catch (error) {
+        console.error('[DescriptionImageDropZone] Error saving image:', error);
+        return null;
       }
-      console.error("[DescriptionImageDropZone] Failed to save image:", result.error);
-      return null;
-    } catch (error) {
-      console.error("[DescriptionImageDropZone] Error saving image:", error);
-      return null;
-    }
-  }, [currentProject?.path]);
+    },
+    [currentProject?.path]
+  );
 
   const processFiles = useCallback(
     async (files: FileList) => {
@@ -189,7 +216,7 @@ export function DescriptionImageDropZone({
       }
 
       if (errors.length > 0) {
-        console.warn("Image upload errors:", errors);
+        console.warn('Image upload errors:', errors);
       }
 
       if (newImages.length > 0) {
@@ -199,7 +226,16 @@ export function DescriptionImageDropZone({
 
       setIsProcessing(false);
     },
-    [disabled, isProcessing, images, maxFiles, maxFileSize, onImagesChange, previewImages, saveImageToTemp]
+    [
+      disabled,
+      isProcessing,
+      images,
+      maxFiles,
+      maxFileSize,
+      onImagesChange,
+      previewImages,
+      saveImageToTemp,
+    ]
   );
 
   const handleDrop = useCallback(
@@ -243,7 +279,7 @@ export function DescriptionImageDropZone({
       }
       // Reset the input so the same file can be selected again
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = '';
       }
     },
     [processFiles]
@@ -283,12 +319,12 @@ export function DescriptionImageDropZone({
         const item = clipboardItems[i];
 
         // Check if the item is an image
-        if (item.type.startsWith("image/")) {
+        if (item.type.startsWith('image/')) {
           const file = item.getAsFile();
           if (file) {
             // Generate a filename for pasted images since they don't have one
-            const extension = item.type.split("/")[1] || "png";
-            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+            const extension = item.type.split('/')[1] || 'png';
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const renamedFile = new File(
               [file],
               `pasted-image-${timestamp}.${extension}`,
@@ -314,13 +350,13 @@ export function DescriptionImageDropZone({
   );
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
         multiple
-        accept={ACCEPTED_IMAGE_TYPES.join(",")}
+        accept={ACCEPTED_IMAGE_TYPES.join(',')}
         onChange={handleFileSelect}
         className="hidden"
         disabled={disabled}
@@ -332,13 +368,10 @@ export function DescriptionImageDropZone({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={cn(
-          "relative rounded-md transition-all duration-200",
-          {
-            "ring-2 ring-blue-400 ring-offset-2 ring-offset-background":
-              isDragOver && !disabled,
-          }
-        )}
+        className={cn('relative rounded-md transition-all duration-200', {
+          'ring-2 ring-blue-400 ring-offset-2 ring-offset-background':
+            isDragOver && !disabled,
+        })}
       >
         {/* Drag overlay */}
         {isDragOver && !disabled && (
@@ -363,8 +396,8 @@ export function DescriptionImageDropZone({
           autoFocus={autoFocus}
           aria-invalid={error}
           className={cn(
-            "min-h-[120px]",
-            isProcessing && "opacity-50 pointer-events-none"
+            'min-h-[120px]',
+            isProcessing && 'opacity-50 pointer-events-none'
           )}
           data-testid="feature-description-input"
         />
@@ -372,7 +405,7 @@ export function DescriptionImageDropZone({
 
       {/* Hint text */}
       <p className="text-xs text-muted-foreground mt-1">
-        Paste, drag and drop images, or{" "}
+        Paste, drag and drop images, or{' '}
         <button
           type="button"
           onClick={handleBrowseClick}
@@ -380,7 +413,7 @@ export function DescriptionImageDropZone({
           disabled={disabled || isProcessing}
         >
           browse
-        </button>{" "}
+        </button>{' '}
         to attach context images
       </p>
 
@@ -394,10 +427,13 @@ export function DescriptionImageDropZone({
 
       {/* Image previews */}
       {images.length > 0 && (
-        <div className="mt-3 space-y-2" data-testid="description-image-previews">
+        <div
+          className="mt-3 space-y-2"
+          data-testid="description-image-previews"
+        >
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-foreground">
-              {images.length} image{images.length > 1 ? "s" : ""} attached
+              {images.length} image{images.length > 1 ? 's' : ''} attached
             </p>
             <button
               type="button"

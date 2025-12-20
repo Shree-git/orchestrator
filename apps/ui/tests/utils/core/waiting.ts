@@ -1,11 +1,11 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator } from '@playwright/test';
 
 /**
  * Wait for the page to reach network idle state
  * This is commonly used after navigation or page reload to ensure all network requests have completed
  */
 export async function waitForNetworkIdle(page: Page): Promise<void> {
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState('networkidle');
 }
 
 /**
@@ -14,12 +14,12 @@ export async function waitForNetworkIdle(page: Page): Promise<void> {
 export async function waitForElement(
   page: Page,
   testId: string,
-  options?: { timeout?: number; state?: "attached" | "visible" | "hidden" }
+  options?: { timeout?: number; state?: 'attached' | 'visible' | 'hidden' }
 ): Promise<Locator> {
   const element = page.locator(`[data-testid="${testId}"]`);
   await element.waitFor({
     timeout: options?.timeout ?? 5000,
-    state: options?.state ?? "visible",
+    state: options?.state ?? 'visible',
   });
   return element;
 }
@@ -35,6 +35,6 @@ export async function waitForElementHidden(
   const element = page.locator(`[data-testid="${testId}"]`);
   await element.waitFor({
     timeout: options?.timeout ?? 5000,
-    state: "hidden",
+    state: 'hidden',
   });
 }

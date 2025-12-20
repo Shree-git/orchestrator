@@ -1,9 +1,8 @@
-
-import { useEffect, useCallback } from "react";
-import { useAppStore, parseShortcut } from "@/store/app-store";
+import { useEffect, useCallback } from 'react';
+import { useAppStore, parseShortcut } from '@/store/app-store';
 
 export interface KeyboardShortcut {
-  key: string;  // Can be simple "K" or with modifiers "Shift+N", "Cmd+K"
+  key: string; // Can be simple "K" or with modifiers "Shift+N", "Cmd+K"
   action: () => void;
   description?: string;
 }
@@ -18,29 +17,29 @@ function isInputFocused(): boolean {
 
   // Check if it's a form input element
   const tagName = activeElement.tagName.toLowerCase();
-  if (tagName === "input" || tagName === "textarea" || tagName === "select") {
+  if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
     return true;
   }
 
   // Check if it's a contenteditable element
-  if (activeElement.getAttribute("contenteditable") === "true") {
+  if (activeElement.getAttribute('contenteditable') === 'true') {
     return true;
   }
 
   // Check if it has a role of textbox or searchbox
-  const role = activeElement.getAttribute("role");
-  if (role === "textbox" || role === "searchbox" || role === "combobox") {
+  const role = activeElement.getAttribute('role');
+  if (role === 'textbox' || role === 'searchbox' || role === 'combobox') {
     return true;
   }
 
   // Check if focus is inside an xterm terminal (they use a hidden textarea)
-  const xtermContainer = activeElement.closest(".xterm");
+  const xtermContainer = activeElement.closest('.xterm');
   if (xtermContainer) {
     return true;
   }
 
   // Also check if any parent has data-terminal-container attribute
-  const terminalContainer = activeElement.closest("[data-terminal-container]");
+  const terminalContainer = activeElement.closest('[data-terminal-container]');
   if (terminalContainer) {
     return true;
   }
@@ -125,8 +124,8 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
       }
 
       // Find matching shortcut
-      const matchingShortcut = shortcuts.find(
-        (shortcut) => matchesShortcut(event, shortcut.key)
+      const matchingShortcut = shortcuts.find((shortcut) =>
+        matchesShortcut(event, shortcut.key)
       );
 
       if (matchingShortcut) {
@@ -138,9 +137,9 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
   );
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
 }

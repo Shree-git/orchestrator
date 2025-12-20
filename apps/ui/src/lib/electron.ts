@@ -1,5 +1,5 @@
 // Type definitions for Electron IPC API
-import type { SessionListItem, Message } from "@/types/electron";
+import type { SessionListItem, Message } from '@/types/electron';
 
 export interface FileEntry {
   name: string;
@@ -54,7 +54,7 @@ export type {
   FileDiffsResult,
   FileDiffResult,
   FileStatus,
-} from "@/types/electron";
+} from '@/types/electron';
 
 // Import types for internal use in this file
 import type {
@@ -63,13 +63,13 @@ import type {
   GitAPI,
   ModelDefinition,
   ProviderStatus,
-} from "@/types/electron";
+} from '@/types/electron';
 
 // Import HTTP API client (ES module)
-import { getHttpApiClient } from "./http-api-client";
+import { getHttpApiClient } from './http-api-client';
 
 // Feature type - Import from app-store
-import type { Feature } from "@/store/app-store";
+import type { Feature } from '@/store/app-store';
 
 // Running Agent type
 export interface RunningAgent {
@@ -102,10 +102,10 @@ export interface FeatureSuggestion {
 
 export interface SuggestionsEvent {
   type:
-    | "suggestions_progress"
-    | "suggestions_tool"
-    | "suggestions_complete"
-    | "suggestions_error";
+    | 'suggestions_progress'
+    | 'suggestions_tool'
+    | 'suggestions_complete'
+    | 'suggestions_error';
   content?: string;
   tool?: string;
   input?: unknown;
@@ -114,10 +114,10 @@ export interface SuggestionsEvent {
 }
 
 export type SuggestionType =
-  | "features"
-  | "refactoring"
-  | "security"
-  | "performance";
+  | 'features'
+  | 'refactoring'
+  | 'security'
+  | 'performance';
 
 export interface SuggestionsAPI {
   generate: (
@@ -135,15 +135,15 @@ export interface SuggestionsAPI {
 
 // Spec Regeneration types
 export type SpecRegenerationEvent =
-  | { type: "spec_regeneration_progress"; content: string; projectPath: string }
+  | { type: 'spec_regeneration_progress'; content: string; projectPath: string }
   | {
-      type: "spec_regeneration_tool";
+      type: 'spec_regeneration_tool';
       tool: string;
       input: unknown;
       projectPath: string;
     }
-  | { type: "spec_regeneration_complete"; message: string; projectPath: string }
-  | { type: "spec_regeneration_error"; error: string; projectPath: string };
+  | { type: 'spec_regeneration_complete'; message: string; projectPath: string }
+  | { type: 'spec_regeneration_error'; error: string; projectPath: string };
 
 export interface SpecRegenerationAPI {
   create: (
@@ -401,7 +401,7 @@ export interface ElectronAPI {
       isMac: boolean;
       isLinux: boolean;
     }>;
-    verifyClaudeAuth: (authMethod?: "cli" | "api_key") => Promise<{
+    verifyClaudeAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
       success: boolean;
       authenticated: boolean;
       error?: string;
@@ -489,18 +489,18 @@ export interface ElectronAPI {
 // Mock data for web development
 const mockFeatures = [
   {
-    category: "Core",
-    description: "Sample Feature",
-    steps: ["Step 1", "Step 2"],
+    category: 'Core',
+    description: 'Sample Feature',
+    steps: ['Step 1', 'Step 2'],
     passes: false,
   },
 ];
 
 // Local storage keys
 const STORAGE_KEYS = {
-  PROJECTS: "automaker_projects",
-  CURRENT_PROJECT: "automaker_current_project",
-  TRASHED_PROJECTS: "automaker_trashed_projects",
+  PROJECTS: 'automaker_projects',
+  CURRENT_PROJECT: 'automaker_current_project',
+  TRASHED_PROJECTS: 'automaker_trashed_projects',
 } as const;
 
 // Mock file system using localStorage
@@ -508,7 +508,7 @@ const mockFileSystem: Record<string, string> = {};
 
 // Check if we're in Electron (for UI indicators only)
 export const isElectron = (): boolean => {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return false;
   }
 
@@ -530,9 +530,9 @@ export const checkServerAvailable = async (): Promise<boolean> => {
   serverCheckPromise = (async () => {
     try {
       const serverUrl =
-        import.meta.env.VITE_SERVER_URL || "http://localhost:3008";
+        import.meta.env.VITE_SERVER_URL || 'http://localhost:3008';
       const response = await fetch(`${serverUrl}/api/health`, {
-        method: "GET",
+        method: 'GET',
         signal: AbortSignal.timeout(2000),
       });
       serverAvailable = response.ok;
@@ -561,8 +561,8 @@ let httpClientInstance: ElectronAPI | null = null;
  * This is the only transport mode supported.
  */
 export const getElectronAPI = (): ElectronAPI => {
-  if (typeof window === "undefined") {
-    throw new Error("Cannot get API during SSR");
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot get API during SSR');
   }
 
   if (!httpClientInstance) {
@@ -585,34 +585,34 @@ export const isBackendConnected = async (): Promise<boolean> => {
  * Get the current API mode being used
  * Always returns "http" since that's the only mode now
  */
-export const getCurrentApiMode = (): "http" => {
-  return "http";
+export const getCurrentApiMode = (): 'http' => {
+  return 'http';
 };
 
 // Debug helpers
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   (window as any).__checkApiMode = () => {
-    console.log("Current API mode:", getCurrentApiMode());
-    console.log("isElectron():", isElectron());
+    console.log('Current API mode:', getCurrentApiMode());
+    console.log('isElectron():', isElectron());
   };
 }
 
 // Mock API for development/fallback when no backend is available
 const getMockElectronAPI = (): ElectronAPI => {
   return {
-    ping: async () => "pong (mock)",
+    ping: async () => 'pong (mock)',
 
     openExternalLink: async (url: string) => {
       // In web mode, open in a new tab
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(url, '_blank', 'noopener,noreferrer');
       return { success: true };
     },
 
     openDirectory: async () => {
       // In web mode, we'll use a prompt to simulate directory selection
       const path = prompt(
-        "Enter project directory path:",
-        "/Users/demo/project"
+        'Enter project directory path:',
+        '/Users/demo/project'
       );
       return {
         canceled: !path,
@@ -621,7 +621,7 @@ const getMockElectronAPI = (): ElectronAPI => {
     },
 
     openFile: async () => {
-      const path = prompt("Enter file path:");
+      const path = prompt('Enter file path:');
       return {
         canceled: !path,
         filePaths: path ? [path] : [],
@@ -635,28 +635,28 @@ const getMockElectronAPI = (): ElectronAPI => {
       }
       // Return mock data based on file type
       // Note: Features are now stored in .automaker/features/{id}/feature.json
-      if (filePath.endsWith("categories.json")) {
+      if (filePath.endsWith('categories.json')) {
         // Return empty array for categories when file doesn't exist yet
-        return { success: true, content: "[]" };
+        return { success: true, content: '[]' };
       }
-      if (filePath.endsWith("app_spec.txt")) {
+      if (filePath.endsWith('app_spec.txt')) {
         return {
           success: true,
           content:
-            "<project_specification>\n  <project_name>Demo Project</project_name>\n</project_specification>",
+            '<project_specification>\n  <project_name>Demo Project</project_name>\n</project_specification>',
         };
       }
       // For any file in mock features directory, check mock file system
-      if (filePath.includes(".automaker/features/")) {
+      if (filePath.includes('.automaker/features/')) {
         if (mockFileSystem[filePath] !== undefined) {
           return { success: true, content: mockFileSystem[filePath] };
         }
         // Return empty string for agent-output.md if it doesn't exist
-        if (filePath.endsWith("/agent-output.md")) {
-          return { success: true, content: "" };
+        if (filePath.endsWith('/agent-output.md')) {
+          return { success: true, content: '' };
         }
       }
-      return { success: false, error: "File not found (mock)" };
+      return { success: false, error: 'File not found (mock)' };
     },
 
     writeFile: async (filePath: string, content: string) => {
@@ -672,7 +672,7 @@ const getMockElectronAPI = (): ElectronAPI => {
       // Return mock directory structure based on path
       if (dirPath) {
         // Check if this is the context directory - return files from mock file system
-        if (dirPath.includes(".automaker/context")) {
+        if (dirPath.includes('.automaker/context')) {
           const contextFiles = Object.keys(mockFileSystem)
             .filter((path) => path.startsWith(dirPath) && path !== dirPath)
             .map((path) => {
@@ -683,94 +683,94 @@ const getMockElectronAPI = (): ElectronAPI => {
                 isFile: true,
               };
             })
-            .filter((entry) => !entry.name.includes("/")); // Only direct children
+            .filter((entry) => !entry.name.includes('/')); // Only direct children
           return { success: true, entries: contextFiles };
         }
         // Root level
         if (
-          !dirPath.includes("/src") &&
-          !dirPath.includes("/tests") &&
-          !dirPath.includes("/public") &&
-          !dirPath.includes(".automaker")
+          !dirPath.includes('/src') &&
+          !dirPath.includes('/tests') &&
+          !dirPath.includes('/public') &&
+          !dirPath.includes('.automaker')
         ) {
           return {
             success: true,
             entries: [
-              { name: "src", isDirectory: true, isFile: false },
-              { name: "tests", isDirectory: true, isFile: false },
-              { name: "public", isDirectory: true, isFile: false },
-              { name: ".automaker", isDirectory: true, isFile: false },
-              { name: "package.json", isDirectory: false, isFile: true },
-              { name: "tsconfig.json", isDirectory: false, isFile: true },
-              { name: "app_spec.txt", isDirectory: false, isFile: true },
-              { name: "features", isDirectory: true, isFile: false },
-              { name: "README.md", isDirectory: false, isFile: true },
+              { name: 'src', isDirectory: true, isFile: false },
+              { name: 'tests', isDirectory: true, isFile: false },
+              { name: 'public', isDirectory: true, isFile: false },
+              { name: '.automaker', isDirectory: true, isFile: false },
+              { name: 'package.json', isDirectory: false, isFile: true },
+              { name: 'tsconfig.json', isDirectory: false, isFile: true },
+              { name: 'app_spec.txt', isDirectory: false, isFile: true },
+              { name: 'features', isDirectory: true, isFile: false },
+              { name: 'README.md', isDirectory: false, isFile: true },
             ],
           };
         }
         // src directory
-        if (dirPath.endsWith("/src")) {
+        if (dirPath.endsWith('/src')) {
           return {
             success: true,
             entries: [
-              { name: "components", isDirectory: true, isFile: false },
-              { name: "lib", isDirectory: true, isFile: false },
-              { name: "app", isDirectory: true, isFile: false },
-              { name: "index.ts", isDirectory: false, isFile: true },
-              { name: "utils.ts", isDirectory: false, isFile: true },
+              { name: 'components', isDirectory: true, isFile: false },
+              { name: 'lib', isDirectory: true, isFile: false },
+              { name: 'app', isDirectory: true, isFile: false },
+              { name: 'index.ts', isDirectory: false, isFile: true },
+              { name: 'utils.ts', isDirectory: false, isFile: true },
             ],
           };
         }
         // src/components directory
-        if (dirPath.endsWith("/components")) {
+        if (dirPath.endsWith('/components')) {
           return {
             success: true,
             entries: [
-              { name: "Button.tsx", isDirectory: false, isFile: true },
-              { name: "Card.tsx", isDirectory: false, isFile: true },
-              { name: "Header.tsx", isDirectory: false, isFile: true },
-              { name: "Footer.tsx", isDirectory: false, isFile: true },
+              { name: 'Button.tsx', isDirectory: false, isFile: true },
+              { name: 'Card.tsx', isDirectory: false, isFile: true },
+              { name: 'Header.tsx', isDirectory: false, isFile: true },
+              { name: 'Footer.tsx', isDirectory: false, isFile: true },
             ],
           };
         }
         // src/lib directory
-        if (dirPath.endsWith("/lib")) {
+        if (dirPath.endsWith('/lib')) {
           return {
             success: true,
             entries: [
-              { name: "api.ts", isDirectory: false, isFile: true },
-              { name: "helpers.ts", isDirectory: false, isFile: true },
+              { name: 'api.ts', isDirectory: false, isFile: true },
+              { name: 'helpers.ts', isDirectory: false, isFile: true },
             ],
           };
         }
         // src/app directory
-        if (dirPath.endsWith("/app")) {
+        if (dirPath.endsWith('/app')) {
           return {
             success: true,
             entries: [
-              { name: "page.tsx", isDirectory: false, isFile: true },
-              { name: "layout.tsx", isDirectory: false, isFile: true },
-              { name: "globals.css", isDirectory: false, isFile: true },
+              { name: 'page.tsx', isDirectory: false, isFile: true },
+              { name: 'layout.tsx', isDirectory: false, isFile: true },
+              { name: 'globals.css', isDirectory: false, isFile: true },
             ],
           };
         }
         // tests directory
-        if (dirPath.endsWith("/tests")) {
+        if (dirPath.endsWith('/tests')) {
           return {
             success: true,
             entries: [
-              { name: "unit.test.ts", isDirectory: false, isFile: true },
-              { name: "e2e.spec.ts", isDirectory: false, isFile: true },
+              { name: 'unit.test.ts', isDirectory: false, isFile: true },
+              { name: 'e2e.spec.ts', isDirectory: false, isFile: true },
             ],
           };
         }
         // public directory
-        if (dirPath.endsWith("/public")) {
+        if (dirPath.endsWith('/public')) {
           return {
             success: true,
             entries: [
-              { name: "favicon.ico", isDirectory: false, isFile: true },
-              { name: "logo.svg", isDirectory: false, isFile: true },
+              { name: 'favicon.ico', isDirectory: false, isFile: true },
+              { name: 'logo.svg', isDirectory: false, isFile: true },
             ],
           };
         }
@@ -787,8 +787,8 @@ const getMockElectronAPI = (): ElectronAPI => {
       }
       // Note: Features are now stored in .automaker/features/{id}/feature.json
       if (
-        filePath.endsWith("app_spec.txt") &&
-        !filePath.includes(".automaker")
+        filePath.endsWith('app_spec.txt') &&
+        !filePath.includes('.automaker')
       ) {
         return true;
       }
@@ -817,8 +817,8 @@ const getMockElectronAPI = (): ElectronAPI => {
     },
 
     getPath: async (name: string) => {
-      if (name === "userData") {
-        return "/mock/userData";
+      if (name === 'userData') {
+        return '/mock/userData';
       }
       return `/mock/${name}`;
     },
@@ -832,7 +832,7 @@ const getMockElectronAPI = (): ElectronAPI => {
     ) => {
       // Generate a mock temp file path - use projectPath if provided
       const timestamp = Date.now();
-      const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
       const tempFilePath = projectPath
         ? `${projectPath}/.automaker/images/${timestamp}_${safeName}`
         : `/tmp/automaker-images/${timestamp}_${safeName}`;
@@ -840,14 +840,14 @@ const getMockElectronAPI = (): ElectronAPI => {
       // Store the image data in mock file system for testing
       mockFileSystem[tempFilePath] = data;
 
-      console.log("[Mock] Saved image to temp:", tempFilePath);
+      console.log('[Mock] Saved image to temp:', tempFilePath);
       return { success: true, path: tempFilePath };
     },
 
     checkClaudeCli: async () => ({
       success: false,
-      status: "not_installed",
-      recommendation: "Claude CLI checks are unavailable in the web preview.",
+      status: 'not_installed',
+      recommendation: 'Claude CLI checks are unavailable in the web preview.',
     }),
 
     model: {
@@ -940,7 +940,7 @@ interface SetupAPI {
     isMac: boolean;
     isLinux: boolean;
   }>;
-  verifyClaudeAuth: (authMethod?: "cli" | "api_key") => Promise<{
+  verifyClaudeAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
     success: boolean;
     authenticated: boolean;
     error?: string;
@@ -962,14 +962,14 @@ interface SetupAPI {
 function createMockSetupAPI(): SetupAPI {
   return {
     getClaudeStatus: async () => {
-      console.log("[Mock] Getting Claude status");
+      console.log('[Mock] Getting Claude status');
       return {
         success: true,
-        status: "not_installed",
+        status: 'not_installed',
         installed: false,
         auth: {
           authenticated: false,
-          method: "none",
+          method: 'none',
           hasCredentialsFile: false,
           hasToken: false,
           hasCliAuth: false,
@@ -979,33 +979,33 @@ function createMockSetupAPI(): SetupAPI {
     },
 
     installClaude: async () => {
-      console.log("[Mock] Installing Claude CLI");
+      console.log('[Mock] Installing Claude CLI');
       // Simulate installation delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return {
         success: false,
         error:
-          "CLI installation is only available in the Electron app. Please run the command manually.",
+          'CLI installation is only available in the Electron app. Please run the command manually.',
       };
     },
 
     authClaude: async () => {
-      console.log("[Mock] Auth Claude CLI");
+      console.log('[Mock] Auth Claude CLI');
       return {
         success: true,
         requiresManualAuth: true,
-        command: "claude login",
+        command: 'claude login',
       };
     },
 
     storeApiKey: async (provider: string, apiKey: string) => {
-      console.log("[Mock] Storing API key for:", provider);
+      console.log('[Mock] Storing API key for:', provider);
       // In mock mode, we just pretend to store it (it's already in the app store)
       return { success: true };
     },
 
     getApiKeys: async () => {
-      console.log("[Mock] Getting API keys");
+      console.log('[Mock] Getting API keys');
       return {
         success: true,
         hasAnthropicKey: false,
@@ -1014,34 +1014,34 @@ function createMockSetupAPI(): SetupAPI {
     },
 
     deleteApiKey: async (provider: string) => {
-      console.log("[Mock] Deleting API key for:", provider);
+      console.log('[Mock] Deleting API key for:', provider);
       return { success: true, message: `API key for ${provider} deleted` };
     },
 
     getPlatform: async () => {
       return {
         success: true,
-        platform: "darwin",
-        arch: "arm64",
-        homeDir: "/Users/mock",
+        platform: 'darwin',
+        arch: 'arm64',
+        homeDir: '/Users/mock',
         isWindows: false,
         isMac: true,
         isLinux: false,
       };
     },
 
-    verifyClaudeAuth: async (authMethod?: "cli" | "api_key") => {
-      console.log("[Mock] Verifying Claude auth with method:", authMethod);
+    verifyClaudeAuth: async (authMethod?: 'cli' | 'api_key') => {
+      console.log('[Mock] Verifying Claude auth with method:', authMethod);
       // Mock always returns not authenticated
       return {
         success: true,
         authenticated: false,
-        error: "Mock environment - authentication not available",
+        error: 'Mock environment - authentication not available',
       };
     },
 
     getGhStatus: async () => {
-      console.log("[Mock] Getting GitHub CLI status");
+      console.log('[Mock] Getting GitHub CLI status');
       return {
         success: true,
         installed: false,
@@ -1072,7 +1072,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
       featureId: string,
       options?: object
     ) => {
-      console.log("[Mock] Merging feature:", {
+      console.log('[Mock] Merging feature:', {
         projectPath,
         featureId,
         options,
@@ -1081,39 +1081,39 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     getInfo: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Getting worktree info:", { projectPath, featureId });
+      console.log('[Mock] Getting worktree info:', { projectPath, featureId });
       return {
         success: true,
         worktreePath: `/mock/worktrees/${featureId}`,
         branchName: `feature/${featureId}`,
-        head: "abc1234",
+        head: 'abc1234',
       };
     },
 
     getStatus: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Getting worktree status:", {
+      console.log('[Mock] Getting worktree status:', {
         projectPath,
         featureId,
       });
       return {
         success: true,
         modifiedFiles: 3,
-        files: ["src/feature.ts", "tests/feature.spec.ts", "README.md"],
-        diffStat: " 3 files changed, 50 insertions(+), 10 deletions(-)",
+        files: ['src/feature.ts', 'tests/feature.spec.ts', 'README.md'],
+        diffStat: ' 3 files changed, 50 insertions(+), 10 deletions(-)',
         recentCommits: [
-          "abc1234 feat: implement feature",
-          "def5678 test: add tests for feature",
+          'abc1234 feat: implement feature',
+          'def5678 test: add tests for feature',
         ],
       };
     },
 
     list: async (projectPath: string) => {
-      console.log("[Mock] Listing worktrees:", { projectPath });
+      console.log('[Mock] Listing worktrees:', { projectPath });
       return { success: true, worktrees: [] };
     },
 
     listAll: async (projectPath: string, includeDetails?: boolean) => {
-      console.log("[Mock] Listing all worktrees:", {
+      console.log('[Mock] Listing all worktrees:', {
         projectPath,
         includeDetails,
       });
@@ -1122,7 +1122,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
         worktrees: [
           {
             path: projectPath,
-            branch: "main",
+            branch: 'main',
             isMain: true,
             isCurrent: true,
             hasWorktree: true,
@@ -1138,7 +1138,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
       branchName: string,
       baseBranch?: string
     ) => {
-      console.log("[Mock] Creating worktree:", {
+      console.log('[Mock] Creating worktree:', {
         projectPath,
         branchName,
         baseBranch,
@@ -1158,7 +1158,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
       worktreePath: string,
       deleteBranch?: boolean
     ) => {
-      console.log("[Mock] Deleting worktree:", {
+      console.log('[Mock] Deleting worktree:', {
         projectPath,
         worktreePath,
         deleteBranch,
@@ -1167,59 +1167,59 @@ function createMockWorktreeAPI(): WorktreeAPI {
         success: true,
         deleted: {
           worktreePath,
-          branch: deleteBranch ? "feature-branch" : null,
+          branch: deleteBranch ? 'feature-branch' : null,
         },
       };
     },
 
     commit: async (worktreePath: string, message: string) => {
-      console.log("[Mock] Committing changes:", { worktreePath, message });
+      console.log('[Mock] Committing changes:', { worktreePath, message });
       return {
         success: true,
         result: {
           committed: true,
-          commitHash: "abc123",
-          branch: "feature-branch",
+          commitHash: 'abc123',
+          branch: 'feature-branch',
           message,
         },
       };
     },
 
     push: async (worktreePath: string, force?: boolean) => {
-      console.log("[Mock] Pushing worktree:", { worktreePath, force });
+      console.log('[Mock] Pushing worktree:', { worktreePath, force });
       return {
         success: true,
         result: {
-          branch: "feature-branch",
+          branch: 'feature-branch',
           pushed: true,
-          message: "Successfully pushed to origin/feature-branch",
+          message: 'Successfully pushed to origin/feature-branch',
         },
       };
     },
 
     createPR: async (worktreePath: string, options?: any) => {
-      console.log("[Mock] Creating PR:", { worktreePath, options });
+      console.log('[Mock] Creating PR:', { worktreePath, options });
       return {
         success: true,
         result: {
-          branch: "feature-branch",
+          branch: 'feature-branch',
           committed: true,
-          commitHash: "abc123",
+          commitHash: 'abc123',
           pushed: true,
-          prUrl: "https://github.com/example/repo/pull/1",
+          prUrl: 'https://github.com/example/repo/pull/1',
           prCreated: true,
         },
       };
     },
 
     getDiffs: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Getting file diffs:", { projectPath, featureId });
+      console.log('[Mock] Getting file diffs:', { projectPath, featureId });
       return {
         success: true,
         diff: "diff --git a/src/feature.ts b/src/feature.ts\n+++ new file\n@@ -0,0 +1,10 @@\n+export function feature() {\n+  return 'hello';\n+}",
         files: [
-          { status: "A", path: "src/feature.ts", statusText: "Added" },
-          { status: "M", path: "README.md", statusText: "Modified" },
+          { status: 'A', path: 'src/feature.ts', statusText: 'Added' },
+          { status: 'M', path: 'README.md', statusText: 'Modified' },
         ],
         hasChanges: true,
       };
@@ -1230,7 +1230,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
       featureId: string,
       filePath: string
     ) => {
-      console.log("[Mock] Getting file diff:", {
+      console.log('[Mock] Getting file diff:', {
         projectPath,
         featureId,
         filePath,
@@ -1243,26 +1243,26 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     pull: async (worktreePath: string) => {
-      console.log("[Mock] Pulling latest changes for:", worktreePath);
+      console.log('[Mock] Pulling latest changes for:', worktreePath);
       return {
         success: true,
         result: {
-          branch: "main",
+          branch: 'main',
           pulled: true,
-          message: "Pulled latest changes",
+          message: 'Pulled latest changes',
         },
       };
     },
 
     checkoutBranch: async (worktreePath: string, branchName: string) => {
-      console.log("[Mock] Creating and checking out branch:", {
+      console.log('[Mock] Creating and checking out branch:', {
         worktreePath,
         branchName,
       });
       return {
         success: true,
         result: {
-          previousBranch: "main",
+          previousBranch: 'main',
           newBranch: branchName,
           message: `Created and checked out branch '${branchName}'`,
         },
@@ -1270,15 +1270,15 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     listBranches: async (worktreePath: string) => {
-      console.log("[Mock] Listing branches for:", worktreePath);
+      console.log('[Mock] Listing branches for:', worktreePath);
       return {
         success: true,
         result: {
-          currentBranch: "main",
+          currentBranch: 'main',
           branches: [
-            { name: "main", isCurrent: true, isRemote: false },
-            { name: "develop", isCurrent: false, isRemote: false },
-            { name: "feature/example", isCurrent: false, isRemote: false },
+            { name: 'main', isCurrent: true, isRemote: false },
+            { name: 'develop', isCurrent: false, isRemote: false },
+            { name: 'feature/example', isCurrent: false, isRemote: false },
           ],
           aheadCount: 2,
           behindCount: 0,
@@ -1287,11 +1287,11 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     switchBranch: async (worktreePath: string, branchName: string) => {
-      console.log("[Mock] Switching to branch:", { worktreePath, branchName });
+      console.log('[Mock] Switching to branch:', { worktreePath, branchName });
       return {
         success: true,
         result: {
-          previousBranch: "main",
+          previousBranch: 'main',
           currentBranch: branchName,
           message: `Switched to branch '${branchName}'`,
         },
@@ -1299,29 +1299,29 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     openInEditor: async (worktreePath: string) => {
-      console.log("[Mock] Opening in editor:", worktreePath);
+      console.log('[Mock] Opening in editor:', worktreePath);
       return {
         success: true,
         result: {
           message: `Opened ${worktreePath} in VS Code`,
-          editorName: "VS Code",
+          editorName: 'VS Code',
         },
       };
     },
 
     getDefaultEditor: async () => {
-      console.log("[Mock] Getting default editor");
+      console.log('[Mock] Getting default editor');
       return {
         success: true,
         result: {
-          editorName: "VS Code",
-          editorCommand: "code",
+          editorName: 'VS Code',
+          editorCommand: 'code',
         },
       };
     },
 
     initGit: async (projectPath: string) => {
-      console.log("[Mock] Initializing git:", projectPath);
+      console.log('[Mock] Initializing git:', projectPath);
       return {
         success: true,
         result: {
@@ -1332,31 +1332,31 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     startDevServer: async (projectPath: string, worktreePath: string) => {
-      console.log("[Mock] Starting dev server:", { projectPath, worktreePath });
+      console.log('[Mock] Starting dev server:', { projectPath, worktreePath });
       return {
         success: true,
         result: {
           worktreePath,
           port: 3001,
-          url: "http://localhost:3001",
-          message: "Dev server started on port 3001",
+          url: 'http://localhost:3001',
+          message: 'Dev server started on port 3001',
         },
       };
     },
 
     stopDevServer: async (worktreePath: string) => {
-      console.log("[Mock] Stopping dev server:", worktreePath);
+      console.log('[Mock] Stopping dev server:', worktreePath);
       return {
         success: true,
         result: {
           worktreePath,
-          message: "Dev server stopped",
+          message: 'Dev server stopped',
         },
       };
     },
 
     listDevServers: async () => {
-      console.log("[Mock] Listing dev servers");
+      console.log('[Mock] Listing dev servers');
       return {
         success: true,
         result: {
@@ -1366,7 +1366,7 @@ function createMockWorktreeAPI(): WorktreeAPI {
     },
 
     getPRInfo: async (worktreePath: string, branchName: string) => {
-      console.log("[Mock] Getting PR info:", { worktreePath, branchName });
+      console.log('[Mock] Getting PR info:', { worktreePath, branchName });
       return {
         success: true,
         result: {
@@ -1382,20 +1382,20 @@ function createMockWorktreeAPI(): WorktreeAPI {
 function createMockGitAPI(): GitAPI {
   return {
     getDiffs: async (projectPath: string) => {
-      console.log("[Mock] Getting git diffs for project:", { projectPath });
+      console.log('[Mock] Getting git diffs for project:', { projectPath });
       return {
         success: true,
         diff: "diff --git a/src/feature.ts b/src/feature.ts\n+++ new file\n@@ -0,0 +1,10 @@\n+export function feature() {\n+  return 'hello';\n+}",
         files: [
-          { status: "A", path: "src/feature.ts", statusText: "Added" },
-          { status: "M", path: "README.md", statusText: "Modified" },
+          { status: 'A', path: 'src/feature.ts', statusText: 'Added' },
+          { status: 'M', path: 'README.md', statusText: 'Modified' },
         ],
         hasChanges: true,
       };
     },
 
     getFileDiff: async (projectPath: string, filePath: string) => {
-      console.log("[Mock] Getting git file diff:", { projectPath, filePath });
+      console.log('[Mock] Getting git file diff:', { projectPath, filePath });
       return {
         success: true,
         diff: `diff --git a/${filePath} b/${filePath}\n+++ new file\n@@ -0,0 +1,5 @@\n+// New content`,
@@ -1415,14 +1415,14 @@ function createMockAutoModeAPI(): AutoModeAPI {
   return {
     start: async (projectPath: string, maxConcurrency?: number) => {
       if (mockAutoModeRunning) {
-        return { success: false, error: "Auto mode is already running" };
+        return { success: false, error: 'Auto mode is already running' };
       }
 
       mockAutoModeRunning = true;
       console.log(
         `[Mock] Auto mode started with maxConcurrency: ${maxConcurrency || 3}`
       );
-      const featureId = "auto-mode-0";
+      const featureId = 'auto-mode-0';
       mockRunningFeatures.add(featureId);
 
       // Simulate auto mode with Plan-Act-Verify phases
@@ -1458,10 +1458,10 @@ function createMockAutoModeAPI(): AutoModeAPI {
 
       // Emit a stopped event
       emitAutoModeEvent({
-        type: "auto_mode_feature_complete",
+        type: 'auto_mode_feature_complete',
         featureId,
         passes: false,
-        message: "Feature stopped by user",
+        message: 'Feature stopped by user',
       });
 
       return { success: true };
@@ -1471,7 +1471,7 @@ function createMockAutoModeAPI(): AutoModeAPI {
       return {
         success: true,
         isRunning: mockAutoModeRunning,
-        currentFeatureId: mockAutoModeRunning ? "feature-0" : null,
+        currentFeatureId: mockAutoModeRunning ? 'feature-0' : null,
         runningFeatures: Array.from(mockRunningFeatures),
         runningCount: mockRunningFeatures.size,
       };
@@ -1548,62 +1548,61 @@ function createMockAutoModeAPI(): AutoModeAPI {
 
       // Emit start event
       emitAutoModeEvent({
-        type: "auto_mode_feature_start",
+        type: 'auto_mode_feature_start',
         featureId: analysisId,
         feature: {
           id: analysisId,
-          category: "Project Analysis",
-          description: "Analyzing project structure and tech stack",
+          category: 'Project Analysis',
+          description: 'Analyzing project structure and tech stack',
         },
       });
 
       // Simulate analysis phases
       await delay(300, analysisId);
       if (!mockRunningFeatures.has(analysisId))
-        return { success: false, message: "Analysis aborted" };
+        return { success: false, message: 'Analysis aborted' };
 
       emitAutoModeEvent({
-        type: "auto_mode_phase",
+        type: 'auto_mode_phase',
         featureId: analysisId,
-        phase: "planning",
-        message: "Scanning project structure...",
+        phase: 'planning',
+        message: 'Scanning project structure...',
       });
 
       emitAutoModeEvent({
-        type: "auto_mode_progress",
+        type: 'auto_mode_progress',
         featureId: analysisId,
-        content: "Starting project analysis...\n",
+        content: 'Starting project analysis...\n',
       });
 
       await delay(500, analysisId);
       if (!mockRunningFeatures.has(analysisId))
-        return { success: false, message: "Analysis aborted" };
+        return { success: false, message: 'Analysis aborted' };
 
       emitAutoModeEvent({
-        type: "auto_mode_tool",
+        type: 'auto_mode_tool',
         featureId: analysisId,
-        tool: "Glob",
-        input: { pattern: "**/*" },
+        tool: 'Glob',
+        input: { pattern: '**/*' },
       });
 
       await delay(300, analysisId);
       if (!mockRunningFeatures.has(analysisId))
-        return { success: false, message: "Analysis aborted" };
+        return { success: false, message: 'Analysis aborted' };
 
       emitAutoModeEvent({
-        type: "auto_mode_progress",
+        type: 'auto_mode_progress',
         featureId: analysisId,
-        content: "Detected tech stack: Next.js, TypeScript, Tailwind CSS\n",
+        content: 'Detected tech stack: Next.js, TypeScript, Tailwind CSS\n',
       });
 
       await delay(300, analysisId);
       if (!mockRunningFeatures.has(analysisId))
-        return { success: false, message: "Analysis aborted" };
+        return { success: false, message: 'Analysis aborted' };
 
       // Write mock app_spec.txt
-      mockFileSystem[
-        `${projectPath}/.automaker/app_spec.txt`
-      ] = `<project_specification>
+      mockFileSystem[`${projectPath}/.automaker/app_spec.txt`] =
+        `<project_specification>
   <project_name>Demo Project</project_name>
 
   <overview>
@@ -1632,23 +1631,23 @@ function createMockAutoModeAPI(): AutoModeAPI {
       // Note: Features are now stored in .automaker/features/{id}/feature.json
 
       emitAutoModeEvent({
-        type: "auto_mode_phase",
+        type: 'auto_mode_phase',
         featureId: analysisId,
-        phase: "verification",
-        message: "Project analysis complete",
+        phase: 'verification',
+        message: 'Project analysis complete',
       });
 
       emitAutoModeEvent({
-        type: "auto_mode_feature_complete",
+        type: 'auto_mode_feature_complete',
         featureId: analysisId,
         passes: true,
-        message: "Project analyzed successfully",
+        message: 'Project analyzed successfully',
       });
 
       mockRunningFeatures.delete(analysisId);
       mockAutoModeTimeouts.delete(analysisId);
 
-      return { success: true, message: "Project analyzed successfully" };
+      return { success: true, message: 'Project analyzed successfully' };
     },
 
     followUpFeature: async (
@@ -1665,7 +1664,7 @@ function createMockAutoModeAPI(): AutoModeAPI {
         };
       }
 
-      console.log("[Mock] Follow-up feature:", {
+      console.log('[Mock] Follow-up feature:', {
         featureId,
         prompt,
         imagePaths,
@@ -1686,7 +1685,7 @@ function createMockAutoModeAPI(): AutoModeAPI {
       featureId: string,
       worktreePath?: string
     ) => {
-      console.log("[Mock] Committing feature:", {
+      console.log('[Mock] Committing feature:', {
         projectPath,
         featureId,
         worktreePath,
@@ -1694,31 +1693,31 @@ function createMockAutoModeAPI(): AutoModeAPI {
 
       // Simulate commit operation
       emitAutoModeEvent({
-        type: "auto_mode_feature_start",
+        type: 'auto_mode_feature_start',
         featureId,
         feature: {
           id: featureId,
-          category: "Commit",
-          description: "Committing changes",
+          category: 'Commit',
+          description: 'Committing changes',
         },
       });
 
       await delay(300, featureId);
 
       emitAutoModeEvent({
-        type: "auto_mode_phase",
+        type: 'auto_mode_phase',
         featureId,
-        phase: "action",
-        message: "Committing changes to git...",
+        phase: 'action',
+        message: 'Committing changes to git...',
       });
 
       await delay(500, featureId);
 
       emitAutoModeEvent({
-        type: "auto_mode_feature_complete",
+        type: 'auto_mode_feature_complete',
         featureId,
         passes: true,
-        message: "Changes committed successfully",
+        message: 'Changes committed successfully',
       });
 
       return { success: true };
@@ -1731,11 +1730,11 @@ function createMockAutoModeAPI(): AutoModeAPI {
       editedPlan?: string,
       feedback?: string
     ) => {
-      console.log("[Mock] Plan approval:", {
+      console.log('[Mock] Plan approval:', {
         projectPath,
         featureId,
         approved,
-        editedPlan: editedPlan ? "[edited]" : undefined,
+        editedPlan: editedPlan ? '[edited]' : undefined,
         feedback,
       });
       return { success: true };
@@ -1759,15 +1758,15 @@ function emitAutoModeEvent(event: AutoModeEvent) {
 async function simulateAutoModeLoop(projectPath: string, featureId: string) {
   const mockFeature = {
     id: featureId,
-    category: "Core",
-    description: "Sample Feature",
-    steps: ["Step 1", "Step 2"],
+    category: 'Core',
+    description: 'Sample Feature',
+    steps: ['Step 1', 'Step 2'],
     passes: false,
   };
 
   // Start feature
   emitAutoModeEvent({
-    type: "auto_mode_feature_start",
+    type: 'auto_mode_feature_start',
     featureId,
     feature: mockFeature,
   });
@@ -1777,16 +1776,16 @@ async function simulateAutoModeLoop(projectPath: string, featureId: string) {
 
   // Phase 1: PLANNING
   emitAutoModeEvent({
-    type: "auto_mode_phase",
+    type: 'auto_mode_phase',
     featureId,
-    phase: "planning",
+    phase: 'planning',
     message: `Planning implementation for: ${mockFeature.description}`,
   });
 
   emitAutoModeEvent({
-    type: "auto_mode_progress",
+    type: 'auto_mode_progress',
     featureId,
-    content: "Analyzing codebase structure and creating implementation plan...",
+    content: 'Analyzing codebase structure and creating implementation plan...',
   });
 
   await delay(500, featureId);
@@ -1794,16 +1793,16 @@ async function simulateAutoModeLoop(projectPath: string, featureId: string) {
 
   // Phase 2: ACTION
   emitAutoModeEvent({
-    type: "auto_mode_phase",
+    type: 'auto_mode_phase',
     featureId,
-    phase: "action",
+    phase: 'action',
     message: `Executing implementation for: ${mockFeature.description}`,
   });
 
   emitAutoModeEvent({
-    type: "auto_mode_progress",
+    type: 'auto_mode_progress',
     featureId,
-    content: "Starting code implementation...",
+    content: 'Starting code implementation...',
   });
 
   await delay(300, featureId);
@@ -1811,20 +1810,20 @@ async function simulateAutoModeLoop(projectPath: string, featureId: string) {
 
   // Simulate tool use
   emitAutoModeEvent({
-    type: "auto_mode_tool",
+    type: 'auto_mode_tool',
     featureId,
-    tool: "Read",
-    input: { file: "package.json" },
+    tool: 'Read',
+    input: { file: 'package.json' },
   });
 
   await delay(300, featureId);
   if (!mockRunningFeatures.has(featureId)) return;
 
   emitAutoModeEvent({
-    type: "auto_mode_tool",
+    type: 'auto_mode_tool',
     featureId,
-    tool: "Write",
-    input: { file: "src/feature.ts", content: "// Feature code" },
+    tool: 'Write',
+    input: { file: 'src/feature.ts', content: '// Feature code' },
   });
 
   await delay(500, featureId);
@@ -1832,33 +1831,33 @@ async function simulateAutoModeLoop(projectPath: string, featureId: string) {
 
   // Phase 3: VERIFICATION
   emitAutoModeEvent({
-    type: "auto_mode_phase",
+    type: 'auto_mode_phase',
     featureId,
-    phase: "verification",
+    phase: 'verification',
     message: `Verifying implementation for: ${mockFeature.description}`,
   });
 
   emitAutoModeEvent({
-    type: "auto_mode_progress",
+    type: 'auto_mode_progress',
     featureId,
-    content: "Verifying implementation and checking test results...",
+    content: 'Verifying implementation and checking test results...',
   });
 
   await delay(500, featureId);
   if (!mockRunningFeatures.has(featureId)) return;
 
   emitAutoModeEvent({
-    type: "auto_mode_progress",
+    type: 'auto_mode_progress',
     featureId,
-    content: "✓ Verification successful: All tests passed",
+    content: '✓ Verification successful: All tests passed',
   });
 
   // Feature complete
   emitAutoModeEvent({
-    type: "auto_mode_feature_complete",
+    type: 'auto_mode_feature_complete',
     featureId,
     passes: true,
-    message: "Feature implemented successfully",
+    message: 'Feature implemented successfully',
   });
 
   // Delete context file when feature is verified (matches real auto-mode-service behavior)
@@ -1887,12 +1886,12 @@ function createMockSuggestionsAPI(): SuggestionsAPI {
   return {
     generate: async (
       projectPath: string,
-      suggestionType: SuggestionType = "features"
+      suggestionType: SuggestionType = 'features'
     ) => {
       if (mockSuggestionsRunning) {
         return {
           success: false,
-          error: "Suggestions generation is already running",
+          error: 'Suggestions generation is already running',
         };
       }
 
@@ -1939,18 +1938,18 @@ function emitSuggestionsEvent(event: SuggestionsEvent) {
 }
 
 async function simulateSuggestionsGeneration(
-  suggestionType: SuggestionType = "features"
+  suggestionType: SuggestionType = 'features'
 ) {
   const typeLabels: Record<SuggestionType, string> = {
-    features: "feature suggestions",
-    refactoring: "refactoring opportunities",
-    security: "security vulnerabilities",
-    performance: "performance issues",
+    features: 'feature suggestions',
+    refactoring: 'refactoring opportunities',
+    security: 'security vulnerabilities',
+    performance: 'performance issues',
   };
 
   // Emit progress events
   emitSuggestionsEvent({
-    type: "suggestions_progress",
+    type: 'suggestions_progress',
     content: `Starting project analysis for ${typeLabels[suggestionType]}...\n`,
   });
 
@@ -1960,9 +1959,9 @@ async function simulateSuggestionsGeneration(
   if (!mockSuggestionsRunning) return;
 
   emitSuggestionsEvent({
-    type: "suggestions_tool",
-    tool: "Glob",
-    input: { pattern: "**/*.{ts,tsx,js,jsx}" },
+    type: 'suggestions_tool',
+    tool: 'Glob',
+    input: { pattern: '**/*.{ts,tsx,js,jsx}' },
   });
 
   await new Promise((resolve) => {
@@ -1971,8 +1970,8 @@ async function simulateSuggestionsGeneration(
   if (!mockSuggestionsRunning) return;
 
   emitSuggestionsEvent({
-    type: "suggestions_progress",
-    content: "Analyzing codebase structure...\n",
+    type: 'suggestions_progress',
+    content: 'Analyzing codebase structure...\n',
   });
 
   await new Promise((resolve) => {
@@ -1981,7 +1980,7 @@ async function simulateSuggestionsGeneration(
   if (!mockSuggestionsRunning) return;
 
   emitSuggestionsEvent({
-    type: "suggestions_progress",
+    type: 'suggestions_progress',
     content: `Identifying ${typeLabels[suggestionType]}...\n`,
   });
 
@@ -1994,137 +1993,137 @@ async function simulateSuggestionsGeneration(
   let mockSuggestions: FeatureSuggestion[];
 
   switch (suggestionType) {
-    case "refactoring":
+    case 'refactoring':
       mockSuggestions = [
         {
           id: `suggestion-${Date.now()}-0`,
-          category: "Code Smell",
+          category: 'Code Smell',
           description:
-            "Extract duplicate validation logic into reusable utility",
+            'Extract duplicate validation logic into reusable utility',
           steps: [
-            "Identify all files with similar validation patterns",
-            "Create a validation utilities module",
-            "Replace duplicate code with utility calls",
-            "Add unit tests for the new utilities",
+            'Identify all files with similar validation patterns',
+            'Create a validation utilities module',
+            'Replace duplicate code with utility calls',
+            'Add unit tests for the new utilities',
           ],
           priority: 1,
-          reasoning: "Reduces code duplication and improves maintainability",
+          reasoning: 'Reduces code duplication and improves maintainability',
         },
         {
           id: `suggestion-${Date.now()}-1`,
-          category: "Complexity",
+          category: 'Complexity',
           description:
-            "Break down large handleSubmit function into smaller functions",
+            'Break down large handleSubmit function into smaller functions',
           steps: [
-            "Identify the handleSubmit function in form components",
-            "Extract validation logic into separate function",
-            "Extract API call logic into separate function",
-            "Extract success/error handling into separate functions",
+            'Identify the handleSubmit function in form components',
+            'Extract validation logic into separate function',
+            'Extract API call logic into separate function',
+            'Extract success/error handling into separate functions',
           ],
           priority: 2,
           reasoning:
-            "Function is too long and handles multiple responsibilities",
+            'Function is too long and handles multiple responsibilities',
         },
         {
           id: `suggestion-${Date.now()}-2`,
-          category: "Architecture",
-          description: "Move business logic out of React components into hooks",
+          category: 'Architecture',
+          description: 'Move business logic out of React components into hooks',
           steps: [
-            "Identify business logic in component files",
-            "Create custom hooks for reusable logic",
-            "Update components to use the new hooks",
-            "Add tests for the extracted hooks",
+            'Identify business logic in component files',
+            'Create custom hooks for reusable logic',
+            'Update components to use the new hooks',
+            'Add tests for the extracted hooks',
           ],
           priority: 3,
-          reasoning: "Improves separation of concerns and testability",
+          reasoning: 'Improves separation of concerns and testability',
         },
       ];
       break;
 
-    case "security":
+    case 'security':
       mockSuggestions = [
         {
           id: `suggestion-${Date.now()}-0`,
-          category: "High",
-          description: "Sanitize user input before rendering to prevent XSS",
+          category: 'High',
+          description: 'Sanitize user input before rendering to prevent XSS',
           steps: [
-            "Audit all places where user input is rendered",
-            "Implement input sanitization using DOMPurify",
-            "Add Content-Security-Policy headers",
-            "Test with common XSS payloads",
+            'Audit all places where user input is rendered',
+            'Implement input sanitization using DOMPurify',
+            'Add Content-Security-Policy headers',
+            'Test with common XSS payloads',
           ],
           priority: 1,
-          reasoning: "User input is rendered without proper sanitization",
+          reasoning: 'User input is rendered without proper sanitization',
         },
         {
           id: `suggestion-${Date.now()}-1`,
-          category: "Medium",
-          description: "Add rate limiting to authentication endpoints",
+          category: 'Medium',
+          description: 'Add rate limiting to authentication endpoints',
           steps: [
-            "Implement rate limiting middleware",
-            "Configure limits for login attempts",
-            "Add account lockout after failed attempts",
-            "Log suspicious activity",
+            'Implement rate limiting middleware',
+            'Configure limits for login attempts',
+            'Add account lockout after failed attempts',
+            'Log suspicious activity',
           ],
           priority: 2,
-          reasoning: "Prevents brute force attacks on authentication",
+          reasoning: 'Prevents brute force attacks on authentication',
         },
         {
           id: `suggestion-${Date.now()}-2`,
-          category: "Low",
-          description: "Remove sensitive information from error messages",
+          category: 'Low',
+          description: 'Remove sensitive information from error messages',
           steps: [
-            "Audit error handling in API routes",
-            "Create generic error messages for production",
-            "Log detailed errors server-side only",
-            "Implement proper error boundaries",
+            'Audit error handling in API routes',
+            'Create generic error messages for production',
+            'Log detailed errors server-side only',
+            'Implement proper error boundaries',
           ],
           priority: 3,
-          reasoning: "Error messages may leak implementation details",
+          reasoning: 'Error messages may leak implementation details',
         },
       ];
       break;
 
-    case "performance":
+    case 'performance':
       mockSuggestions = [
         {
           id: `suggestion-${Date.now()}-0`,
-          category: "Rendering",
-          description: "Add React.memo to prevent unnecessary re-renders",
+          category: 'Rendering',
+          description: 'Add React.memo to prevent unnecessary re-renders',
           steps: [
-            "Profile component renders with React DevTools",
-            "Identify components that re-render unnecessarily",
-            "Wrap pure components with React.memo",
-            "Use useCallback for event handlers passed as props",
+            'Profile component renders with React DevTools',
+            'Identify components that re-render unnecessarily',
+            'Wrap pure components with React.memo',
+            'Use useCallback for event handlers passed as props',
           ],
           priority: 1,
           reasoning: "Components re-render even when props haven't changed",
         },
         {
           id: `suggestion-${Date.now()}-1`,
-          category: "Bundle Size",
-          description: "Implement code splitting for route components",
+          category: 'Bundle Size',
+          description: 'Implement code splitting for route components',
           steps: [
-            "Use React.lazy for route components",
-            "Add Suspense boundaries with loading states",
-            "Analyze bundle with webpack-bundle-analyzer",
-            "Consider dynamic imports for heavy libraries",
+            'Use React.lazy for route components',
+            'Add Suspense boundaries with loading states',
+            'Analyze bundle with webpack-bundle-analyzer',
+            'Consider dynamic imports for heavy libraries',
           ],
           priority: 2,
-          reasoning: "Initial bundle is larger than necessary",
+          reasoning: 'Initial bundle is larger than necessary',
         },
         {
           id: `suggestion-${Date.now()}-2`,
-          category: "Caching",
-          description: "Add memoization for expensive computations",
+          category: 'Caching',
+          description: 'Add memoization for expensive computations',
           steps: [
-            "Identify expensive calculations in render",
-            "Use useMemo for derived data",
-            "Consider using react-query for server state",
-            "Add caching headers for static assets",
+            'Identify expensive calculations in render',
+            'Use useMemo for derived data',
+            'Consider using react-query for server state',
+            'Add caching headers for static assets',
           ],
           priority: 3,
-          reasoning: "Expensive computations run on every render",
+          reasoning: 'Expensive computations run on every render',
         },
       ];
       break;
@@ -2133,49 +2132,49 @@ async function simulateSuggestionsGeneration(
       mockSuggestions = [
         {
           id: `suggestion-${Date.now()}-0`,
-          category: "User Experience",
-          description: "Add dark mode toggle with system preference detection",
+          category: 'User Experience',
+          description: 'Add dark mode toggle with system preference detection',
           steps: [
-            "Create a ThemeProvider context to manage theme state",
-            "Add a toggle component in the settings or header",
-            "Implement CSS variables for theme colors",
-            "Add localStorage persistence for user preference",
+            'Create a ThemeProvider context to manage theme state',
+            'Add a toggle component in the settings or header',
+            'Implement CSS variables for theme colors',
+            'Add localStorage persistence for user preference',
           ],
           priority: 1,
           reasoning:
-            "Dark mode is a standard feature that improves accessibility and user comfort",
+            'Dark mode is a standard feature that improves accessibility and user comfort',
         },
         {
           id: `suggestion-${Date.now()}-1`,
-          category: "Performance",
-          description: "Implement lazy loading for heavy components",
+          category: 'Performance',
+          description: 'Implement lazy loading for heavy components',
           steps: [
-            "Identify components that are heavy or rarely used",
-            "Use React.lazy() and Suspense for code splitting",
-            "Add loading states for lazy-loaded components",
+            'Identify components that are heavy or rarely used',
+            'Use React.lazy() and Suspense for code splitting',
+            'Add loading states for lazy-loaded components',
           ],
           priority: 2,
-          reasoning: "Improves initial load time and reduces bundle size",
+          reasoning: 'Improves initial load time and reduces bundle size',
         },
         {
           id: `suggestion-${Date.now()}-2`,
-          category: "Accessibility",
-          description: "Add keyboard navigation support throughout the app",
+          category: 'Accessibility',
+          description: 'Add keyboard navigation support throughout the app',
           steps: [
-            "Implement focus management for modals and dialogs",
-            "Add keyboard shortcuts for common actions",
-            "Ensure all interactive elements are focusable",
-            "Add ARIA labels and roles where needed",
+            'Implement focus management for modals and dialogs',
+            'Add keyboard shortcuts for common actions',
+            'Ensure all interactive elements are focusable',
+            'Add ARIA labels and roles where needed',
           ],
           priority: 3,
           reasoning:
-            "Improves accessibility for users who rely on keyboard navigation",
+            'Improves accessibility for users who rely on keyboard navigation',
         },
       ];
   }
 
   emitSuggestionsEvent({
-    type: "suggestions_complete",
+    type: 'suggestions_complete',
     suggestions: mockSuggestions,
   });
 
@@ -2185,7 +2184,7 @@ async function simulateSuggestionsGeneration(
 
 // Mock Spec Regeneration state and implementation
 let mockSpecRegenerationRunning = false;
-let mockSpecRegenerationPhase = "";
+let mockSpecRegenerationPhase = '';
 let mockSpecRegenerationCallbacks: ((event: SpecRegenerationEvent) => void)[] =
   [];
 let mockSpecRegenerationTimeout: NodeJS.Timeout | null = null;
@@ -2200,7 +2199,7 @@ function createMockSpecRegenerationAPI(): SpecRegenerationAPI {
       maxFeatures?: number
     ) => {
       if (mockSpecRegenerationRunning) {
-        return { success: false, error: "Spec creation is already running" };
+        return { success: false, error: 'Spec creation is already running' };
       }
 
       mockSpecRegenerationRunning = true;
@@ -2224,7 +2223,7 @@ function createMockSpecRegenerationAPI(): SpecRegenerationAPI {
       if (mockSpecRegenerationRunning) {
         return {
           success: false,
-          error: "Spec regeneration is already running",
+          error: 'Spec regeneration is already running',
         };
       }
 
@@ -2247,7 +2246,7 @@ function createMockSpecRegenerationAPI(): SpecRegenerationAPI {
       if (mockSpecRegenerationRunning) {
         return {
           success: false,
-          error: "Feature generation is already running",
+          error: 'Feature generation is already running',
         };
       }
 
@@ -2264,7 +2263,7 @@ function createMockSpecRegenerationAPI(): SpecRegenerationAPI {
 
     stop: async () => {
       mockSpecRegenerationRunning = false;
-      mockSpecRegenerationPhase = "";
+      mockSpecRegenerationPhase = '';
       if (mockSpecRegenerationTimeout) {
         clearTimeout(mockSpecRegenerationTimeout);
         mockSpecRegenerationTimeout = null;
@@ -2300,10 +2299,10 @@ async function simulateSpecCreation(
   projectOverview: string,
   generateFeatures = true
 ) {
-  mockSpecRegenerationPhase = "initialization";
+  mockSpecRegenerationPhase = 'initialization';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: initialization] Starting project analysis...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: initialization] Starting project analysis...\n',
     projectPath: projectPath,
   });
 
@@ -2312,11 +2311,11 @@ async function simulateSpecCreation(
   });
   if (!mockSpecRegenerationRunning) return;
 
-  mockSpecRegenerationPhase = "setup";
+  mockSpecRegenerationPhase = 'setup';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_tool",
-    tool: "Glob",
-    input: { pattern: "**/*.{json,ts,tsx}" },
+    type: 'spec_regeneration_tool',
+    tool: 'Glob',
+    input: { pattern: '**/*.{json,ts,tsx}' },
     projectPath: projectPath,
   });
 
@@ -2325,10 +2324,10 @@ async function simulateSpecCreation(
   });
   if (!mockSpecRegenerationRunning) return;
 
-  mockSpecRegenerationPhase = "analysis";
+  mockSpecRegenerationPhase = 'analysis';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: analysis] Detecting tech stack...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: analysis] Detecting tech stack...\n',
     projectPath: projectPath,
   });
 
@@ -2338,9 +2337,8 @@ async function simulateSpecCreation(
   if (!mockSpecRegenerationRunning) return;
 
   // Write mock app_spec.txt
-  mockFileSystem[
-    `${projectPath}/.automaker/app_spec.txt`
-  ] = `<project_specification>
+  mockFileSystem[`${projectPath}/.automaker/app_spec.txt`] =
+    `<project_specification>
   <project_name>Demo Project</project_name>
 
   <overview>
@@ -2369,15 +2367,15 @@ async function simulateSpecCreation(
   // The generateFeatures parameter is kept for API compatibility but features
   // should be created through the features API
 
-  mockSpecRegenerationPhase = "complete";
+  mockSpecRegenerationPhase = 'complete';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_complete",
-    message: "All tasks completed!",
+    type: 'spec_regeneration_complete',
+    message: 'All tasks completed!',
     projectPath: projectPath,
   });
 
   mockSpecRegenerationRunning = false;
-  mockSpecRegenerationPhase = "";
+  mockSpecRegenerationPhase = '';
   mockSpecRegenerationTimeout = null;
 }
 
@@ -2386,10 +2384,10 @@ async function simulateSpecRegeneration(
   projectDefinition: string,
   generateFeatures = false
 ) {
-  mockSpecRegenerationPhase = "initialization";
+  mockSpecRegenerationPhase = 'initialization';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: initialization] Starting spec regeneration...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: initialization] Starting spec regeneration...\n',
     projectPath: projectPath,
   });
 
@@ -2398,10 +2396,10 @@ async function simulateSpecRegeneration(
   });
   if (!mockSpecRegenerationRunning) return;
 
-  mockSpecRegenerationPhase = "analysis";
+  mockSpecRegenerationPhase = 'analysis';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: analysis] Analyzing codebase...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: analysis] Analyzing codebase...\n',
     projectPath: projectPath,
   });
 
@@ -2411,9 +2409,8 @@ async function simulateSpecRegeneration(
   if (!mockSpecRegenerationRunning) return;
 
   // Write regenerated spec
-  mockFileSystem[
-    `${projectPath}/.automaker/app_spec.txt`
-  ] = `<project_specification>
+  mockFileSystem[`${projectPath}/.automaker/app_spec.txt`] =
+    `<project_specification>
   <project_name>Regenerated Project</project_name>
 
   <overview>
@@ -2434,11 +2431,11 @@ async function simulateSpecRegeneration(
 </project_specification>`;
 
   if (generateFeatures) {
-    mockSpecRegenerationPhase = "spec_complete";
+    mockSpecRegenerationPhase = 'spec_complete';
     emitSpecRegenerationEvent({
-      type: "spec_regeneration_progress",
+      type: 'spec_regeneration_progress',
       content:
-        "[Phase: spec_complete] Spec regenerated! Generating features...\n",
+        '[Phase: spec_complete] Spec regenerated! Generating features...\n',
       projectPath: projectPath,
     });
 
@@ -2452,24 +2449,24 @@ async function simulateSpecRegeneration(
     if (!mockSpecRegenerationRunning) return;
   }
 
-  mockSpecRegenerationPhase = "complete";
+  mockSpecRegenerationPhase = 'complete';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_complete",
-    message: "All tasks completed!",
+    type: 'spec_regeneration_complete',
+    message: 'All tasks completed!',
     projectPath: projectPath,
   });
 
   mockSpecRegenerationRunning = false;
-  mockSpecRegenerationPhase = "";
+  mockSpecRegenerationPhase = '';
   mockSpecRegenerationTimeout = null;
 }
 
 async function simulateFeatureGeneration(projectPath: string) {
-  mockSpecRegenerationPhase = "initialization";
+  mockSpecRegenerationPhase = 'initialization';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
+    type: 'spec_regeneration_progress',
     content:
-      "[Phase: initialization] Starting feature generation from existing app_spec.txt...\n",
+      '[Phase: initialization] Starting feature generation from existing app_spec.txt...\n',
     projectPath: projectPath,
   });
 
@@ -2479,8 +2476,8 @@ async function simulateFeatureGeneration(projectPath: string) {
   if (!mockSpecRegenerationRunning) return;
 
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: feature_generation] Reading implementation roadmap...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: feature_generation] Reading implementation roadmap...\n',
     projectPath: projectPath,
   });
 
@@ -2489,10 +2486,10 @@ async function simulateFeatureGeneration(projectPath: string) {
   });
   if (!mockSpecRegenerationRunning) return;
 
-  mockSpecRegenerationPhase = "feature_generation";
+  mockSpecRegenerationPhase = 'feature_generation';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: feature_generation] Creating features from roadmap...\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: feature_generation] Creating features from roadmap...\n',
     projectPath: projectPath,
   });
 
@@ -2501,21 +2498,21 @@ async function simulateFeatureGeneration(projectPath: string) {
   });
   if (!mockSpecRegenerationRunning) return;
 
-  mockSpecRegenerationPhase = "complete";
+  mockSpecRegenerationPhase = 'complete';
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_progress",
-    content: "[Phase: complete] All tasks completed!\n",
+    type: 'spec_regeneration_progress',
+    content: '[Phase: complete] All tasks completed!\n',
     projectPath: projectPath,
   });
 
   emitSpecRegenerationEvent({
-    type: "spec_regeneration_complete",
-    message: "All tasks completed!",
+    type: 'spec_regeneration_complete',
+    message: 'All tasks completed!',
     projectPath: projectPath,
   });
 
   mockSpecRegenerationRunning = false;
-  mockSpecRegenerationPhase = "";
+  mockSpecRegenerationPhase = '';
   mockSpecRegenerationTimeout = null;
 }
 
@@ -2524,7 +2521,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
   // Store features in mock file system using features/{id}/feature.json pattern
   return {
     getAll: async (projectPath: string) => {
-      console.log("[Mock] Getting all features for:", projectPath);
+      console.log('[Mock] Getting all features for:', projectPath);
 
       // Check if test has set mock features via global variable
       const testFeatures = (window as any).__mockFeatures;
@@ -2538,7 +2535,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
 
       // Simulate reading feature folders
       const featureKeys = Object.keys(mockFileSystem).filter(
-        (key) => key.startsWith(featuresDir) && key.endsWith("/feature.json")
+        (key) => key.startsWith(featuresDir) && key.endsWith('/feature.json')
       );
 
       for (const key of featureKeys) {
@@ -2549,7 +2546,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
             features.push(feature);
           }
         } catch (error) {
-          console.error("[Mock] Failed to parse feature:", error);
+          console.error('[Mock] Failed to parse feature:', error);
         }
       }
 
@@ -2562,17 +2559,17 @@ function createMockFeaturesAPI(): FeaturesAPI {
     },
 
     get: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Getting feature:", { projectPath, featureId });
+      console.log('[Mock] Getting feature:', { projectPath, featureId });
       const featurePath = `${projectPath}/.automaker/features/${featureId}/feature.json`;
       const content = mockFileSystem[featurePath];
       if (content) {
         return { success: true, feature: JSON.parse(content) };
       }
-      return { success: false, error: "Feature not found" };
+      return { success: false, error: 'Feature not found' };
     },
 
     create: async (projectPath: string, feature: Feature) => {
-      console.log("[Mock] Creating feature:", {
+      console.log('[Mock] Creating feature:', {
         projectPath,
         featureId: feature.id,
       });
@@ -2586,7 +2583,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
       featureId: string,
       updates: Partial<Feature>
     ) => {
-      console.log("[Mock] Updating feature:", {
+      console.log('[Mock] Updating feature:', {
         projectPath,
         featureId,
         updates,
@@ -2594,7 +2591,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
       const featurePath = `${projectPath}/.automaker/features/${featureId}/feature.json`;
       const existing = mockFileSystem[featurePath];
       if (!existing) {
-        return { success: false, error: "Feature not found" };
+        return { success: false, error: 'Feature not found' };
       }
       const feature = { ...JSON.parse(existing), ...updates };
       mockFileSystem[featurePath] = JSON.stringify(feature, null, 2);
@@ -2602,7 +2599,7 @@ function createMockFeaturesAPI(): FeaturesAPI {
     },
 
     delete: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Deleting feature:", { projectPath, featureId });
+      console.log('[Mock] Deleting feature:', { projectPath, featureId });
       const featurePath = `${projectPath}/.automaker/features/${featureId}/feature.json`;
       delete mockFileSystem[featurePath];
       // Also delete agent-output.md if it exists
@@ -2612,17 +2609,17 @@ function createMockFeaturesAPI(): FeaturesAPI {
     },
 
     getAgentOutput: async (projectPath: string, featureId: string) => {
-      console.log("[Mock] Getting agent output:", { projectPath, featureId });
+      console.log('[Mock] Getting agent output:', { projectPath, featureId });
       const agentOutputPath = `${projectPath}/.automaker/features/${featureId}/agent-output.md`;
       const content = mockFileSystem[agentOutputPath];
       return { success: true, content: content || null };
     },
 
     generateTitle: async (description: string) => {
-      console.log("[Mock] Generating title for:", description.substring(0, 50));
+      console.log('[Mock] Generating title for:', description.substring(0, 50));
       // Mock title generation - just take first few words
-      const words = description.split(/\s+/).slice(0, 6).join(" ");
-      const title = words.length > 40 ? words.substring(0, 40) + "..." : words;
+      const words = description.split(/\s+/).slice(0, 6).join(' ');
+      const title = words.length > 40 ? words.substring(0, 40) + '...' : words;
       return { success: true, title: `Add ${title}` };
     },
   };
@@ -2632,13 +2629,13 @@ function createMockFeaturesAPI(): FeaturesAPI {
 function createMockRunningAgentsAPI(): RunningAgentsAPI {
   return {
     getAll: async () => {
-      console.log("[Mock] Getting all running agents");
+      console.log('[Mock] Getting all running agents');
       // Return running agents from mock auto mode state
       const runningAgents: RunningAgent[] = Array.from(mockRunningFeatures).map(
         (featureId) => ({
           featureId,
-          projectPath: "/mock/project",
-          projectName: "Mock Project",
+          projectPath: '/mock/project',
+          projectName: 'Mock Project',
           isAutoMode: mockAutoModeRunning,
         })
       );
@@ -2667,24 +2664,24 @@ export interface TrashedProject extends Project {
 }
 
 export const getStoredProjects = (): Project[] => {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   const stored = localStorage.getItem(STORAGE_KEYS.PROJECTS);
   return stored ? JSON.parse(stored) : [];
 };
 
 export const saveProjects = (projects: Project[]): void => {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
 };
 
 export const getCurrentProject = (): Project | null => {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   const stored = localStorage.getItem(STORAGE_KEYS.CURRENT_PROJECT);
   return stored ? JSON.parse(stored) : null;
 };
 
 export const setCurrentProject = (project: Project | null): void => {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   if (project) {
     localStorage.setItem(STORAGE_KEYS.CURRENT_PROJECT, JSON.stringify(project));
   } else {
@@ -2709,12 +2706,12 @@ export const removeProject = (projectId: string): void => {
 };
 
 export const getStoredTrashedProjects = (): TrashedProject[] => {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   const stored = localStorage.getItem(STORAGE_KEYS.TRASHED_PROJECTS);
   return stored ? JSON.parse(stored) : [];
 };
 
 export const saveTrashedProjects = (projects: TrashedProject[]): void => {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.setItem(STORAGE_KEYS.TRASHED_PROJECTS, JSON.stringify(projects));
 };

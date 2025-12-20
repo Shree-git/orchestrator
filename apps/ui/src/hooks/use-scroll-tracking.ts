@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface ScrollTrackingItem {
   id: string;
@@ -27,7 +27,7 @@ export function useScrollTracking<T extends ScrollTrackingItem>({
   scrollOffset = 24,
 }: UseScrollTrackingOptions<T>) {
   const [activeSection, setActiveSection] = useState(
-    initialSection || items[0]?.id || ""
+    initialSection || items[0]?.id || ''
   );
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -72,8 +72,8 @@ export function useScrollTracking<T extends ScrollTrackingItem>({
       }
     };
 
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [items, filterFn]);
 
   // Scroll to a specific section with smooth animation
@@ -89,7 +89,7 @@ export function useScrollTracking<T extends ScrollTrackingItem>({
 
         container.scrollTo({
           top: relativeTop - scrollOffset,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
       }
     },

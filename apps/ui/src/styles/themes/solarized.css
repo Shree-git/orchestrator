@@ -76,30 +76,37 @@
 /* Theme-specific overrides */
 
 .solarized .animated-outline-gradient {
-    background: conic-gradient(from 90deg at 50% 50%, #268bd2 0%, #2aa198 50%, #268bd2 100%);
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    #268bd2 0%,
+    #2aa198 50%,
+    #268bd2 100%
+  );
 }
 
 .solarized .animated-outline-inner {
-    background: oklch(0.2 0.02 230) !important;
-    color: #268bd2 !important;
+  background: oklch(0.2 0.02 230) !important;
+  color: #268bd2 !important;
 }
 
-.solarized [data-slot="button"][class*="animated-outline"]:hover .animated-outline-inner {
-    background: oklch(0.25 0.03 230) !important;
-    color: #2aa198 !important;
+.solarized
+  [data-slot='button'][class*='animated-outline']:hover
+  .animated-outline-inner {
+  background: oklch(0.25 0.03 230) !important;
+  color: #2aa198 !important;
 }
 
 .solarized .slider-track {
-    background: oklch(0.25 0.02 230);
+  background: oklch(0.25 0.02 230);
 }
 
 .solarized .slider-range {
-    background: linear-gradient(to right, #268bd2, #2aa198);
+  background: linear-gradient(to right, #268bd2, #2aa198);
 }
 
 .solarized .slider-thumb {
-    background: oklch(0.23 0.02 230);
-    border-color: #268bd2;
+  background: oklch(0.23 0.02 230);
+  border-color: #268bd2;
 }
 
 .solarized .xml-highlight {

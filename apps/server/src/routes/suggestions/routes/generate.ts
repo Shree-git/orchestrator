@@ -2,29 +2,29 @@
  * POST /generate endpoint - Generate suggestions
  */
 
-import type { Request, Response } from "express";
-import type { EventEmitter } from "../../../lib/events.js";
-import { createLogger } from "../../../lib/logger.js";
+import type { Request, Response } from 'express';
+import type { EventEmitter } from '../../../lib/events.js';
+import { createLogger } from '../../../lib/logger.js';
 import {
   getSuggestionsStatus,
   setRunningState,
   getErrorMessage,
   logError,
-} from "../common.js";
-import { generateSuggestions } from "../generate-suggestions.js";
+} from '../common.js';
+import { generateSuggestions } from '../generate-suggestions.js';
 
-const logger = createLogger("Suggestions");
+const logger = createLogger('Suggestions');
 
 export function createGenerateHandler(events: EventEmitter) {
   return async (req: Request, res: Response): Promise<void> => {
     try {
-      const { projectPath, suggestionType = "features" } = req.body as {
+      const { projectPath, suggestionType = 'features' } = req.body as {
         projectPath: string;
         suggestionType?: string;
       };
 
       if (!projectPath) {
-        res.status(400).json({ success: false, error: "projectPath required" });
+        res.status(400).json({ success: false, error: 'projectPath required' });
         return;
       }
 
@@ -32,7 +32,7 @@ export function createGenerateHandler(events: EventEmitter) {
       if (isRunning) {
         res.json({
           success: false,
-          error: "Suggestions generation is already running",
+          error: 'Suggestions generation is already running',
         });
         return;
       }
@@ -44,9 +44,9 @@ export function createGenerateHandler(events: EventEmitter) {
       // Start generation in background
       generateSuggestions(projectPath, suggestionType, events, abortController)
         .catch((error) => {
-          logError(error, "Generate suggestions failed (background)");
-          events.emit("suggestions:event", {
-            type: "suggestions_error",
+          logError(error, 'Generate suggestions failed (background)');
+          events.emit('suggestions:event', {
+            type: 'suggestions_error',
             error: getErrorMessage(error),
           });
         })
@@ -56,7 +56,7 @@ export function createGenerateHandler(events: EventEmitter) {
 
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Generate suggestions failed");
+      logError(error, 'Generate suggestions failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

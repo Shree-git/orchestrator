@@ -1,13 +1,13 @@
-import { StatusBadge } from "./status-badge";
+import { StatusBadge } from './status-badge';
 
 interface StatusRowProps {
   label: string;
   status:
-    | "checking"
-    | "installed"
-    | "not_installed"
-    | "authenticated"
-    | "not_authenticated";
+    | 'checking'
+    | 'installed'
+    | 'not_installed'
+    | 'authenticated'
+    | 'not_authenticated';
   statusLabel: string;
   metadata?: string; // e.g., "(Subscription Token)"
 }

@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   GitBranch,
   Plus,
   RefreshCw,
   PanelLeftOpen,
   PanelLeftClose,
-} from "lucide-react";
-import { cn, pathsEqual } from "@/lib/utils";
-import type { WorktreePanelProps, WorktreeInfo } from "./types";
+} from 'lucide-react';
+import { cn, pathsEqual } from '@/lib/utils';
+import type { WorktreePanelProps, WorktreeInfo } from './types';
 import {
   useWorktrees,
   useDevServers,
@@ -16,10 +16,10 @@ import {
   useWorktreeActions,
   useDefaultEditor,
   useRunningFeatures,
-} from "./hooks";
-import { WorktreeTab } from "./components";
+} from './hooks';
+import { WorktreeTab } from './components';
 
-const WORKTREE_PANEL_COLLAPSED_KEY = "worktree-panel-collapsed";
+const WORKTREE_PANEL_COLLAPSED_KEY = 'worktree-panel-collapsed';
 
 export function WorktreePanel({
   projectPath,
@@ -91,9 +91,9 @@ export function WorktreePanel({
 
   // Collapse state with localStorage persistence
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === 'undefined') return false;
     const saved = localStorage.getItem(WORKTREE_PANEL_COLLAPSED_KEY);
-    return saved === "true";
+    return saved === 'true';
   });
 
   useEffect(() => {
@@ -170,11 +170,11 @@ export function WorktreePanel({
         <GitBranch className="w-4 h-4 text-muted-foreground" />
         <span className="text-sm text-muted-foreground">Branch:</span>
         <span className="text-sm font-mono font-medium">
-          {selectedWorktree?.branch ?? "main"}
+          {selectedWorktree?.branch ?? 'main'}
         </span>
         {selectedWorktree?.hasChanges && (
           <span className="inline-flex items-center justify-center h-4 min-w-[1rem] px-1 text-[10px] font-medium rounded border bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
-            {selectedWorktree.changedFilesCount ?? "!"}
+            {selectedWorktree.changedFilesCount ?? '!'}
           </span>
         )}
       </div>
@@ -332,7 +332,7 @@ export function WorktreePanel({
               title="Refresh worktrees"
             >
               <RefreshCw
-                className={cn("w-3.5 h-3.5", isLoading && "animate-spin")}
+                className={cn('w-3.5 h-3.5', isLoading && 'animate-spin')}
               />
             </Button>
           </div>

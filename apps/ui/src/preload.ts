@@ -5,38 +5,50 @@
  * All other operations go through HTTP API.
  */
 
-import { contextBridge, ipcRenderer, OpenDialogOptions, SaveDialogOptions } from "electron";
+import {
+  contextBridge,
+  ipcRenderer,
+  OpenDialogOptions,
+  SaveDialogOptions,
+} from 'electron';
 
 // Expose minimal API for native features
-contextBridge.exposeInMainWorld("electronAPI", {
+contextBridge.exposeInMainWorld('electronAPI', {
   // Platform info
   platform: process.platform,
   isElectron: true,
 
   // Connection check
-  ping: (): Promise<string> => ipcRenderer.invoke("ping"),
+  ping: (): Promise<string> => ipcRenderer.invoke('ping'),
 
   // Get server URL for HTTP client
-  getServerUrl: (): Promise<string> => ipcRenderer.invoke("server:getUrl"),
+  getServerUrl: (): Promise<string> => ipcRenderer.invoke('server:getUrl'),
 
   // Native dialogs - better UX than prompt()
   openDirectory: (): Promise<Electron.OpenDialogReturnValue> =>
-    ipcRenderer.invoke("dialog:openDirectory"),
-  openFile: (options?: OpenDialogOptions): Promise<Electron.OpenDialogReturnValue> =>
-    ipcRenderer.invoke("dialog:openFile", options),
-  saveFile: (options?: SaveDialogOptions): Promise<Electron.SaveDialogReturnValue> =>
-    ipcRenderer.invoke("dialog:saveFile", options),
+    ipcRenderer.invoke('dialog:openDirectory'),
+  openFile: (
+    options?: OpenDialogOptions
+  ): Promise<Electron.OpenDialogReturnValue> =>
+    ipcRenderer.invoke('dialog:openFile', options),
+  saveFile: (
+    options?: SaveDialogOptions
+  ): Promise<Electron.SaveDialogReturnValue> =>
+    ipcRenderer.invoke('dialog:saveFile', options),
 
   // Shell operations
-  openExternalLink: (url: string): Promise<{ success: boolean; error?: string }> =>
-    ipcRenderer.invoke("shell:openExternal", url),
+  openExternalLink: (
+    url: string
+  ): Promise<{ success: boolean; error?: string }> =>
+    ipcRenderer.invoke('shell:openExternal', url),
   openPath: (filePath: string): Promise<{ success: boolean; error?: string }> =>
-    ipcRenderer.invoke("shell:openPath", filePath),
+    ipcRenderer.invoke('shell:openPath', filePath),
 
   // App info
-  getPath: (name: string): Promise<string> => ipcRenderer.invoke("app:getPath", name),
-  getVersion: (): Promise<string> => ipcRenderer.invoke("app:getVersion"),
-  isPackaged: (): Promise<boolean> => ipcRenderer.invoke("app:isPackaged"),
+  getPath: (name: string): Promise<string> =>
+    ipcRenderer.invoke('app:getPath', name),
+  getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
+  isPackaged: (): Promise<boolean> => ipcRenderer.invoke('app:isPackaged'),
 });
 
-console.log("[Preload] Electron API exposed (TypeScript)");
+console.log('[Preload] Electron API exposed (TypeScript)');

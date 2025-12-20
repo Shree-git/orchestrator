@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState } from 'react';
 import {
   X,
   SplitSquareHorizontal,
@@ -11,12 +11,12 @@ import {
   ClipboardPaste,
   CheckSquare,
   Trash2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { useAppStore } from "@/store/app-store";
-import { getTerminalTheme } from "@/config/terminal-themes";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
+import { useAppStore } from '@/store/app-store';
+import { getTerminalTheme } from '@/config/terminal-themes';
 
 // Font size constraints
 const MIN_FONT_SIZE = 8;
@@ -41,8 +41,8 @@ interface TerminalPanelProps {
 }
 
 // Type for xterm Terminal - we'll use any since we're dynamically importing
-type XTerminal = InstanceType<typeof import("@xterm/xterm").Terminal>;
-type XFitAddon = InstanceType<typeof import("@xterm/addon-fit").FitAddon>;
+type XTerminal = InstanceType<typeof import('@xterm/xterm').Terminal>;
+type XFitAddon = InstanceType<typeof import('@xterm/addon-fit').FitAddon>;
 
 export function TerminalPanel({
   sessionId,
@@ -67,8 +67,11 @@ export function TerminalPanel({
   const resizeDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const focusHandlerRef = useRef<{ dispose: () => void } | null>(null);
   const [isTerminalReady, setIsTerminalReady] = useState(false);
-  const [shellName, setShellName] = useState("shell");
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [shellName, setShellName] = useState('shell');
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [isMac, setIsMac] = useState(false);
   const isMacRef = useRef(false);
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -78,11 +81,13 @@ export function TerminalPanel({
   // Detect platform on mount
   useEffect(() => {
     // Use modern userAgentData API with fallback to navigator.platform
-    const nav = navigator as Navigator & { userAgentData?: { platform: string } };
+    const nav = navigator as Navigator & {
+      userAgentData?: { platform: string };
+    };
     let detected = false;
     if (nav.userAgentData?.platform) {
-      detected = nav.userAgentData.platform.toLowerCase().includes("mac");
-    } else if (typeof navigator !== "undefined") {
+      detected = nav.userAgentData.platform.toLowerCase().includes('mac');
+    } else if (typeof navigator !== 'undefined') {
       // Fallback for browsers without userAgentData (intentionally using deprecated API)
       detected = /mac/i.test(navigator.platform);
     }
@@ -107,8 +112,12 @@ export function TerminalPanel({
   fontSizeRef.current = fontSize;
   const themeRef = useRef(effectiveTheme);
   themeRef.current = effectiveTheme;
-  const copySelectionRef = useRef<() => Promise<boolean>>(() => Promise.resolve(false));
-  const pasteFromClipboardRef = useRef<() => Promise<void>>(() => Promise.resolve());
+  const copySelectionRef = useRef<() => Promise<boolean>>(() =>
+    Promise.resolve(false)
+  );
+  const pasteFromClipboardRef = useRef<() => Promise<void>>(() =>
+    Promise.resolve()
+  );
 
   // Zoom functions - use the prop callback
   const zoomIn = useCallback(() => {
@@ -135,7 +144,7 @@ export function TerminalPanel({
       await navigator.clipboard.writeText(selection);
       return true;
     } catch (err) {
-      console.error("[Terminal] Copy failed:", err);
+      console.error('[Terminal] Copy failed:', err);
       return false;
     }
   }, []);
@@ -149,10 +158,10 @@ export function TerminalPanel({
     try {
       const text = await navigator.clipboard.readText();
       if (text && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({ type: "input", data: text }));
+        wsRef.current.send(JSON.stringify({ type: 'input', data: text }));
       }
     } catch (err) {
-      console.error("[Terminal] Paste failed:", err);
+      console.error('[Terminal] Paste failed:', err);
     }
   }, []);
   pasteFromClipboardRef.current = pasteFromClipboard;
@@ -173,27 +182,36 @@ export function TerminalPanel({
   }, []);
 
   // Handle context menu action
-  const handleContextMenuAction = useCallback(async (action: "copy" | "paste" | "selectAll" | "clear") => {
-    closeContextMenu();
-    switch (action) {
-      case "copy":
-        await copySelection();
-        break;
-      case "paste":
-        await pasteFromClipboard();
-        break;
-      case "selectAll":
-        selectAll();
-        break;
-      case "clear":
-        clearTerminal();
-        break;
-    }
-    xtermRef.current?.focus();
-  }, [closeContextMenu, copySelection, pasteFromClipboard, selectAll, clearTerminal]);
+  const handleContextMenuAction = useCallback(
+    async (action: 'copy' | 'paste' | 'selectAll' | 'clear') => {
+      closeContextMenu();
+      switch (action) {
+        case 'copy':
+          await copySelection();
+          break;
+        case 'paste':
+          await pasteFromClipboard();
+          break;
+        case 'selectAll':
+          selectAll();
+          break;
+        case 'clear':
+          clearTerminal();
+          break;
+      }
+      xtermRef.current?.focus();
+    },
+    [
+      closeContextMenu,
+      copySelection,
+      pasteFromClipboard,
+      selectAll,
+      clearTerminal,
+    ]
+  );
 
-  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:3008";
-  const wsUrl = serverUrl.replace(/^http/, "ws");
+  const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3008';
+  const wsUrl = serverUrl.replace(/^http/, 'ws');
 
   // Draggable - only the drag handle triggers drag
   const {
@@ -205,10 +223,7 @@ export function TerminalPanel({
   });
 
   // Droppable - the entire panel is a drop target
-  const {
-    setNodeRef: setDropRef,
-    isOver,
-  } = useDroppable({
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: sessionId,
   });
 
@@ -220,18 +235,14 @@ export function TerminalPanel({
 
     const initTerminal = async () => {
       // Dynamically import xterm modules
-      const [
-        { Terminal },
-        { FitAddon },
-        { WebglAddon },
-      ] = await Promise.all([
-        import("@xterm/xterm"),
-        import("@xterm/addon-fit"),
-        import("@xterm/addon-webgl"),
+      const [{ Terminal }, { FitAddon }, { WebglAddon }] = await Promise.all([
+        import('@xterm/xterm'),
+        import('@xterm/addon-fit'),
+        import('@xterm/addon-webgl'),
       ]);
 
       // Also import CSS
-      await import("@xterm/xterm/css/xterm.css");
+      await import('@xterm/xterm/css/xterm.css');
 
       if (!mounted || !terminalRef.current) return;
 
@@ -241,7 +252,7 @@ export function TerminalPanel({
       // Create terminal instance with the current global font size and theme
       const terminal = new Terminal({
         cursorBlink: true,
-        cursorStyle: "block",
+        cursorStyle: 'block',
         fontSize: fontSizeRef.current,
         fontFamily: "Menlo, Monaco, 'Courier New', monospace",
         theme: terminalTheme,
@@ -263,7 +274,9 @@ export function TerminalPanel({
         });
         terminal.loadAddon(webglAddon);
       } catch {
-        console.warn("[Terminal] WebGL addon not available, falling back to canvas");
+        console.warn(
+          '[Terminal] WebGL addon not available, falling back to canvas'
+        );
       }
 
       // Fit terminal to container - wait for stable dimensions
@@ -274,7 +287,12 @@ export function TerminalPanel({
       let lastHeight = 0;
 
       const attemptFit = () => {
-        if (!fitAddon || !terminalRef.current || fitAttempts >= MAX_FIT_ATTEMPTS) return;
+        if (
+          !fitAddon ||
+          !terminalRef.current ||
+          fitAttempts >= MAX_FIT_ATTEMPTS
+        )
+          return;
 
         const rect = terminalRef.current.getBoundingClientRect();
         fitAttempts++;
@@ -289,7 +307,7 @@ export function TerminalPanel({
           try {
             fitAddon.fit();
           } catch (err) {
-            console.error("[Terminal] Initial fit error:", err);
+            console.error('[Terminal] Initial fit error:', err);
           }
           return;
         }
@@ -322,13 +340,20 @@ export function TerminalPanel({
 
         // Check cooldown to prevent rapid terminal creation
         const now = Date.now();
-        const canTrigger = now - lastShortcutTimeRef.current > SHORTCUT_COOLDOWN_MS;
+        const canTrigger =
+          now - lastShortcutTimeRef.current > SHORTCUT_COOLDOWN_MS;
 
         // Use event.code for keyboard-layout-independent key detection
         const code = event.code;
 
         // Alt+D - Split right
-        if (event.altKey && !event.shiftKey && !event.ctrlKey && !event.metaKey && code === 'KeyD') {
+        if (
+          event.altKey &&
+          !event.shiftKey &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          code === 'KeyD'
+        ) {
           event.preventDefault();
           if (canTrigger) {
             lastShortcutTimeRef.current = now;
@@ -338,7 +363,13 @@ export function TerminalPanel({
         }
 
         // Alt+S - Split down
-        if (event.altKey && !event.shiftKey && !event.ctrlKey && !event.metaKey && code === 'KeyS') {
+        if (
+          event.altKey &&
+          !event.shiftKey &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          code === 'KeyS'
+        ) {
           event.preventDefault();
           if (canTrigger) {
             lastShortcutTimeRef.current = now;
@@ -348,7 +379,13 @@ export function TerminalPanel({
         }
 
         // Alt+W - Close terminal
-        if (event.altKey && !event.shiftKey && !event.ctrlKey && !event.metaKey && code === 'KeyW') {
+        if (
+          event.altKey &&
+          !event.shiftKey &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          code === 'KeyW'
+        ) {
           event.preventDefault();
           if (canTrigger) {
             lastShortcutTimeRef.current = now;
@@ -361,14 +398,26 @@ export function TerminalPanel({
         const otherModKey = isMacRef.current ? event.ctrlKey : event.metaKey;
 
         // Ctrl+Shift+C / Cmd+Shift+C - Always copy (Linux terminal convention)
-        if (modKey && !otherModKey && event.shiftKey && !event.altKey && code === 'KeyC') {
+        if (
+          modKey &&
+          !otherModKey &&
+          event.shiftKey &&
+          !event.altKey &&
+          code === 'KeyC'
+        ) {
           event.preventDefault();
           copySelectionRef.current();
           return false;
         }
 
         // Ctrl+C / Cmd+C - Copy if text is selected, otherwise send SIGINT
-        if (modKey && !otherModKey && !event.shiftKey && !event.altKey && code === 'KeyC') {
+        if (
+          modKey &&
+          !otherModKey &&
+          !event.shiftKey &&
+          !event.altKey &&
+          code === 'KeyC'
+        ) {
           const hasSelection = terminal.hasSelection();
           if (hasSelection) {
             event.preventDefault();
@@ -388,7 +437,13 @@ export function TerminalPanel({
         }
 
         // Ctrl+A / Cmd+A - Select all
-        if (modKey && !otherModKey && !event.shiftKey && !event.altKey && code === 'KeyA') {
+        if (
+          modKey &&
+          !otherModKey &&
+          !event.shiftKey &&
+          !event.altKey &&
+          code === 'KeyA'
+        ) {
           event.preventDefault();
           terminal.selectAll();
           return false;
@@ -450,10 +505,10 @@ export function TerminalPanel({
         try {
           const msg = JSON.parse(event.data);
           switch (msg.type) {
-            case "data":
+            case 'data':
               terminal.write(msg.data);
               break;
-            case "scrollback":
+            case 'scrollback':
               // Only process scrollback if there's actual data
               // Don't clear if empty - prevents blank terminal issue
               if (msg.data && msg.data.length > 0) {
@@ -462,28 +517,36 @@ export function TerminalPanel({
                 terminal.write(msg.data);
               }
               break;
-            case "connected":
-              console.log(`[Terminal] Session connected: ${msg.shell} in ${msg.cwd}`);
+            case 'connected':
+              console.log(
+                `[Terminal] Session connected: ${msg.shell} in ${msg.cwd}`
+              );
               if (msg.shell) {
                 // Extract shell name from path (e.g., "/bin/bash" -> "bash")
-                const name = msg.shell.split("/").pop() || msg.shell;
+                const name = msg.shell.split('/').pop() || msg.shell;
                 setShellName(name);
               }
               break;
-            case "exit":
-              terminal.write(`\r\n\x1b[33m[Process exited with code ${msg.exitCode}]\x1b[0m\r\n`);
+            case 'exit':
+              terminal.write(
+                `\r\n\x1b[33m[Process exited with code ${msg.exitCode}]\x1b[0m\r\n`
+              );
               break;
-            case "pong":
+            case 'pong':
               // Heartbeat response
               break;
           }
         } catch (err) {
-          console.error("[Terminal] Message parse error:", err);
+          console.error('[Terminal] Message parse error:', err);
         }
       };
 
       ws.onclose = (event) => {
-        console.log(`[Terminal] WebSocket closed for session ${sessionId}:`, event.code, event.reason);
+        console.log(
+          `[Terminal] WebSocket closed for session ${sessionId}:`,
+          event.code,
+          event.reason
+        );
         wsRef.current = null;
 
         // Don't reconnect if closed normally or auth failed
@@ -494,14 +557,19 @@ export function TerminalPanel({
         // Attempt reconnect after a delay
         reconnectTimeoutRef.current = setTimeout(() => {
           if (xtermRef.current) {
-            console.log(`[Terminal] Attempting reconnect for session ${sessionId}`);
+            console.log(
+              `[Terminal] Attempting reconnect for session ${sessionId}`
+            );
             connect();
           }
         }, 2000);
       };
 
       ws.onerror = (error) => {
-        console.error(`[Terminal] WebSocket error for session ${sessionId}:`, error);
+        console.error(
+          `[Terminal] WebSocket error for session ${sessionId}:`,
+          error
+        );
       };
     };
 
@@ -510,7 +578,7 @@ export function TerminalPanel({
     // Handle terminal input
     const dataHandler = terminal.onData((data) => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({ type: "input", data }));
+        wsRef.current.send(JSON.stringify({ type: 'input', data }));
       }
     });
 
@@ -536,7 +604,8 @@ export function TerminalPanel({
 
     // Debounce resize operations to prevent race conditions
     resizeDebounceRef.current = setTimeout(() => {
-      if (!fitAddonRef.current || !xtermRef.current || !terminalRef.current) return;
+      if (!fitAddonRef.current || !xtermRef.current || !terminalRef.current)
+        return;
 
       const container = terminalRef.current;
       const rect = container.getBoundingClientRect();
@@ -552,10 +621,10 @@ export function TerminalPanel({
 
         // Send resize to server
         if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ type: "resize", cols, rows }));
+          wsRef.current.send(JSON.stringify({ type: 'resize', cols, rows }));
         }
       } catch (err) {
-        console.error("[Terminal] Resize error:", err);
+        console.error('[Terminal] Resize error:', err);
       }
     }, RESIZE_DEBOUNCE_MS);
   }, []);
@@ -572,11 +641,11 @@ export function TerminalPanel({
     resizeObserver.observe(container);
 
     // Also handle window resize
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [handleResize]);
 
@@ -600,7 +669,7 @@ export function TerminalPanel({
           // Notify server of new dimensions
           const { cols, rows } = xtermRef.current;
           if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({ type: "resize", cols, rows }));
+            wsRef.current.send(JSON.stringify({ type: 'resize', cols, rows }));
           }
         }
       }
@@ -625,7 +694,7 @@ export function TerminalPanel({
       if (!e.ctrlKey && !e.metaKey) return;
 
       // Ctrl/Cmd + Plus or Ctrl/Cmd + = (for keyboards without numpad)
-      if (e.key === "+" || e.key === "=") {
+      if (e.key === '+' || e.key === '=') {
         e.preventDefault();
         e.stopPropagation();
         zoomIn();
@@ -633,7 +702,7 @@ export function TerminalPanel({
       }
 
       // Ctrl/Cmd + Minus
-      if (e.key === "-") {
+      if (e.key === '-') {
         e.preventDefault();
         e.stopPropagation();
         zoomOut();
@@ -641,7 +710,7 @@ export function TerminalPanel({
       }
 
       // Ctrl/Cmd + 0 to reset
-      if (e.key === "0") {
+      if (e.key === '0') {
         e.preventDefault();
         e.stopPropagation();
         resetZoom();
@@ -649,8 +718,8 @@ export function TerminalPanel({
       }
     };
 
-    container.addEventListener("keydown", handleKeyDown);
-    return () => container.removeEventListener("keydown", handleKeyDown);
+    container.addEventListener('keydown', handleKeyDown);
+    return () => container.removeEventListener('keydown', handleKeyDown);
   }, [zoomIn, zoomOut, resetZoom]);
 
   // Handle mouse wheel zoom (Ctrl+Wheel)
@@ -675,12 +744,12 @@ export function TerminalPanel({
     };
 
     // Use passive: false to allow preventDefault
-    container.addEventListener("wheel", handleWheel, { passive: false });
-    return () => container.removeEventListener("wheel", handleWheel);
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
   }, [zoomIn, zoomOut]);
 
   // Context menu actions for keyboard navigation
-  const menuActions = ["copy", "paste", "selectAll", "clear"] as const;
+  const menuActions = ['copy', 'paste', 'selectAll', 'clear'] as const;
 
   // Keep ref in sync with state for use in event handlers
   useEffect(() => {
@@ -695,7 +764,10 @@ export function TerminalPanel({
     setFocusedMenuIndex(0);
     focusedMenuIndexRef.current = 0;
     requestAnimationFrame(() => {
-      const firstButton = contextMenuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]');
+      const firstButton =
+        contextMenuRef.current?.querySelector<HTMLButtonElement>(
+          '[role="menuitem"]'
+        );
       firstButton?.focus();
     });
 
@@ -708,45 +780,53 @@ export function TerminalPanel({
       };
 
       switch (e.key) {
-        case "Escape":
+        case 'Escape':
           e.preventDefault();
           closeContextMenu();
           break;
-        case "ArrowDown":
+        case 'ArrowDown':
           e.preventDefault();
-          updateFocusIndex((focusedMenuIndexRef.current + 1) % menuActions.length);
+          updateFocusIndex(
+            (focusedMenuIndexRef.current + 1) % menuActions.length
+          );
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           e.preventDefault();
-          updateFocusIndex((focusedMenuIndexRef.current - 1 + menuActions.length) % menuActions.length);
+          updateFocusIndex(
+            (focusedMenuIndexRef.current - 1 + menuActions.length) %
+              menuActions.length
+          );
           break;
-        case "Enter":
-        case " ":
+        case 'Enter':
+        case ' ':
           e.preventDefault();
           handleContextMenuAction(menuActions[focusedMenuIndexRef.current]);
           break;
-        case "Tab":
+        case 'Tab':
           e.preventDefault();
           closeContextMenu();
           break;
       }
     };
 
-    document.addEventListener("click", handleClick);
-    document.addEventListener("scroll", handleScroll, true);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('click', handleClick);
+    document.addEventListener('scroll', handleScroll, true);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("click", handleClick);
-      document.removeEventListener("scroll", handleScroll, true);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('scroll', handleScroll, true);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [contextMenu, closeContextMenu, handleContextMenuAction]);
 
   // Focus the correct menu item when navigation changes
   useEffect(() => {
     if (!contextMenu || !contextMenuRef.current) return;
-    const buttons = contextMenuRef.current.querySelectorAll<HTMLButtonElement>('[role="menuitem"]');
+    const buttons =
+      contextMenuRef.current.querySelectorAll<HTMLButtonElement>(
+        '[role="menuitem"]'
+      );
     buttons[focusedMenuIndex]?.focus();
   }, [focusedMenuIndex, contextMenu]);
 
@@ -782,10 +862,13 @@ export function TerminalPanel({
   }, []);
 
   // Combine refs for the container
-  const setRefs = useCallback((node: HTMLDivElement | null) => {
-    containerRef.current = node;
-    setDropRef(node);
-  }, [setDropRef]);
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      setDropRef(node);
+    },
+    [setDropRef]
+  );
 
   // Get current terminal theme for xterm styling
   const currentTerminalTheme = getTerminalTheme(effectiveTheme);
@@ -794,12 +877,12 @@ export function TerminalPanel({
     <div
       ref={setRefs}
       className={cn(
-        "flex flex-col h-full relative",
-        isActive && "ring-1 ring-brand-500 ring-inset",
+        'flex flex-col h-full relative',
+        isActive && 'ring-1 ring-brand-500 ring-inset',
         // Visual feedback when dragging this terminal
-        isDragging && "opacity-50",
+        isDragging && 'opacity-50',
         // Visual feedback when hovering over as drop target
-        isOver && isDropTarget && "ring-2 ring-green-500 ring-inset"
+        isOver && isDropTarget && 'ring-2 ring-green-500 ring-inset'
       )}
       onClick={onFocus}
       tabIndex={0}
@@ -822,8 +905,8 @@ export function TerminalPanel({
           {...dragAttributes}
           {...dragListeners}
           className={cn(
-            "p-1 rounded cursor-grab active:cursor-grabbing mr-1 transition-colors text-muted-foreground hover:text-foreground hover:bg-accent",
-            isDragging && "cursor-grabbing"
+            'p-1 rounded cursor-grab active:cursor-grabbing mr-1 transition-colors text-muted-foreground hover:text-foreground hover:bg-accent',
+            isDragging && 'cursor-grabbing'
           )}
           title="Drag to swap terminals"
         >
@@ -833,9 +916,7 @@ export function TerminalPanel({
         {/* Terminal icon and label */}
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <Terminal className="h-3 w-3 shrink-0 text-muted-foreground" />
-          <span className="text-xs truncate text-foreground">
-            {shellName}
-          </span>
+          <span className="text-xs truncate text-foreground">{shellName}</span>
           {/* Font size indicator - only show when not default */}
           {fontSize !== DEFAULT_FONT_SIZE && (
             <button
@@ -945,50 +1026,64 @@ export function TerminalPanel({
             role="menuitem"
             tabIndex={focusedMenuIndex === 0 ? 0 : -1}
             className={cn(
-              "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none",
-              focusedMenuIndex === 0 ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+              'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none',
+              focusedMenuIndex === 0
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-accent hover:text-accent-foreground'
             )}
-            onClick={() => handleContextMenuAction("copy")}
+            onClick={() => handleContextMenuAction('copy')}
           >
             <Copy className="h-4 w-4" />
             <span className="flex-1 text-left">Copy</span>
-            <span className="text-xs text-muted-foreground">{isMac ? "⌘C" : "Ctrl+C"}</span>
+            <span className="text-xs text-muted-foreground">
+              {isMac ? '⌘C' : 'Ctrl+C'}
+            </span>
           </button>
           <button
             role="menuitem"
             tabIndex={focusedMenuIndex === 1 ? 0 : -1}
             className={cn(
-              "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none",
-              focusedMenuIndex === 1 ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+              'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none',
+              focusedMenuIndex === 1
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-accent hover:text-accent-foreground'
             )}
-            onClick={() => handleContextMenuAction("paste")}
+            onClick={() => handleContextMenuAction('paste')}
           >
             <ClipboardPaste className="h-4 w-4" />
             <span className="flex-1 text-left">Paste</span>
-            <span className="text-xs text-muted-foreground">{isMac ? "⌘V" : "Ctrl+V"}</span>
+            <span className="text-xs text-muted-foreground">
+              {isMac ? '⌘V' : 'Ctrl+V'}
+            </span>
           </button>
           <div role="separator" className="my-1 h-px bg-border" />
           <button
             role="menuitem"
             tabIndex={focusedMenuIndex === 2 ? 0 : -1}
             className={cn(
-              "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none",
-              focusedMenuIndex === 2 ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+              'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none',
+              focusedMenuIndex === 2
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-accent hover:text-accent-foreground'
             )}
-            onClick={() => handleContextMenuAction("selectAll")}
+            onClick={() => handleContextMenuAction('selectAll')}
           >
             <CheckSquare className="h-4 w-4" />
             <span className="flex-1 text-left">Select All</span>
-            <span className="text-xs text-muted-foreground">{isMac ? "⌘A" : "Ctrl+A"}</span>
+            <span className="text-xs text-muted-foreground">
+              {isMac ? '⌘A' : 'Ctrl+A'}
+            </span>
           </button>
           <button
             role="menuitem"
             tabIndex={focusedMenuIndex === 3 ? 0 : -1}
             className={cn(
-              "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none",
-              focusedMenuIndex === 3 ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+              'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-popover-foreground cursor-default outline-none',
+              focusedMenuIndex === 3
+                ? 'bg-accent text-accent-foreground'
+                : 'hover:bg-accent hover:text-accent-foreground'
             )}
-            onClick={() => handleContextMenuAction("clear")}
+            onClick={() => handleContextMenuAction('clear')}
           >
             <Trash2 className="h-4 w-4" />
             <span className="flex-1 text-left">Clear</span>

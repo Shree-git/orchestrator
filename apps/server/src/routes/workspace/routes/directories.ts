@@ -2,11 +2,11 @@
  * GET /directories endpoint - List directories in workspace
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import path from "path";
-import { addAllowedPath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { addAllowedPath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createDirectoriesHandler() {
   return async (_req: Request, res: Response): Promise<void> => {
@@ -16,7 +16,7 @@ export function createDirectoriesHandler() {
       if (!workspaceDir) {
         res.status(400).json({
           success: false,
-          error: "WORKSPACE_DIR is not configured",
+          error: 'WORKSPACE_DIR is not configured',
         });
         return;
       }
@@ -27,7 +27,7 @@ export function createDirectoriesHandler() {
       } catch {
         res.status(400).json({
           success: false,
-          error: "WORKSPACE_DIR path does not exist",
+          error: 'WORKSPACE_DIR path does not exist',
         });
         return;
       }
@@ -40,7 +40,7 @@ export function createDirectoriesHandler() {
 
       // Filter to directories only and map to result format
       const directories = entries
-        .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
+        .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
         .map((entry) => ({
           name: entry.name,
           path: path.join(workspaceDir, entry.name),
@@ -55,7 +55,7 @@ export function createDirectoriesHandler() {
         directories,
       });
     } catch (error) {
-      logError(error, "List workspace directories failed");
+      logError(error, 'List workspace directories failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

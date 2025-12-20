@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -6,11 +5,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArchiveRestore, Trash2 } from "lucide-react";
-import { Feature } from "@/store/app-store";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { ArchiveRestore, Trash2 } from 'lucide-react';
+import { Feature } from '@/store/app-store';
 
 interface CompletedFeaturesModalProps {
   open: boolean;
@@ -37,9 +41,9 @@ export function CompletedFeaturesModal({
           <DialogTitle>Completed Features</DialogTitle>
           <DialogDescription>
             {completedFeatures.length === 0
-              ? "No completed features yet."
+              ? 'No completed features yet.'
               : `${completedFeatures.length} completed feature${
-                  completedFeatures.length > 1 ? "s" : ""
+                  completedFeatures.length > 1 ? 's' : ''
                 }`}
           </DialogDescription>
         </DialogHeader>
@@ -62,7 +66,7 @@ export function CompletedFeaturesModal({
                       {feature.description || feature.summary || feature.id}
                     </CardTitle>
                     <CardDescription className="text-xs mt-1 truncate">
-                      {feature.category || "Uncategorized"}
+                      {feature.category || 'Uncategorized'}
                     </CardDescription>
                   </CardHeader>
                   <div className="p-3 pt-0 flex gap-2">

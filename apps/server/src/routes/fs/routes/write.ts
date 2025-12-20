@@ -2,12 +2,12 @@
  * POST /write endpoint - Write file
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import path from "path";
-import { validatePath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
-import { mkdirSafe } from "../../../lib/fs-utils.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { validatePath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
+import { mkdirSafe } from '../../../lib/fs-utils.js';
 
 export function createWriteHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -18,7 +18,7 @@ export function createWriteHandler() {
       };
 
       if (!filePath) {
-        res.status(400).json({ success: false, error: "filePath is required" });
+        res.status(400).json({ success: false, error: 'filePath is required' });
         return;
       }
 
@@ -26,11 +26,11 @@ export function createWriteHandler() {
 
       // Ensure parent directory exists (symlink-safe)
       await mkdirSafe(path.dirname(resolvedPath));
-      await fs.writeFile(resolvedPath, content, "utf-8");
+      await fs.writeFile(resolvedPath, content, 'utf-8');
 
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Write file failed");
+      logError(error, 'Write file failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

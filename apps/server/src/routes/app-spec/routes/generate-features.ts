@@ -2,24 +2,24 @@
  * POST /generate-features endpoint - Generate features from existing spec
  */
 
-import type { Request, Response } from "express";
-import type { EventEmitter } from "../../../lib/events.js";
-import { createLogger } from "../../../lib/logger.js";
+import type { Request, Response } from 'express';
+import type { EventEmitter } from '../../../lib/events.js';
+import { createLogger } from '../../../lib/logger.js';
 import {
   getSpecRegenerationStatus,
   setRunningState,
   logAuthStatus,
   logError,
   getErrorMessage,
-} from "../common.js";
-import { generateFeaturesFromSpec } from "../generate-features-from-spec.js";
+} from '../common.js';
+import { generateFeaturesFromSpec } from '../generate-features-from-spec.js';
 
-const logger = createLogger("SpecRegeneration");
+const logger = createLogger('SpecRegeneration');
 
 export function createGenerateFeaturesHandler(events: EventEmitter) {
   return async (req: Request, res: Response): Promise<void> => {
-    logger.info("========== /generate-features endpoint called ==========");
-    logger.debug("Request body:", JSON.stringify(req.body, null, 2));
+    logger.info('========== /generate-features endpoint called ==========');
+    logger.debug('Request body:', JSON.stringify(req.body, null, 2));
 
     try {
       const { projectPath, maxFeatures } = req.body as {
@@ -27,27 +27,27 @@ export function createGenerateFeaturesHandler(events: EventEmitter) {
         maxFeatures?: number;
       };
 
-      logger.debug("projectPath:", projectPath);
-      logger.debug("maxFeatures:", maxFeatures);
+      logger.debug('projectPath:', projectPath);
+      logger.debug('maxFeatures:', maxFeatures);
 
       if (!projectPath) {
-        logger.error("Missing projectPath parameter");
-        res.status(400).json({ success: false, error: "projectPath required" });
+        logger.error('Missing projectPath parameter');
+        res.status(400).json({ success: false, error: 'projectPath required' });
         return;
       }
 
       const { isRunning } = getSpecRegenerationStatus();
       if (isRunning) {
-        logger.warn("Generation already running, rejecting request");
-        res.json({ success: false, error: "Generation already running" });
+        logger.warn('Generation already running, rejecting request');
+        res.json({ success: false, error: 'Generation already running' });
         return;
       }
 
-      logAuthStatus("Before starting feature generation");
+      logAuthStatus('Before starting feature generation');
 
       const abortController = new AbortController();
       setRunningState(true, abortController);
-      logger.info("Starting background feature generation task...");
+      logger.info('Starting background feature generation task...');
 
       generateFeaturesFromSpec(
         projectPath,
@@ -56,23 +56,23 @@ export function createGenerateFeaturesHandler(events: EventEmitter) {
         maxFeatures
       )
         .catch((error) => {
-          logError(error, "Feature generation failed with error");
-          events.emit("spec-regeneration:event", {
-            type: "features_error",
+          logError(error, 'Feature generation failed with error');
+          events.emit('spec-regeneration:event', {
+            type: 'features_error',
             error: getErrorMessage(error),
           });
         })
         .finally(() => {
-          logger.info("Feature generation task finished (success or error)");
+          logger.info('Feature generation task finished (success or error)');
           setRunningState(false, null);
         });
 
       logger.info(
-        "Returning success response (generation running in background)"
+        'Returning success response (generation running in background)'
       );
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Generate features route handler failed");
+      logError(error, 'Generate features route handler failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

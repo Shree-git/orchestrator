@@ -3,14 +3,14 @@
  * Each feature is stored in .automaker/features/{featureId}/feature.json
  */
 
-import path from "path";
-import fs from "fs/promises";
+import path from 'path';
+import fs from 'fs/promises';
 import {
   getFeaturesDir,
   getFeatureDir,
   getFeatureImagesDir,
   ensureAutomakerDir,
-} from "../lib/automaker-paths.js";
+} from '../lib/automaker-paths.js';
 
 export interface Feature {
   id: string;
@@ -45,7 +45,7 @@ export interface Feature {
   error?: string;
   summary?: string;
   startedAt?: string;
-  [key: string]: unknown;  // Keep catch-all for extensibility
+  [key: string]: unknown; // Keep catch-all for extensibility
 }
 
 export class FeatureLoader {
@@ -68,8 +68,12 @@ export class FeatureLoader {
    */
   private async deleteOrphanedImages(
     projectPath: string,
-    oldPaths: Array<string | { path: string; [key: string]: unknown }> | undefined,
-    newPaths: Array<string | { path: string; [key: string]: unknown }> | undefined
+    oldPaths:
+      | Array<string | { path: string; [key: string]: unknown }>
+      | undefined,
+    newPaths:
+      | Array<string | { path: string; [key: string]: unknown }>
+      | undefined
   ): Promise<void> {
     if (!oldPaths || oldPaths.length === 0) {
       return;
@@ -77,10 +81,10 @@ export class FeatureLoader {
 
     // Build sets of paths for comparison
     const oldPathSet = new Set(
-      oldPaths.map((p) => (typeof p === "string" ? p : p.path))
+      oldPaths.map((p) => (typeof p === 'string' ? p : p.path))
     );
     const newPathSet = new Set(
-      (newPaths || []).map((p) => (typeof p === "string" ? p : p.path))
+      (newPaths || []).map((p) => (typeof p === 'string' ? p : p.path))
     );
 
     // Find images that were removed
@@ -118,13 +122,14 @@ export class FeatureLoader {
     const featureImagesDir = this.getFeatureImagesDir(projectPath, featureId);
     await fs.mkdir(featureImagesDir, { recursive: true });
 
-    const updatedPaths: Array<string | { path: string; [key: string]: unknown }> =
-      [];
+    const updatedPaths: Array<
+      string | { path: string; [key: string]: unknown }
+    > = [];
 
     for (const imagePath of imagePaths) {
       try {
         const originalPath =
-          typeof imagePath === "string" ? imagePath : imagePath.path;
+          typeof imagePath === 'string' ? imagePath : imagePath.path;
 
         // Skip if already in feature directory (already absolute path in external storage)
         if (originalPath.includes(`/features/${featureId}/images/`)) {
@@ -165,7 +170,7 @@ export class FeatureLoader {
         }
 
         // Update the path in the result (use absolute path)
-        if (typeof imagePath === "string") {
+        if (typeof imagePath === 'string') {
           updatedPaths.push(newPath);
         } else {
           updatedPaths.push({ ...imagePath, path: newPath });
@@ -191,14 +196,20 @@ export class FeatureLoader {
    * Get the path to a feature's feature.json file
    */
   getFeatureJsonPath(projectPath: string, featureId: string): string {
-    return path.join(this.getFeatureDir(projectPath, featureId), "feature.json");
+    return path.join(
+      this.getFeatureDir(projectPath, featureId),
+      'feature.json'
+    );
   }
 
   /**
    * Get the path to a feature's agent-output.md file
    */
   getAgentOutputPath(projectPath: string, featureId: string): string {
-    return path.join(this.getFeatureDir(projectPath, featureId), "agent-output.md");
+    return path.join(
+      this.getFeatureDir(projectPath, featureId),
+      'agent-output.md'
+    );
   }
 
   /**
@@ -233,7 +244,7 @@ export class FeatureLoader {
         const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
 
         try {
-          const content = await fs.readFile(featureJsonPath, "utf-8");
+          const content = await fs.readFile(featureJsonPath, 'utf-8');
           const feature = JSON.parse(content);
 
           if (!feature.id) {
@@ -245,7 +256,7 @@ export class FeatureLoader {
 
           features.push(feature);
         } catch (error) {
-          if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
             continue;
           } else if (error instanceof SyntaxError) {
             console.warn(
@@ -262,14 +273,14 @@ export class FeatureLoader {
 
       // Sort by creation order (feature IDs contain timestamp)
       features.sort((a, b) => {
-        const aTime = a.id ? parseInt(a.id.split("-")[1] || "0") : 0;
-        const bTime = b.id ? parseInt(b.id.split("-")[1] || "0") : 0;
+        const aTime = a.id ? parseInt(a.id.split('-')[1] || '0') : 0;
+        const bTime = b.id ? parseInt(b.id.split('-')[1] || '0') : 0;
         return aTime - bTime;
       });
 
       return features;
     } catch (error) {
-      console.error("[FeatureLoader] Failed to get all features:", error);
+      console.error('[FeatureLoader] Failed to get all features:', error);
       return [];
     }
   }
@@ -280,10 +291,10 @@ export class FeatureLoader {
   async get(projectPath: string, featureId: string): Promise<Feature | null> {
     try {
       const featureJsonPath = this.getFeatureJsonPath(projectPath, featureId);
-      const content = await fs.readFile(featureJsonPath, "utf-8");
+      const content = await fs.readFile(featureJsonPath, 'utf-8');
       return JSON.parse(content);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         return null;
       }
       console.error(
@@ -320,8 +331,8 @@ export class FeatureLoader {
 
     // Ensure feature has required fields
     const feature: Feature = {
-      category: featureData.category || "Uncategorized",
-      description: featureData.description || "",
+      category: featureData.category || 'Uncategorized',
+      description: featureData.description || '',
       ...featureData,
       id: featureId,
       imagePaths: migratedImagePaths,
@@ -331,7 +342,7 @@ export class FeatureLoader {
     await fs.writeFile(
       featureJsonPath,
       JSON.stringify(feature, null, 2),
-      "utf-8"
+      'utf-8'
     );
 
     console.log(`[FeatureLoader] Created feature ${featureId}`);
@@ -383,7 +394,7 @@ export class FeatureLoader {
     await fs.writeFile(
       featureJsonPath,
       JSON.stringify(updatedFeature, null, 2),
-      "utf-8"
+      'utf-8'
     );
 
     console.log(`[FeatureLoader] Updated feature ${featureId}`);
@@ -417,10 +428,10 @@ export class FeatureLoader {
   ): Promise<string | null> {
     try {
       const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
-      const content = await fs.readFile(agentOutputPath, "utf-8");
+      const content = await fs.readFile(agentOutputPath, 'utf-8');
       return content;
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         return null;
       }
       console.error(
@@ -443,7 +454,7 @@ export class FeatureLoader {
     await fs.mkdir(featureDir, { recursive: true });
 
     const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
-    await fs.writeFile(agentOutputPath, content, "utf-8");
+    await fs.writeFile(agentOutputPath, content, 'utf-8');
   }
 
   /**
@@ -457,7 +468,7 @@ export class FeatureLoader {
       const agentOutputPath = this.getAgentOutputPath(projectPath, featureId);
       await fs.unlink(agentOutputPath);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
         throw error;
       }
     }

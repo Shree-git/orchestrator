@@ -1,15 +1,14 @@
-
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { useSetupStore } from "@/store/setup-store";
-import { getElectronAPI } from "@/lib/electron";
+} from '@/components/ui/card';
+import { useSetupStore } from '@/store/setup-store';
+import { getElectronAPI } from '@/lib/electron';
 import {
   CheckCircle2,
   Loader2,
@@ -21,9 +20,9 @@ import {
   AlertTriangle,
   Github,
   XCircle,
-} from "lucide-react";
-import { toast } from "sonner";
-import { StatusBadge } from "../components";
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { StatusBadge } from '../components';
 
 interface GitHubSetupStepProps {
   onNext: () => void;
@@ -57,7 +56,7 @@ export function GitHubSetupStep({
         });
       }
     } catch (error) {
-      console.error("Failed to check gh status:", error);
+      console.error('Failed to check gh status:', error);
     } finally {
       setIsChecking(false);
     }
@@ -69,7 +68,7 @@ export function GitHubSetupStep({
 
   const copyCommand = (command: string) => {
     navigator.clipboard.writeText(command);
-    toast.success("Command copied to clipboard");
+    toast.success('Command copied to clipboard');
   };
 
   const isReady = ghCliStatus?.installed && ghCliStatus?.authenticated;
@@ -137,7 +136,7 @@ export function GitHubSetupStep({
                 disabled={isChecking}
               >
                 <RefreshCw
-                  className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
+                  className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`}
                 />
               </Button>
             </div>
@@ -145,9 +144,9 @@ export function GitHubSetupStep({
           <CardDescription>
             {ghCliStatus?.installed
               ? ghCliStatus.authenticated
-                ? `Logged in${ghCliStatus.user ? ` as ${ghCliStatus.user}` : ""}`
-                : "Installed but not logged in"
-              : "Not installed on your system"}
+                ? `Logged in${ghCliStatus.user ? ` as ${ghCliStatus.user}` : ''}`
+                : 'Installed but not logged in'
+              : 'Not installed on your system'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -190,7 +189,9 @@ export function GitHubSetupStep({
                 </p>
 
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">macOS (Homebrew)</p>
+                  <p className="text-xs text-muted-foreground">
+                    macOS (Homebrew)
+                  </p>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
                       brew install gh
@@ -198,7 +199,7 @@ export function GitHubSetupStep({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => copyCommand("brew install gh")}
+                      onClick={() => copyCommand('brew install gh')}
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -206,7 +207,9 @@ export function GitHubSetupStep({
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Windows (winget)</p>
+                  <p className="text-xs text-muted-foreground">
+                    Windows (winget)
+                  </p>
                   <div className="flex items-center gap-2">
                     <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
                       winget install GitHub.cli
@@ -214,7 +217,7 @@ export function GitHubSetupStep({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => copyCommand("winget install GitHub.cli")}
+                      onClick={() => copyCommand('winget install GitHub.cli')}
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -230,7 +233,7 @@ export function GitHubSetupStep({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => copyCommand("sudo apt install gh")}
+                      onClick={() => copyCommand('sudo apt install gh')}
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -251,39 +254,41 @@ export function GitHubSetupStep({
           )}
 
           {/* Installed but not authenticated */}
-          {ghCliStatus?.installed && !ghCliStatus?.authenticated && !isChecking && (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">
-                    GitHub CLI not logged in
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Run the login command to authenticate with GitHub.
-                  </p>
+          {ghCliStatus?.installed &&
+            !ghCliStatus?.authenticated &&
+            !isChecking && (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">
+                      GitHub CLI not logged in
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Run the login command to authenticate with GitHub.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2 p-4 rounded-lg bg-muted/30 border border-border">
-                <p className="text-sm text-muted-foreground">
-                  Run this command in your terminal:
-                </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
-                    gh auth login
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => copyCommand("gh auth login")}
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
+                <div className="space-y-2 p-4 rounded-lg bg-muted/30 border border-border">
+                  <p className="text-sm text-muted-foreground">
+                    Run this command in your terminal:
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
+                      gh auth login
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => copyCommand('gh auth login')}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Loading State */}
           {isChecking && (
@@ -315,14 +320,14 @@ export function GitHubSetupStep({
             onClick={onSkip}
             className="text-muted-foreground"
           >
-            {isReady ? "Skip" : "Skip for now"}
+            {isReady ? 'Skip' : 'Skip for now'}
           </Button>
           <Button
             onClick={onNext}
             className="bg-brand-500 hover:bg-brand-600 text-white"
             data-testid="github-next-button"
           >
-            {isReady ? "Continue" : "Continue without GitHub CLI"}
+            {isReady ? 'Continue' : 'Continue without GitHub CLI'}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

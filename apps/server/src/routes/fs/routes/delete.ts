@@ -2,10 +2,10 @@
  * POST /delete endpoint - Delete file
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import { validatePath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import { validatePath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createDeleteHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -13,7 +13,7 @@ export function createDeleteHandler() {
       const { filePath } = req.body as { filePath: string };
 
       if (!filePath) {
-        res.status(400).json({ success: false, error: "filePath is required" });
+        res.status(400).json({ success: false, error: 'filePath is required' });
         return;
       }
 
@@ -22,7 +22,7 @@ export function createDeleteHandler() {
 
       res.json({ success: true });
     } catch (error) {
-      logError(error, "Delete file failed");
+      logError(error, 'Delete file failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

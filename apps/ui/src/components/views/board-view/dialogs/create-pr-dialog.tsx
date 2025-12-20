@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,15 +6,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { GitPullRequest, Loader2, ExternalLink } from "lucide-react";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { GitPullRequest, Loader2, ExternalLink } from 'lucide-react';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
 
 interface WorktreeInfo {
   path: string;
@@ -40,10 +39,10 @@ export function CreatePRDialog({
   projectPath,
   onCreated,
 }: CreatePRDialogProps) {
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [baseBranch, setBaseBranch] = useState("main");
-  const [commitMessage, setCommitMessage] = useState("");
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [baseBranch, setBaseBranch] = useState('main');
+  const [commitMessage, setCommitMessage] = useState('');
   const [isDraft, setIsDraft] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,10 +56,10 @@ export function CreatePRDialog({
   useEffect(() => {
     if (open) {
       // Reset form fields
-      setTitle("");
-      setBody("");
-      setCommitMessage("");
-      setBaseBranch("main");
+      setTitle('');
+      setBody('');
+      setCommitMessage('');
+      setBaseBranch('main');
       setIsDraft(false);
       setError(null);
       // Also reset result states when opening for a new worktree
@@ -72,10 +71,10 @@ export function CreatePRDialog({
       operationCompletedRef.current = false;
     } else {
       // Reset everything when dialog closes
-      setTitle("");
-      setBody("");
-      setCommitMessage("");
-      setBaseBranch("main");
+      setTitle('');
+      setBody('');
+      setCommitMessage('');
+      setBaseBranch('main');
       setIsDraft(false);
       setError(null);
       setPrUrl(null);
@@ -94,7 +93,7 @@ export function CreatePRDialog({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.createPR) {
-        setError("Worktree API not available");
+        setError('Worktree API not available');
         return;
       }
       const result = await api.worktree.createPR(worktree.path, {
@@ -114,19 +113,19 @@ export function CreatePRDialog({
 
           // Show different message based on whether PR already existed
           if (result.result.prAlreadyExisted) {
-            toast.success("Pull request found!", {
+            toast.success('Pull request found!', {
               description: `PR already exists for ${result.result.branch}`,
               action: {
-                label: "View PR",
-                onClick: () => window.open(result.result!.prUrl!, "_blank"),
+                label: 'View PR',
+                onClick: () => window.open(result.result!.prUrl!, '_blank'),
               },
             });
           } else {
-            toast.success("Pull request created!", {
+            toast.success('Pull request created!', {
               description: `PR created from ${result.result.branch}`,
               action: {
-                label: "View PR",
-                onClick: () => window.open(result.result!.prUrl!, "_blank"),
+                label: 'View PR',
+                onClick: () => window.open(result.result!.prUrl!, '_blank'),
               },
             });
           }
@@ -140,12 +139,15 @@ export function CreatePRDialog({
           // Check if we should show browser fallback
           if (!result.result.prCreated && hasBrowserUrl) {
             // If gh CLI is not available, show browser fallback UI
-            if (prError === "gh_cli_not_available" || !result.result.ghCliAvailable) {
+            if (
+              prError === 'gh_cli_not_available' ||
+              !result.result.ghCliAvailable
+            ) {
               setBrowserUrl(result.result.browserUrl ?? null);
               setShowBrowserFallback(true);
               // Mark operation as completed - branch was pushed successfully
               operationCompletedRef.current = true;
-              toast.success("Branch pushed", {
+              toast.success('Branch pushed', {
                 description: result.result.committed
                   ? `Commit ${result.result.commitHash} pushed to ${result.result.branch}`
                   : `Branch ${result.result.branch} pushed`,
@@ -159,12 +161,17 @@ export function CreatePRDialog({
             if (prError) {
               // Parse common gh CLI errors for better messages
               let errorMessage = prError;
-              if (prError.includes("No commits between")) {
-                errorMessage = "No new commits to create PR. Make sure your branch has changes compared to the base branch.";
-              } else if (prError.includes("already exists")) {
-                errorMessage = "A pull request already exists for this branch.";
-              } else if (prError.includes("not logged in") || prError.includes("auth")) {
-                errorMessage = "GitHub CLI not authenticated. Run 'gh auth login' in terminal.";
+              if (prError.includes('No commits between')) {
+                errorMessage =
+                  'No new commits to create PR. Make sure your branch has changes compared to the base branch.';
+              } else if (prError.includes('already exists')) {
+                errorMessage = 'A pull request already exists for this branch.';
+              } else if (
+                prError.includes('not logged in') ||
+                prError.includes('auth')
+              ) {
+                errorMessage =
+                  "GitHub CLI not authenticated. Run 'gh auth login' in terminal.";
               }
 
               // Show error but also provide browser option
@@ -172,7 +179,7 @@ export function CreatePRDialog({
               setShowBrowserFallback(true);
               // Mark operation as completed - branch was pushed even though PR creation failed
               operationCompletedRef.current = true;
-              toast.error("PR creation failed", {
+              toast.error('PR creation failed', {
                 description: errorMessage,
                 duration: 8000,
               });
@@ -183,7 +190,7 @@ export function CreatePRDialog({
           }
 
           // Show success toast for push
-          toast.success("Branch pushed", {
+          toast.success('Branch pushed', {
             description: result.result.committed
               ? `Commit ${result.result.commitHash} pushed to ${result.result.branch}`
               : `Branch ${result.result.branch} pushed`,
@@ -192,8 +199,9 @@ export function CreatePRDialog({
           // No browser URL available, just close
           if (!result.result.prCreated) {
             if (!hasBrowserUrl) {
-              toast.info("PR not created", {
-                description: "Could not determine repository URL. GitHub CLI (gh) may not be installed or authenticated.",
+              toast.info('PR not created', {
+                description:
+                  'Could not determine repository URL. GitHub CLI (gh) may not be installed or authenticated.',
                 duration: 8000,
               });
             }
@@ -202,10 +210,10 @@ export function CreatePRDialog({
           onOpenChange(false);
         }
       } else {
-        setError(result.error || "Failed to create pull request");
+        setError(result.error || 'Failed to create pull request');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create PR");
+      setError(err instanceof Error ? err.message : 'Failed to create PR');
     } finally {
       setIsLoading(false);
     }
@@ -235,7 +243,7 @@ export function CreatePRDialog({
             Create Pull Request
           </DialogTitle>
           <DialogDescription>
-            Push changes and create a pull request from{" "}
+            Push changes and create a pull request from{' '}
             <code className="font-mono bg-muted px-1 rounded">
               {worktree.branch}
             </code>
@@ -255,7 +263,7 @@ export function CreatePRDialog({
             </div>
             <div className="flex gap-2 justify-center">
               <Button
-                onClick={() => window.open(prUrl, "_blank")}
+                onClick={() => window.open(prUrl, '_blank')}
                 className="gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -283,7 +291,7 @@ export function CreatePRDialog({
               <Button
                 onClick={() => {
                   if (browserUrl) {
-                    window.open(browserUrl, "_blank");
+                    window.open(browserUrl, '_blank');
                   }
                 }}
                 className="gap-2 w-full"
@@ -296,7 +304,9 @@ export function CreatePRDialog({
                 {browserUrl}
               </div>
               <p className="text-xs text-muted-foreground">
-                Tip: Install the GitHub CLI (<code className="bg-muted px-1 rounded">gh</code>) to create PRs directly from the app
+                Tip: Install the GitHub CLI (
+                <code className="bg-muted px-1 rounded">gh</code>) to create PRs
+                directly from the app
               </p>
               <DialogFooter className="mt-4">
                 <Button variant="outline" onClick={handleClose}>
@@ -311,7 +321,7 @@ export function CreatePRDialog({
               {worktree.hasChanges && (
                 <div className="grid gap-2">
                   <Label htmlFor="commit-message">
-                    Commit Message{" "}
+                    Commit Message{' '}
                     <span className="text-muted-foreground">(optional)</span>
                   </Label>
                   <Input
@@ -365,7 +375,9 @@ export function CreatePRDialog({
                     <Checkbox
                       id="draft"
                       checked={isDraft}
-                      onCheckedChange={(checked) => setIsDraft(checked === true)}
+                      onCheckedChange={(checked) =>
+                        setIsDraft(checked === true)
+                      }
                     />
                     <Label htmlFor="draft" className="cursor-pointer">
                       Create as draft
@@ -374,13 +386,15 @@ export function CreatePRDialog({
                 </div>
               </div>
 
-              {error && (
-                <p className="text-sm text-destructive">{error}</p>
-              )}
+              {error && <p className="text-sm text-destructive">{error}</p>}
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={handleClose} disabled={isLoading}>
+              <Button
+                variant="ghost"
+                onClick={handleClose}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
               <Button onClick={handleCreate} disabled={isLoading}>

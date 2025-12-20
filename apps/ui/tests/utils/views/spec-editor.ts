@@ -1,6 +1,6 @@
-import { Page, Locator } from "@playwright/test";
-import { clickElement } from "../core/interactions";
-import { navigateToSpec } from "../navigation/views";
+import { Page, Locator } from '@playwright/test';
+import { clickElement } from '../core/interactions';
+import { navigateToSpec } from '../navigation/views';
 
 /**
  * Get the spec editor element
@@ -32,14 +32,14 @@ export async function setSpecEditorContent(
  * Click the save spec button
  */
 export async function clickSaveSpec(page: Page): Promise<void> {
-  await clickElement(page, "save-spec");
+  await clickElement(page, 'save-spec');
 }
 
 /**
  * Click the reload spec button
  */
 export async function clickReloadSpec(page: Page): Promise<void> {
-  await clickElement(page, "reload-spec");
+  await clickElement(page, 'reload-spec');
 }
 
 /**
@@ -47,7 +47,7 @@ export async function clickReloadSpec(page: Page): Promise<void> {
  */
 export async function getDisplayedSpecPath(page: Page): Promise<string | null> {
   const specView = page.locator('[data-testid="spec-view"]');
-  const pathElement = specView.locator("p.text-muted-foreground").first();
+  const pathElement = specView.locator('p.text-muted-foreground').first();
   return await pathElement.textContent();
 }
 
@@ -65,18 +65,23 @@ export async function navigateToSpecEditor(page: Page): Promise<void> {
 export async function getEditorContent(page: Page): Promise<string> {
   // CodeMirror uses a contenteditable div with class .cm-content
   // Wait for it to be visible and then read its textContent
-  const contentElement = page.locator('[data-testid="spec-editor"] .cm-content');
-  await contentElement.waitFor({ state: "visible", timeout: 10000 });
-  
+  const contentElement = page.locator(
+    '[data-testid="spec-editor"] .cm-content'
+  );
+  await contentElement.waitFor({ state: 'visible', timeout: 10000 });
+
   // Read the content - CodeMirror should have updated its DOM by now
   const content = await contentElement.textContent();
-  return content || "";
+  return content || '';
 }
 
 /**
  * Set the CodeMirror editor content by selecting all and typing
  */
-export async function setEditorContent(page: Page, content: string): Promise<void> {
+export async function setEditorContent(
+  page: Page,
+  content: string
+): Promise<void> {
   // Click on the editor to focus it
   const editor = page.locator('[data-testid="spec-editor"] .cm-content');
   await editor.click();
@@ -85,14 +90,14 @@ export async function setEditorContent(page: Page, content: string): Promise<voi
   await page.waitForTimeout(200);
 
   // Select all content (Cmd+A on Mac, Ctrl+A on others)
-  const isMac = process.platform === "darwin";
-  await page.keyboard.press(isMac ? "Meta+a" : "Control+a");
+  const isMac = process.platform === 'darwin';
+  await page.keyboard.press(isMac ? 'Meta+a' : 'Control+a');
 
   // Wait for selection
   await page.waitForTimeout(100);
 
   // Delete the selected content first
-  await page.keyboard.press("Backspace");
+  await page.keyboard.press('Backspace');
 
   // Wait for deletion
   await page.waitForTimeout(100);
@@ -115,7 +120,7 @@ export async function clickSaveButton(page: Page): Promise<void> {
   await page.waitForFunction(
     () => {
       const btn = document.querySelector('[data-testid="save-spec"]');
-      return btn?.textContent?.includes("Saved");
+      return btn?.textContent?.includes('Saved');
     },
     { timeout: 5000 }
   );

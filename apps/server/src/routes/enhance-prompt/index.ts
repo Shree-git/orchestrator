@@ -5,8 +5,8 @@
  * with different enhancement modes (improve, expand, simplify, etc.)
  */
 
-import { Router } from "express";
-import { createEnhanceHandler } from "./routes/enhance.js";
+import { Router } from 'express';
+import { createEnhanceHandler } from './routes/enhance.js';
 
 /**
  * Create the enhance-prompt router
@@ -16,7 +16,7 @@ import { createEnhanceHandler } from "./routes/enhance.js";
 export function createEnhancePromptRoutes(): Router {
   const router = Router();
 
-  router.post("/", createEnhanceHandler());
+  router.post('/', createEnhanceHandler());
 
   return router;
 }

@@ -11,7 +11,7 @@ const path = require('path');
 
 const execAsync = promisify(exec);
 
-exports.default = async function(context) {
+exports.default = async function (context) {
   const { appOutDir, electronPlatformName, arch, packager } = context;
   const electronVersion = packager.config.electronVersion;
 
@@ -19,7 +19,9 @@ exports.default = async function(context) {
   const archNames = ['ia32', 'x64', 'armv7l', 'arm64', 'universal'];
   const archStr = typeof arch === 'number' ? archNames[arch] : arch;
 
-  console.log(`\n🔨 Rebuilding server native modules for ${electronPlatformName}-${archStr}...`);
+  console.log(
+    `\n🔨 Rebuilding server native modules for ${electronPlatformName}-${archStr}...`
+  );
 
   // Path to server node_modules in the packaged app
   let serverNodeModulesPath;
@@ -58,7 +60,9 @@ exports.default = async function(context) {
     if (stdout) console.log(stdout);
     if (stderr) console.error(stderr);
 
-    console.log(`✅ Server native modules rebuilt successfully for ${archStr}\n`);
+    console.log(
+      `✅ Server native modules rebuilt successfully for ${archStr}\n`
+    );
   } catch (error) {
     console.error(`❌ Failed to rebuild server native modules:`, error.message);
     // Don't fail the build, just warn

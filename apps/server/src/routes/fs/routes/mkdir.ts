@@ -3,11 +3,11 @@
  * Handles symlinks safely to avoid ELOOP errors
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import path from "path";
-import { addAllowedPath } from "../../../lib/security.js";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { addAllowedPath } from '../../../lib/security.js';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createMkdirHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -15,7 +15,7 @@ export function createMkdirHandler() {
       const { dirPath } = req.body as { dirPath: string };
 
       if (!dirPath) {
-        res.status(400).json({ success: false, error: "dirPath is required" });
+        res.status(400).json({ success: false, error: 'dirPath is required' });
         return;
       }
 
@@ -33,12 +33,12 @@ export function createMkdirHandler() {
         // It's a file - can't create directory
         res.status(400).json({
           success: false,
-          error: "Path exists and is not a directory",
+          error: 'Path exists and is not a directory',
         });
         return;
       } catch (statError: any) {
         // ENOENT means path doesn't exist - we should create it
-        if (statError.code !== "ENOENT") {
+        if (statError.code !== 'ENOENT') {
           // Some other error (could be ELOOP in parent path)
           throw statError;
         }
@@ -53,15 +53,15 @@ export function createMkdirHandler() {
       res.json({ success: true });
     } catch (error: any) {
       // Handle ELOOP specifically
-      if (error.code === "ELOOP") {
-        logError(error, "Create directory failed - symlink loop detected");
+      if (error.code === 'ELOOP') {
+        logError(error, 'Create directory failed - symlink loop detected');
         res.status(400).json({
           success: false,
-          error: "Cannot create directory: symlink loop detected in path",
+          error: 'Cannot create directory: symlink loop detected in path',
         });
         return;
       }
-      logError(error, "Create directory failed");
+      logError(error, 'Create directory failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

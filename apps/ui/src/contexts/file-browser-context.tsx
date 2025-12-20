@@ -1,12 +1,11 @@
-
 import {
   createContext,
   useContext,
   useState,
   useCallback,
   type ReactNode,
-} from "react";
-import { FileBrowserDialog } from "@/components/dialogs/file-browser-dialog";
+} from 'react';
+import { FileBrowserDialog } from '@/components/dialogs/file-browser-dialog';
 
 interface FileBrowserOptions {
   title?: string;
@@ -82,7 +81,7 @@ export function FileBrowserProvider({ children }: { children: ReactNode }) {
 export function useFileBrowser() {
   const context = useContext(FileBrowserContext);
   if (!context) {
-    throw new Error("useFileBrowser must be used within FileBrowserProvider");
+    throw new Error('useFileBrowser must be used within FileBrowserProvider');
   }
   return context;
 }

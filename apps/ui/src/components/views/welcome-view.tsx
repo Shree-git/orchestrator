@@ -1,6 +1,5 @@
-
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,10 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useAppStore, type ThemeMode } from "@/store/app-store";
-import { getElectronAPI, type Project } from "@/lib/electron";
-import { initializeProject } from "@/lib/project-init";
+} from '@/components/ui/dialog';
+import { useAppStore, type ThemeMode } from '@/store/app-store';
+import { getElectronAPI, type Project } from '@/lib/electron';
+import { initializeProject } from '@/lib/project-init';
 import {
   FolderOpen,
   Plus,
@@ -21,19 +20,19 @@ import {
   MessageSquare,
   ChevronDown,
   Loader2,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
-import { WorkspacePickerModal } from "@/components/workspace-picker-modal";
-import { NewProjectModal } from "@/components/new-project-modal";
-import { getHttpApiClient } from "@/lib/http-api-client";
-import type { StarterTemplate } from "@/lib/templates";
-import { useNavigate } from "@tanstack/react-router";
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
+import { WorkspacePickerModal } from '@/components/workspace-picker-modal';
+import { NewProjectModal } from '@/components/new-project-modal';
+import { getHttpApiClient } from '@/lib/http-api-client';
+import type { StarterTemplate } from '@/lib/templates';
+import { useNavigate } from '@tanstack/react-router';
 
 export function WelcomeView() {
   const {
@@ -66,24 +65,24 @@ export function WelcomeView() {
     const api = getElectronAPI();
 
     if (!api.autoMode?.analyzeProject) {
-      console.log("[Welcome] Auto mode API not available, skipping analysis");
+      console.log('[Welcome] Auto mode API not available, skipping analysis');
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      console.log("[Welcome] Starting project analysis for:", projectPath);
+      console.log('[Welcome] Starting project analysis for:', projectPath);
       const result = await api.autoMode.analyzeProject(projectPath);
 
       if (result.success) {
-        toast.success("Project analyzed", {
-          description: "AI agent has analyzed your project structure",
+        toast.success('Project analyzed', {
+          description: 'AI agent has analyzed your project structure',
         });
       } else {
-        console.error("[Welcome] Project analysis failed:", result.error);
+        console.error('[Welcome] Project analysis failed:', result.error);
       }
     } catch (error) {
-      console.error("[Welcome] Failed to analyze project:", error);
+      console.error('[Welcome] Failed to analyze project:', error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -100,8 +99,8 @@ export function WelcomeView() {
         const initResult = await initializeProject(path);
 
         if (!initResult.success) {
-          toast.error("Failed to initialize project", {
-            description: initResult.error || "Unknown error occurred",
+          toast.error('Failed to initialize project', {
+            description: initResult.error || 'Unknown error occurred',
           });
           return;
         }
@@ -127,25 +126,25 @@ export function WelcomeView() {
 
           // Kick off agent to analyze the project and update app_spec.txt
           console.log(
-            "[Welcome] Project initialized, created files:",
+            '[Welcome] Project initialized, created files:',
             initResult.createdFiles
           );
-          console.log("[Welcome] Kicking off project analysis agent...");
+          console.log('[Welcome] Kicking off project analysis agent...');
 
           // Start analysis in background (don't await, let it run async)
           analyzeProject(path);
         } else {
-          toast.success("Project opened", {
+          toast.success('Project opened', {
             description: `Opened ${name}`,
           });
         }
 
         // Navigate to the board view
-        navigate({ to: "/board" });
+        navigate({ to: '/board' });
       } catch (error) {
-        console.error("[Welcome] Failed to open project:", error);
-        toast.error("Failed to open project", {
-          description: error instanceof Error ? error.message : "Unknown error",
+        console.error('[Welcome] Failed to open project:', error);
+        toast.error('Failed to open project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
         });
       } finally {
         setIsOpening(false);
@@ -179,12 +178,12 @@ export function WelcomeView() {
           const path = result.filePaths[0];
           // Extract folder name from path (works on both Windows and Mac/Linux)
           const name =
-            path.split(/[/\\]/).filter(Boolean).pop() || "Untitled Project";
+            path.split(/[/\\]/).filter(Boolean).pop() || 'Untitled Project';
           await initializeAndOpenProject(path, name);
         }
       }
     } catch (error) {
-      console.error("[Welcome] Failed to check workspace config:", error);
+      console.error('[Welcome] Failed to check workspace config:', error);
       // Fall back to current behavior on error
       const api = getElectronAPI();
       const result = await api.openDirectory();
@@ -192,7 +191,7 @@ export function WelcomeView() {
       if (!result.canceled && result.filePaths[0]) {
         const path = result.filePaths[0];
         const name =
-          path.split(/[/\\]/).filter(Boolean).pop() || "Untitled Project";
+          path.split(/[/\\]/).filter(Boolean).pop() || 'Untitled Project';
         await initializeAndOpenProject(path, name);
       }
     }
@@ -224,7 +223,7 @@ export function WelcomeView() {
   };
 
   const handleInteractiveMode = () => {
-    navigate({ to: "/interview" });
+    navigate({ to: '/interview' });
   };
 
   /**
@@ -242,8 +241,8 @@ export function WelcomeView() {
       // Create project directory
       const mkdirResult = await api.mkdir(projectPath);
       if (!mkdirResult.success) {
-        toast.error("Failed to create project directory", {
-          description: mkdirResult.error || "Unknown error occurred",
+        toast.error('Failed to create project directory', {
+          description: mkdirResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -252,8 +251,8 @@ export function WelcomeView() {
       const initResult = await initializeProject(projectPath);
 
       if (!initResult.success) {
-        toast.error("Failed to initialize project", {
-          description: initResult.error || "Unknown error occurred",
+        toast.error('Failed to initialize project', {
+          description: initResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -295,7 +294,7 @@ export function WelcomeView() {
       setCurrentProject(project);
       setShowNewProjectModal(false);
 
-      toast.success("Project created", {
+      toast.success('Project created', {
         description: `Created ${projectName} with .automaker directory`,
       });
 
@@ -308,9 +307,9 @@ export function WelcomeView() {
       });
       setShowInitDialog(true);
     } catch (error) {
-      console.error("Failed to create project:", error);
-      toast.error("Failed to create project", {
-        description: error instanceof Error ? error.message : "Unknown error",
+      console.error('Failed to create project:', error);
+      toast.error('Failed to create project', {
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsCreating(false);
@@ -338,8 +337,8 @@ export function WelcomeView() {
       );
 
       if (!cloneResult.success || !cloneResult.projectPath) {
-        toast.error("Failed to clone template", {
-          description: cloneResult.error || "Unknown error occurred",
+        toast.error('Failed to clone template', {
+          description: cloneResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -350,8 +349,8 @@ export function WelcomeView() {
       const initResult = await initializeProject(projectPath);
 
       if (!initResult.success) {
-        toast.error("Failed to initialize project", {
-          description: initResult.error || "Unknown error occurred",
+        toast.error('Failed to initialize project', {
+          description: initResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -371,13 +370,13 @@ export function WelcomeView() {
   <technology_stack>
     ${template.techStack
       .map((tech) => `<technology>${tech}</technology>`)
-      .join("\n    ")}
+      .join('\n    ')}
   </technology_stack>
 
   <core_capabilities>
     ${template.features
       .map((feature) => `<capability>${feature}</capability>`)
-      .join("\n    ")}
+      .join('\n    ')}
   </core_capabilities>
 
   <implemented_features>
@@ -397,7 +396,7 @@ export function WelcomeView() {
       setCurrentProject(project);
       setShowNewProjectModal(false);
 
-      toast.success("Project created from template", {
+      toast.success('Project created from template', {
         description: `Created ${projectName} from ${template.name}`,
       });
 
@@ -413,9 +412,9 @@ export function WelcomeView() {
       // Kick off project analysis
       analyzeProject(projectPath);
     } catch (error) {
-      console.error("Failed to create project from template:", error);
-      toast.error("Failed to create project", {
-        description: error instanceof Error ? error.message : "Unknown error",
+      console.error('Failed to create project from template:', error);
+      toast.error('Failed to create project', {
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsCreating(false);
@@ -443,8 +442,8 @@ export function WelcomeView() {
       );
 
       if (!cloneResult.success || !cloneResult.projectPath) {
-        toast.error("Failed to clone repository", {
-          description: cloneResult.error || "Unknown error occurred",
+        toast.error('Failed to clone repository', {
+          description: cloneResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -455,8 +454,8 @@ export function WelcomeView() {
       const initResult = await initializeProject(projectPath);
 
       if (!initResult.success) {
-        toast.error("Failed to initialize project", {
-          description: initResult.error || "Unknown error occurred",
+        toast.error('Failed to initialize project', {
+          description: initResult.error || 'Unknown error occurred',
         });
         return;
       }
@@ -498,7 +497,7 @@ export function WelcomeView() {
       setCurrentProject(project);
       setShowNewProjectModal(false);
 
-      toast.success("Project created from repository", {
+      toast.success('Project created from repository', {
         description: `Created ${projectName} from ${repoUrl}`,
       });
 
@@ -514,9 +513,9 @@ export function WelcomeView() {
       // Kick off project analysis
       analyzeProject(projectPath);
     } catch (error) {
-      console.error("Failed to create project from custom URL:", error);
-      toast.error("Failed to create project", {
-        description: error instanceof Error ? error.message : "Unknown error",
+      console.error('Failed to create project from custom URL:', error);
+      toast.error('Failed to create project', {
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
     } finally {
       setIsCreating(false);
@@ -730,8 +729,8 @@ export function WelcomeView() {
                 <Sparkles className="w-4 h-4 text-brand-500" />
               </div>
               {initStatus?.isNewProject
-                ? "Project Initialized"
-                : "Project Updated"}
+                ? 'Project Initialized'
+                : 'Project Updated'}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-1">
               {initStatus?.isNewProject
@@ -770,10 +769,11 @@ export function WelcomeView() {
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    <span className="text-brand-500 font-medium">Tip:</span> Edit the{" "}
+                    <span className="text-brand-500 font-medium">Tip:</span>{' '}
+                    Edit the{' '}
                     <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">
                       app_spec.txt
-                    </code>{" "}
+                    </code>{' '}
                     file to describe your project. The AI agent will use this to
                     understand your project structure.
                   </p>

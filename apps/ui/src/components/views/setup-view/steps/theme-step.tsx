@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
-import { themeOptions } from "@/config/theme-options";
-import { useAppStore } from "@/store/app-store";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { themeOptions } from '@/config/theme-options';
+import { useAppStore } from '@/store/app-store';
+import { cn } from '@/lib/utils';
 
 interface ThemeStepProps {
   onNext: () => void;
@@ -49,11 +49,11 @@ export function ThemeStep({ onNext, onBack }: ThemeStepProps) {
               onMouseLeave={handleThemeLeave}
               onClick={() => handleThemeClick(option.value)}
               className={cn(
-                "relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all duration-200",
-                "hover:scale-105 hover:shadow-lg",
+                'relative flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all duration-200',
+                'hover:scale-105 hover:shadow-lg',
                 isSelected
-                  ? "border-brand-500 bg-brand-500/10"
-                  : "border-border hover:border-brand-400 bg-card"
+                  ? 'border-brand-500 bg-brand-500/10'
+                  : 'border-border hover:border-brand-400 bg-card'
               )}
             >
               {isSelected && (

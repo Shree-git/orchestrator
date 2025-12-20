@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Settings2, Keyboard } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { Settings2, Keyboard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface KeyboardShortcutsSectionProps {
   onOpenKeyboardMap: () => void;
@@ -12,10 +12,10 @@ export function KeyboardShortcutsSection({
   return (
     <div
       className={cn(
-        "rounded-2xl overflow-hidden",
-        "border border-border/50",
-        "bg-gradient-to-br from-card/90 via-card/70 to-card/80 backdrop-blur-xl",
-        "shadow-sm shadow-black/5"
+        'rounded-2xl overflow-hidden',
+        'border border-border/50',
+        'bg-gradient-to-br from-card/90 via-card/70 to-card/80 backdrop-blur-xl',
+        'shadow-sm shadow-black/5'
       )}
     >
       <div className="p-6 border-b border-border/50 bg-gradient-to-r from-transparent via-accent/5 to-transparent">
@@ -46,8 +46,9 @@ export function KeyboardShortcutsSection({
               Use the Visual Keyboard Map
             </h3>
             <p className="text-sm text-muted-foreground/80">
-              Click the button below to customize your keyboard shortcuts. The visual
-              interface shows all available keys and lets you easily edit shortcuts.
+              Click the button below to customize your keyboard shortcuts. The
+              visual interface shows all available keys and lets you easily edit
+              shortcuts.
             </p>
           </div>
           <Button
@@ -55,13 +56,13 @@ export function KeyboardShortcutsSection({
             size="lg"
             onClick={onOpenKeyboardMap}
             className={cn(
-              "gap-2.5 mt-2 h-11 px-6",
-              "bg-gradient-to-r from-brand-500 to-brand-600",
-              "hover:from-brand-600 hover:to-brand-600",
-              "text-white font-medium border-0",
-              "shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/25",
-              "transition-all duration-200 ease-out",
-              "hover:scale-[1.02] active:scale-[0.98]"
+              'gap-2.5 mt-2 h-11 px-6',
+              'bg-gradient-to-r from-brand-500 to-brand-600',
+              'hover:from-brand-600 hover:to-brand-600',
+              'text-white font-medium border-0',
+              'shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/25',
+              'transition-all duration-200 ease-out',
+              'hover:scale-[1.02] active:scale-[0.98]'
             )}
           >
             <Keyboard className="w-5 h-5" />

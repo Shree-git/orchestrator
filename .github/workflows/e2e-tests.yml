@@ -3,7 +3,7 @@ name: E2E Tests
 on:
   pull_request:
     branches:
-      - "*"
+      - '*'
   push:
     branches:
       - main
@@ -21,8 +21,8 @@ jobs:
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
-          check-lockfile: "true"
-          rebuild-node-pty-path: "apps/server"
+          check-lockfile: 'true'
+          rebuild-node-pty-path: 'apps/server'
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -58,7 +58,7 @@ jobs:
         env:
           CI: true
           VITE_SERVER_URL: http://localhost:3008
-          VITE_SKIP_SETUP: "true"
+          VITE_SKIP_SETUP: 'true'
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

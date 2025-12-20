@@ -10,17 +10,17 @@
  * Claude model aliases for convenience
  */
 export const CLAUDE_MODEL_MAP: Record<string, string> = {
-  haiku: "claude-haiku-4-5",
-  sonnet: "claude-sonnet-4-20250514",
-  opus: "claude-opus-4-5-20251101",
+  haiku: 'claude-haiku-4-5',
+  sonnet: 'claude-sonnet-4-20250514',
+  opus: 'claude-opus-4-5-20251101',
 } as const;
 
 /**
  * Default models per use case
  */
 export const DEFAULT_MODELS = {
-  chat: "claude-opus-4-5-20251101",
-  default: "claude-opus-4-5-20251101",
+  chat: 'claude-opus-4-5-20251101',
+  default: 'claude-opus-4-5-20251101',
 } as const;
 
 /**
@@ -35,7 +35,7 @@ export function resolveModelString(
   }
 
   // Full Claude model string - pass through
-  if (modelKey.includes("claude-")) {
+  if (modelKey.includes('claude-')) {
     return modelKey;
   }
 
@@ -77,18 +77,17 @@ export function getChatModel(explicitModel?: string): string {
  * Default allowed tools for chat interactions
  */
 export const CHAT_TOOLS = [
-  "Read",
-  "Write",
-  "Edit",
-  "Glob",
-  "Grep",
-  "Bash",
-  "WebSearch",
-  "WebFetch",
+  'Read',
+  'Write',
+  'Edit',
+  'Glob',
+  'Grep',
+  'Bash',
+  'WebSearch',
+  'WebFetch',
 ] as const;
 
 /**
  * Default max turns for chat
  */
 export const CHAT_MAX_TURNS = 1000;
-

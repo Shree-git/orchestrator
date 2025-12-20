@@ -4,12 +4,12 @@
  * Uses Claude Haiku to generate a short, descriptive title from feature description.
  */
 
-import type { Request, Response } from "express";
-import { query } from "@anthropic-ai/claude-agent-sdk";
-import { createLogger } from "../../../lib/logger.js";
-import { CLAUDE_MODEL_MAP } from "../../../lib/model-resolver.js";
+import type { Request, Response } from 'express';
+import { query } from '@anthropic-ai/claude-agent-sdk';
+import { createLogger } from '../../../lib/logger.js';
+import { CLAUDE_MODEL_MAP } from '../../../lib/model-resolver.js';
 
-const logger = createLogger("GenerateTitle");
+const logger = createLogger('GenerateTitle');
 
 interface GenerateTitleRequestBody {
   description: string;
@@ -44,16 +44,16 @@ async function extractTextFromStream(
     };
   }>
 ): Promise<string> {
-  let responseText = "";
+  let responseText = '';
 
   for await (const msg of stream) {
-    if (msg.type === "assistant" && msg.message?.content) {
+    if (msg.type === 'assistant' && msg.message?.content) {
       for (const block of msg.message.content) {
-        if (block.type === "text" && block.text) {
+        if (block.type === 'text' && block.text) {
           responseText += block.text;
         }
       }
-    } else if (msg.type === "result" && msg.subtype === "success") {
+    } else if (msg.type === 'result' && msg.subtype === 'success') {
       responseText = msg.result || responseText;
     }
   }
@@ -69,10 +69,10 @@ export function createGenerateTitleHandler(): (
     try {
       const { description } = req.body as GenerateTitleRequestBody;
 
-      if (!description || typeof description !== "string") {
+      if (!description || typeof description !== 'string') {
         const response: GenerateTitleErrorResponse = {
           success: false,
-          error: "description is required and must be a string",
+          error: 'description is required and must be a string',
         };
         res.status(400).json(response);
         return;
@@ -82,13 +82,15 @@ export function createGenerateTitleHandler(): (
       if (trimmedDescription.length === 0) {
         const response: GenerateTitleErrorResponse = {
           success: false,
-          error: "description cannot be empty",
+          error: 'description cannot be empty',
         };
         res.status(400).json(response);
         return;
       }
 
-      logger.info(`Generating title for description: ${trimmedDescription.substring(0, 50)}...`);
+      logger.info(
+        `Generating title for description: ${trimmedDescription.substring(0, 50)}...`
+      );
 
       const userPrompt = `Generate a concise title for this feature:\n\n${trimmedDescription}`;
 
@@ -99,17 +101,17 @@ export function createGenerateTitleHandler(): (
           systemPrompt: SYSTEM_PROMPT,
           maxTurns: 1,
           allowedTools: [],
-          permissionMode: "acceptEdits",
+          permissionMode: 'acceptEdits',
         },
       });
 
       const title = await extractTextFromStream(stream);
 
       if (!title || title.trim().length === 0) {
-        logger.warn("Received empty response from Claude");
+        logger.warn('Received empty response from Claude');
         const response: GenerateTitleErrorResponse = {
           success: false,
-          error: "Failed to generate title - empty response",
+          error: 'Failed to generate title - empty response',
         };
         res.status(500).json(response);
         return;
@@ -124,8 +126,8 @@ export function createGenerateTitleHandler(): (
       res.json(response);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      logger.error("Title generation failed:", errorMessage);
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      logger.error('Title generation failed:', errorMessage);
 
       const response: GenerateTitleErrorResponse = {
         success: false,

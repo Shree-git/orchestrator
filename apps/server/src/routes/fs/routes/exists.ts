@@ -2,10 +2,10 @@
  * POST /exists endpoint - Check if file/directory exists
  */
 
-import type { Request, Response } from "express";
-import fs from "fs/promises";
-import path from "path";
-import { getErrorMessage, logError } from "../common.js";
+import type { Request, Response } from 'express';
+import fs from 'fs/promises';
+import path from 'path';
+import { getErrorMessage, logError } from '../common.js';
 
 export function createExistsHandler() {
   return async (req: Request, res: Response): Promise<void> => {
@@ -13,7 +13,7 @@ export function createExistsHandler() {
       const { filePath } = req.body as { filePath: string };
 
       if (!filePath) {
-        res.status(400).json({ success: false, error: "filePath is required" });
+        res.status(400).json({ success: false, error: 'filePath is required' });
         return;
       }
 
@@ -28,7 +28,7 @@ export function createExistsHandler() {
         res.json({ success: true, exists: false });
       }
     } catch (error) {
-      logError(error, "Check exists failed");
+      logError(error, 'Check exists failed');
       res.status(500).json({ success: false, error: getErrorMessage(error) });
     }
   };

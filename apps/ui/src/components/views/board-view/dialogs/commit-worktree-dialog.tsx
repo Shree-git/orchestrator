@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { GitCommit, Loader2 } from "lucide-react";
-import { getElectronAPI } from "@/lib/electron";
-import { toast } from "sonner";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { GitCommit, Loader2 } from 'lucide-react';
+import { getElectronAPI } from '@/lib/electron';
+import { toast } from 'sonner';
 
 interface WorktreeInfo {
   path: string;
@@ -36,7 +35,7 @@ export function CommitWorktreeDialog({
   worktree,
   onCommitted,
 }: CommitWorktreeDialogProps) {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,36 +48,36 @@ export function CommitWorktreeDialog({
     try {
       const api = getElectronAPI();
       if (!api?.worktree?.commit) {
-        setError("Worktree API not available");
+        setError('Worktree API not available');
         return;
       }
       const result = await api.worktree.commit(worktree.path, message);
 
       if (result.success && result.result) {
         if (result.result.committed) {
-          toast.success("Changes committed", {
+          toast.success('Changes committed', {
             description: `Commit ${result.result.commitHash} on ${result.result.branch}`,
           });
           onCommitted();
           onOpenChange(false);
-          setMessage("");
+          setMessage('');
         } else {
-          toast.info("No changes to commit", {
+          toast.info('No changes to commit', {
             description: result.result.message,
           });
         }
       } else {
-        setError(result.error || "Failed to commit changes");
+        setError(result.error || 'Failed to commit changes');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to commit");
+      setError(err instanceof Error ? err.message : 'Failed to commit');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && e.metaKey && !isLoading && message.trim()) {
+    if (e.key === 'Enter' && e.metaKey && !isLoading && message.trim()) {
       handleCommit();
     }
   };
@@ -94,15 +93,15 @@ export function CommitWorktreeDialog({
             Commit Changes
           </DialogTitle>
           <DialogDescription>
-            Commit changes in the{" "}
+            Commit changes in the{' '}
             <code className="font-mono bg-muted px-1 rounded">
               {worktree.branch}
-            </code>{" "}
+            </code>{' '}
             worktree.
             {worktree.changedFilesCount && (
               <span className="ml-1">
                 ({worktree.changedFilesCount} file
-                {worktree.changedFilesCount > 1 ? "s" : ""} changed)
+                {worktree.changedFilesCount > 1 ? 's' : ''} changed)
               </span>
             )}
           </DialogDescription>
@@ -127,7 +126,11 @@ export function CommitWorktreeDialog({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Cmd+Enter</kbd> to commit
+            Press{' '}
+            <kbd className="px-1 py-0.5 bg-muted rounded text-xs">
+              Cmd+Enter
+            </kbd>{' '}
+            to commit
           </p>
         </div>
 

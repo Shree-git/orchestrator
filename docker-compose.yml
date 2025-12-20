@@ -9,7 +9,7 @@ services:
     container_name: automaker-server
     restart: unless-stopped
     ports:
-      - "3008:3008"
+      - '3008:3008'
     environment:
       # Required
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

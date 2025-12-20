@@ -5,7 +5,9 @@
 /**
  * Collect all values from an async generator
  */
-export async function collectAsyncGenerator<T>(gen: AsyncGenerator<T>): Promise<T[]> {
+export async function collectAsyncGenerator<T>(
+  gen: AsyncGenerator<T>
+): Promise<T[]> {
   const results: T[] = [];
   for await (const item of gen) {
     results.push(item);
@@ -24,7 +26,7 @@ export async function waitFor(
   const start = Date.now();
   while (!condition()) {
     if (Date.now() - start > timeout) {
-      throw new Error("Timeout waiting for condition");
+      throw new Error('Timeout waiting for condition');
     }
     await new Promise((resolve) => setTimeout(resolve, interval));
   }

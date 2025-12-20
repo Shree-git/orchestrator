@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,13 +6,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { HotkeyButton } from "@/components/ui/hotkey-button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { HotkeyButton } from '@/components/ui/hotkey-button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import {
   FolderPlus,
   FolderOpen,
@@ -23,14 +22,14 @@ import {
   Loader2,
   Link,
   Folder,
-} from "lucide-react";
-import { starterTemplates, type StarterTemplate } from "@/lib/templates";
-import { getElectronAPI } from "@/lib/electron";
-import { getHttpApiClient } from "@/lib/http-api-client";
-import { cn } from "@/lib/utils";
-import { useFileBrowser } from "@/contexts/file-browser-context";
+} from 'lucide-react';
+import { starterTemplates, type StarterTemplate } from '@/lib/templates';
+import { getElectronAPI } from '@/lib/electron';
+import { getHttpApiClient } from '@/lib/http-api-client';
+import { cn } from '@/lib/utils';
+import { useFileBrowser } from '@/contexts/file-browser-context';
 
-const LAST_PROJECT_DIR_KEY = "automaker:lastProjectDir";
+const LAST_PROJECT_DIR_KEY = 'automaker:lastProjectDir';
 
 interface ValidationErrors {
   projectName?: boolean;
@@ -67,14 +66,14 @@ export function NewProjectModal({
   onCreateFromCustomUrl,
   isCreating,
 }: NewProjectModalProps) {
-  const [activeTab, setActiveTab] = useState<"blank" | "template">("blank");
-  const [projectName, setProjectName] = useState("");
-  const [workspaceDir, setWorkspaceDir] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<'blank' | 'template'>('blank');
+  const [projectName, setProjectName] = useState('');
+  const [workspaceDir, setWorkspaceDir] = useState<string>('');
   const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
   const [selectedTemplate, setSelectedTemplate] =
     useState<StarterTemplate | null>(null);
   const [useCustomUrl, setUseCustomUrl] = useState(false);
-  const [customUrl, setCustomUrl] = useState("");
+  const [customUrl, setCustomUrl] = useState('');
   const [errors, setErrors] = useState<ValidationErrors>({});
   const { openFileBrowser } = useFileBrowser();
 
@@ -99,7 +98,7 @@ export function NewProjectModal({
           }
         })
         .catch((error) => {
-          console.error("Failed to get workspace config:", error);
+          console.error('Failed to get workspace config:', error);
         })
         .finally(() => {
           setIsLoadingWorkspace(false);
@@ -110,11 +109,11 @@ export function NewProjectModal({
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {
-      setProjectName("");
+      setProjectName('');
       setSelectedTemplate(null);
       setUseCustomUrl(false);
-      setCustomUrl("");
-      setActiveTab("blank");
+      setCustomUrl('');
+      setActiveTab('blank');
       setErrors({});
     }
   }, [open]);
@@ -155,7 +154,7 @@ export function NewProjectModal({
     }
 
     // Check template selection (only for template tab)
-    if (activeTab === "template") {
+    if (activeTab === 'template') {
       if (useCustomUrl) {
         if (!customUrl.trim()) {
           newErrors.customUrl = true;
@@ -174,7 +173,7 @@ export function NewProjectModal({
     // Clear errors and proceed
     setErrors({});
 
-    if (activeTab === "blank") {
+    if (activeTab === 'blank') {
       await onCreateBlankProject(projectName, workspaceDir);
     } else if (useCustomUrl && customUrl) {
       await onCreateFromCustomUrl(customUrl, projectName, workspaceDir);
@@ -191,7 +190,7 @@ export function NewProjectModal({
   const handleSelectTemplate = (template: StarterTemplate) => {
     setSelectedTemplate(template);
     setUseCustomUrl(false);
-    setCustomUrl("");
+    setCustomUrl('');
   };
 
   const handleToggleCustomUrl = () => {
@@ -203,9 +202,9 @@ export function NewProjectModal({
 
   const handleBrowseDirectory = async () => {
     const selectedPath = await openFileBrowser({
-      title: "Select Base Project Directory",
+      title: 'Select Base Project Directory',
       description:
-        "Choose the parent directory where your project will be created",
+        'Choose the parent directory where your project will be created',
       initialPath: workspaceDir || undefined,
     });
     if (selectedPath) {
@@ -221,15 +220,15 @@ export function NewProjectModal({
 
   // Use platform-specific path separator
   const pathSep =
-    typeof window !== "undefined" && (window as any).electronAPI
-      ? navigator.platform.indexOf("Win") !== -1
-        ? "\\"
-        : "/"
-      : "/";
+    typeof window !== 'undefined' && (window as any).electronAPI
+      ? navigator.platform.indexOf('Win') !== -1
+        ? '\\'
+        : '/'
+      : '/';
   const projectPath =
     workspaceDir && projectName
       ? `${workspaceDir}${pathSep}${projectName}`
-      : "";
+      : '';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -252,11 +251,11 @@ export function NewProjectModal({
             <Label
               htmlFor="project-name"
               className={cn(
-                "text-foreground",
-                errors.projectName && "text-red-500"
+                'text-foreground',
+                errors.projectName && 'text-red-500'
               )}
             >
-              Project Name{" "}
+              Project Name{' '}
               {errors.projectName && <span className="text-red-500">*</span>}
             </Label>
             <Input
@@ -265,10 +264,10 @@ export function NewProjectModal({
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className={cn(
-                "bg-input text-foreground placeholder:text-muted-foreground",
+                'bg-input text-foreground placeholder:text-muted-foreground',
                 errors.projectName
-                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                  : "border-border"
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                  : 'border-border'
               )}
               data-testid="project-name-input"
               autoFocus
@@ -281,17 +280,17 @@ export function NewProjectModal({
           {/* Workspace Directory Display */}
           <div
             className={cn(
-              "flex items-center gap-2 text-sm",
-              errors.workspaceDir ? "text-red-500" : "text-muted-foreground"
+              'flex items-center gap-2 text-sm',
+              errors.workspaceDir ? 'text-red-500' : 'text-muted-foreground'
             )}
           >
             <Folder className="w-4 h-4 shrink-0" />
             <span className="flex-1 min-w-0">
               {isLoadingWorkspace ? (
-                "Loading workspace..."
+                'Loading workspace...'
               ) : workspaceDir ? (
                 <>
-                  Will be created at:{" "}
+                  Will be created at:{' '}
                   <code className="text-xs bg-muted px-1.5 py-0.5 rounded truncate">
                     {projectPath || workspaceDir}
                   </code>
@@ -317,7 +316,7 @@ export function NewProjectModal({
 
         <Tabs
           value={activeTab}
-          onValueChange={(v) => setActiveTab(v as "blank" | "template")}
+          onValueChange={(v) => setActiveTab(v as 'blank' | 'template')}
           className="flex-1 flex flex-col overflow-hidden"
         >
           <TabsList className="w-full justify-start">
@@ -354,18 +353,18 @@ export function NewProjectModal({
                 {/* Preset Templates */}
                 <div
                   className={cn(
-                    "space-y-3 rounded-lg p-1 -m-1",
-                    errors.templateSelection && "ring-2 ring-red-500/50"
+                    'space-y-3 rounded-lg p-1 -m-1',
+                    errors.templateSelection && 'ring-2 ring-red-500/50'
                   )}
                 >
                   {starterTemplates.map((template) => (
                     <div
                       key={template.id}
                       className={cn(
-                        "p-4 rounded-lg border cursor-pointer transition-all",
+                        'p-4 rounded-lg border cursor-pointer transition-all',
                         selectedTemplate?.id === template.id && !useCustomUrl
-                          ? "border-brand-500 bg-brand-500/10"
-                          : "border-border bg-muted/30 hover:border-border-glass hover:bg-muted/50"
+                          ? 'border-brand-500 bg-brand-500/10'
+                          : 'border-border bg-muted/30 hover:border-border-glass hover:bg-muted/50'
                       )}
                       onClick={() => handleSelectTemplate(template)}
                       data-testid={`template-${template.id}`}
@@ -406,7 +405,7 @@ export function NewProjectModal({
                           {/* Key Features */}
                           <div className="text-xs text-muted-foreground">
                             <span className="font-medium">Features: </span>
-                            {template.features.slice(0, 3).join(" · ")}
+                            {template.features.slice(0, 3).join(' · ')}
                             {template.features.length > 3 &&
                               ` · +${template.features.length - 3} more`}
                           </div>
@@ -431,10 +430,10 @@ export function NewProjectModal({
                   {/* Custom URL Option */}
                   <div
                     className={cn(
-                      "p-4 rounded-lg border cursor-pointer transition-all",
+                      'p-4 rounded-lg border cursor-pointer transition-all',
                       useCustomUrl
-                        ? "border-brand-500 bg-brand-500/10"
-                        : "border-border bg-muted/30 hover:border-border-glass hover:bg-muted/50"
+                        ? 'border-brand-500 bg-brand-500/10'
+                        : 'border-border bg-muted/30 hover:border-border-glass hover:bg-muted/50'
                     )}
                     onClick={handleToggleCustomUrl}
                   >
@@ -461,10 +460,10 @@ export function NewProjectModal({
                           value={customUrl}
                           onChange={(e) => setCustomUrl(e.target.value)}
                           className={cn(
-                            "bg-input text-foreground placeholder:text-muted-foreground",
+                            'bg-input text-foreground placeholder:text-muted-foreground',
                             errors.customUrl
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                              : "border-border"
+                              ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                              : 'border-border'
                           )}
                           data-testid="custom-url-input"
                         />
@@ -494,14 +493,14 @@ export function NewProjectModal({
             onClick={validateAndCreate}
             disabled={isCreating}
             className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-600 text-white border-0"
-            hotkey={{ key: "Enter", cmdCtrl: true }}
+            hotkey={{ key: 'Enter', cmdCtrl: true }}
             hotkeyActive={open}
             data-testid="confirm-create-project"
           >
             {isCreating ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {activeTab === "template" ? "Cloning..." : "Creating..."}
+                {activeTab === 'template' ? 'Cloning...' : 'Creating...'}
               </>
             ) : (
               <>Create Project</>

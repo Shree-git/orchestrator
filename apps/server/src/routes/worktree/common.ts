@@ -2,18 +2,18 @@
  * Common utilities for worktree routes
  */
 
-import { createLogger } from "../../lib/logger.js";
-import { exec } from "child_process";
-import { promisify } from "util";
-import path from "path";
-import fs from "fs/promises";
+import { createLogger } from '../../lib/logger.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import path from 'path';
+import fs from 'fs/promises';
 import {
   getErrorMessage as getErrorMessageShared,
   createLogError,
-} from "../common.js";
-import { FeatureLoader } from "../../services/feature-loader.js";
+} from '../common.js';
+import { FeatureLoader } from '../../services/feature-loader.js';
 
-const logger = createLogger("Worktree");
+const logger = createLogger('Worktree');
 export const execAsync = promisify(exec);
 const featureLoader = new FeatureLoader();
 
@@ -28,10 +28,10 @@ export const MAX_BRANCH_NAME_LENGTH = 250;
 // Extended PATH configuration for Electron apps
 // ============================================================================
 
-const pathSeparator = process.platform === "win32" ? ";" : ":";
+const pathSeparator = process.platform === 'win32' ? ';' : ':';
 const additionalPaths: string[] = [];
 
-if (process.platform === "win32") {
+if (process.platform === 'win32') {
   // Windows paths
   if (process.env.LOCALAPPDATA) {
     additionalPaths.push(`${process.env.LOCALAPPDATA}\\Programs\\Git\\cmd`);
@@ -39,23 +39,22 @@ if (process.platform === "win32") {
   if (process.env.PROGRAMFILES) {
     additionalPaths.push(`${process.env.PROGRAMFILES}\\Git\\cmd`);
   }
-  if (process.env["ProgramFiles(x86)"]) {
-    additionalPaths.push(`${process.env["ProgramFiles(x86)"]}\\Git\\cmd`);
+  if (process.env['ProgramFiles(x86)']) {
+    additionalPaths.push(`${process.env['ProgramFiles(x86)']}\\Git\\cmd`);
   }
 } else {
   // Unix/Mac paths
   additionalPaths.push(
-    "/opt/homebrew/bin",        // Homebrew on Apple Silicon
-    "/usr/local/bin",           // Homebrew on Intel Mac, common Linux location
-    "/home/linuxbrew/.linuxbrew/bin", // Linuxbrew
-    `${process.env.HOME}/.local/bin`, // pipx, other user installs
+    '/opt/homebrew/bin', // Homebrew on Apple Silicon
+    '/usr/local/bin', // Homebrew on Intel Mac, common Linux location
+    '/home/linuxbrew/.linuxbrew/bin', // Linuxbrew
+    `${process.env.HOME}/.local/bin` // pipx, other user installs
   );
 }
 
-const extendedPath = [
-  process.env.PATH,
-  ...additionalPaths.filter(Boolean),
-].filter(Boolean).join(pathSeparator);
+const extendedPath = [process.env.PATH, ...additionalPaths.filter(Boolean)]
+  .filter(Boolean)
+  .join(pathSeparator);
 
 /**
  * Environment variables with extended PATH for executing shell commands.
@@ -77,7 +76,9 @@ export const execEnv = {
  * We also reject shell metacharacters for safety.
  */
 export function isValidBranchName(name: string): boolean {
-  return /^[a-zA-Z0-9._\-/]+$/.test(name) && name.length < MAX_BRANCH_NAME_LENGTH;
+  return (
+    /^[a-zA-Z0-9._\-/]+$/.test(name) && name.length < MAX_BRANCH_NAME_LENGTH
+  );
 }
 
 /**
@@ -85,9 +86,8 @@ export function isValidBranchName(name: string): boolean {
  */
 export async function isGhCliAvailable(): Promise<boolean> {
   try {
-    const checkCommand = process.platform === "win32"
-      ? "where gh"
-      : "command -v gh";
+    const checkCommand =
+      process.platform === 'win32' ? 'where gh' : 'command -v gh';
     await execAsync(checkCommand, { env: execEnv });
     return true;
   } catch {
@@ -96,7 +96,7 @@ export async function isGhCliAvailable(): Promise<boolean> {
 }
 
 export const AUTOMAKER_INITIAL_COMMIT_MESSAGE =
-  "chore: automaker initial commit";
+  'chore: automaker initial commit';
 
 /**
  * Normalize path separators to forward slashes for cross-platform consistency.
@@ -104,7 +104,7 @@ export const AUTOMAKER_INITIAL_COMMIT_MESSAGE =
  * from git commands (which may use forward slashes).
  */
 export function normalizePath(p: string): string {
-  return p.replace(/\\/g, "/");
+  return p.replace(/\\/g, '/');
 }
 
 /**
@@ -112,7 +112,7 @@ export function normalizePath(p: string): string {
  */
 export async function isGitRepo(repoPath: string): Promise<boolean> {
   try {
-    await execAsync("git rev-parse --is-inside-work-tree", { cwd: repoPath });
+    await execAsync('git rev-parse --is-inside-work-tree', { cwd: repoPath });
     return true;
   } catch {
     return false;
@@ -126,9 +126,9 @@ export async function isGitRepo(repoPath: string): Promise<boolean> {
 export function isENOENT(error: unknown): boolean {
   return (
     error !== null &&
-    typeof error === "object" &&
-    "code" in error &&
-    error.code === "ENOENT"
+    typeof error === 'object' &&
+    'code' in error &&
+    error.code === 'ENOENT'
   );
 }
 
@@ -136,7 +136,7 @@ export function isENOENT(error: unknown): boolean {
  * Check if a path is a mock/test path that doesn't exist
  */
 export function isMockPath(worktreePath: string): boolean {
-  return worktreePath.startsWith("/mock/") || worktreePath.includes("/mock/");
+  return worktreePath.startsWith('/mock/') || worktreePath.includes('/mock/');
 }
 
 /**
@@ -165,7 +165,7 @@ export const logError = createLogError(logger);
  */
 export async function ensureInitialCommit(repoPath: string): Promise<boolean> {
   try {
-    await execAsync("git rev-parse --verify HEAD", { cwd: repoPath });
+    await execAsync('git rev-parse --verify HEAD', { cwd: repoPath });
     return false;
   } catch {
     try {

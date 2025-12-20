@@ -1,28 +1,28 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
 const port = process.env.TEST_PORT || 3007;
 const serverPort = process.env.TEST_SERVER_PORT || 3008;
-const reuseServer = process.env.TEST_REUSE_SERVER === "true";
+const reuseServer = process.env.TEST_REUSE_SERVER === 'true';
 const mockAgent =
-  process.env.CI === "true" || process.env.AUTOMAKER_MOCK_AGENT === "true";
+  process.env.CI === 'true' || process.env.AUTOMAKER_MOCK_AGENT === 'true';
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: undefined,
-  reporter: "html",
+  reporter: 'html',
   timeout: 30000,
   use: {
     baseURL: `http://localhost:${port}`,
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
   ...(reuseServer
@@ -39,9 +39,9 @@ export default defineConfig({
               ...process.env,
               PORT: String(serverPort),
               // Enable mock agent in CI to avoid real API calls
-              AUTOMAKER_MOCK_AGENT: mockAgent ? "true" : "false",
+              AUTOMAKER_MOCK_AGENT: mockAgent ? 'true' : 'false',
               // Allow access to test directories and common project paths
-              ALLOWED_PROJECT_DIRS: "/Users,/home,/tmp,/var/folders",
+              ALLOWED_PROJECT_DIRS: '/Users,/home,/tmp,/var/folders',
             },
           },
           // Frontend Vite dev server
@@ -52,9 +52,10 @@ export default defineConfig({
             timeout: 120000,
             env: {
               ...process.env,
-              VITE_SKIP_SETUP: "true",
+              VITE_SKIP_SETUP: 'true',
               // Skip electron plugin in CI - no display available for Electron
-              VITE_SKIP_ELECTRON: process.env.CI === "true" ? "true" : undefined,
+              VITE_SKIP_ELECTRON:
+                process.env.CI === 'true' ? 'true' : undefined,
             },
           },
         ],

@@ -1,18 +1,27 @@
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
-  FlaskConical, Settings2, TestTube, GitBranch, AlertCircle,
-  Zap, ClipboardList, FileText, ScrollText, ShieldCheck, User
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+  FlaskConical,
+  Settings2,
+  TestTube,
+  GitBranch,
+  AlertCircle,
+  Zap,
+  ClipboardList,
+  FileText,
+  ScrollText,
+  ShieldCheck,
+  User,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { AIProfile } from "@/store/app-store";
+} from '@/components/ui/select';
+import type { AIProfile } from '@/store/app-store';
 
 type PlanningMode = 'skip' | 'lite' | 'spec' | 'full';
 
@@ -58,10 +67,10 @@ export function FeatureDefaultsSection({
   return (
     <div
       className={cn(
-        "rounded-2xl overflow-hidden",
-        "border border-border/50",
-        "bg-gradient-to-br from-card/90 via-card/70 to-card/80 backdrop-blur-xl",
-        "shadow-sm shadow-black/5"
+        'rounded-2xl overflow-hidden',
+        'border border-border/50',
+        'bg-gradient-to-br from-card/90 via-card/70 to-card/80 backdrop-blur-xl',
+        'shadow-sm shadow-black/5'
       )}
     >
       <div className="p-6 border-b border-border/50 bg-gradient-to-r from-transparent via-accent/5 to-transparent">
@@ -80,17 +89,30 @@ export function FeatureDefaultsSection({
       <div className="p-6 space-y-5">
         {/* Planning Mode Default */}
         <div className="group flex items-start space-x-3 p-3 rounded-xl hover:bg-accent/30 transition-colors duration-200 -mx-3">
-          <div className={cn(
-            "w-10 h-10 mt-0.5 rounded-xl flex items-center justify-center shrink-0",
-            defaultPlanningMode === 'skip' ? "bg-emerald-500/10" :
-            defaultPlanningMode === 'lite' ? "bg-blue-500/10" :
-            defaultPlanningMode === 'spec' ? "bg-purple-500/10" :
-            "bg-amber-500/10"
-          )}>
-            {defaultPlanningMode === 'skip' && <Zap className="w-5 h-5 text-emerald-500" />}
-            {defaultPlanningMode === 'lite' && <ClipboardList className="w-5 h-5 text-blue-500" />}
-            {defaultPlanningMode === 'spec' && <FileText className="w-5 h-5 text-purple-500" />}
-            {defaultPlanningMode === 'full' && <ScrollText className="w-5 h-5 text-amber-500" />}
+          <div
+            className={cn(
+              'w-10 h-10 mt-0.5 rounded-xl flex items-center justify-center shrink-0',
+              defaultPlanningMode === 'skip'
+                ? 'bg-emerald-500/10'
+                : defaultPlanningMode === 'lite'
+                  ? 'bg-blue-500/10'
+                  : defaultPlanningMode === 'spec'
+                    ? 'bg-purple-500/10'
+                    : 'bg-amber-500/10'
+            )}
+          >
+            {defaultPlanningMode === 'skip' && (
+              <Zap className="w-5 h-5 text-emerald-500" />
+            )}
+            {defaultPlanningMode === 'lite' && (
+              <ClipboardList className="w-5 h-5 text-blue-500" />
+            )}
+            {defaultPlanningMode === 'spec' && (
+              <FileText className="w-5 h-5 text-purple-500" />
+            )}
+            {defaultPlanningMode === 'full' && (
+              <ScrollText className="w-5 h-5 text-amber-500" />
+            )}
           </div>
           <div className="flex-1 space-y-2">
             <div className="flex items-center justify-between">
@@ -99,7 +121,9 @@ export function FeatureDefaultsSection({
               </Label>
               <Select
                 value={defaultPlanningMode}
-                onValueChange={(v: string) => onDefaultPlanningModeChange(v as PlanningMode)}
+                onValueChange={(v: string) =>
+                  onDefaultPlanningModeChange(v as PlanningMode)
+                }
               >
                 <SelectTrigger
                   className="w-[160px] h-8"
@@ -112,7 +136,9 @@ export function FeatureDefaultsSection({
                     <div className="flex items-center gap-2">
                       <Zap className="h-3.5 w-3.5 text-emerald-500" />
                       <span>Skip</span>
-                      <span className="text-[10px] text-muted-foreground">(Default)</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        (Default)
+                      </span>
                     </div>
                   </SelectItem>
                   <SelectItem value="lite">
@@ -137,10 +163,14 @@ export function FeatureDefaultsSection({
               </Select>
             </div>
             <p className="text-xs text-muted-foreground/80 leading-relaxed">
-              {defaultPlanningMode === 'skip' && "Jump straight to implementation without upfront planning."}
-              {defaultPlanningMode === 'lite' && "Create a quick planning outline with tasks before building."}
-              {defaultPlanningMode === 'spec' && "Generate a specification with acceptance criteria for approval."}
-              {defaultPlanningMode === 'full' && "Create comprehensive spec with phased implementation plan."}
+              {defaultPlanningMode === 'skip' &&
+                'Jump straight to implementation without upfront planning.'}
+              {defaultPlanningMode === 'lite' &&
+                'Create a quick planning outline with tasks before building.'}
+              {defaultPlanningMode === 'spec' &&
+                'Generate a specification with acceptance criteria for approval.'}
+              {defaultPlanningMode === 'full' &&
+                'Create comprehensive spec with phased implementation plan.'}
             </p>
           </div>
         </div>
@@ -167,9 +197,10 @@ export function FeatureDefaultsSection({
                   Require manual plan approval by default
                 </Label>
                 <p className="text-xs text-muted-foreground/80 leading-relaxed">
-                  When enabled, the agent will pause after generating a plan and wait for you to
-                  review, edit, and approve before starting implementation. You can also view the
-                  plan from the feature card.
+                  When enabled, the agent will pause after generating a plan and
+                  wait for you to review, edit, and approve before starting
+                  implementation. You can also view the plan from the feature
+                  card.
                 </p>
               </div>
             </div>
@@ -178,7 +209,9 @@ export function FeatureDefaultsSection({
         )}
 
         {/* Separator */}
-        {defaultPlanningMode === 'skip' && <div className="border-t border-border/30" />}
+        {defaultPlanningMode === 'skip' && (
+          <div className="border-t border-border/30" />
+        )}
 
         {/* Default AI Profile */}
         <div className="group flex items-start space-x-3 p-3 rounded-xl hover:bg-accent/30 transition-colors duration-200 -mx-3">
@@ -191,8 +224,10 @@ export function FeatureDefaultsSection({
                 Default AI Profile
               </Label>
               <Select
-                value={defaultAIProfileId ?? "none"}
-                onValueChange={(v: string) => onDefaultAIProfileIdChange(v === "none" ? null : v)}
+                value={defaultAIProfileId ?? 'none'}
+                onValueChange={(v: string) =>
+                  onDefaultAIProfileIdChange(v === 'none' ? null : v)
+                }
               >
                 <SelectTrigger
                   className="w-[180px] h-8"
@@ -202,7 +237,9 @@ export function FeatureDefaultsSection({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">
-                    <span className="text-muted-foreground">None (pick manually)</span>
+                    <span className="text-muted-foreground">
+                      None (pick manually)
+                    </span>
                   </SelectItem>
                   {aiProfiles.map((profile) => (
                     <SelectItem key={profile.id} value={profile.id}>
@@ -215,7 +252,7 @@ export function FeatureDefaultsSection({
             <p className="text-xs text-muted-foreground/80 leading-relaxed">
               {selectedProfile
                 ? `New features will use the "${selectedProfile.name}" profile (${selectedProfile.model}, ${selectedProfile.thinkingLevel} thinking).`
-                : "Pre-select an AI profile when creating new features. Choose \"None\" to pick manually each time."}
+                : 'Pre-select an AI profile when creating new features. Choose "None" to pick manually each time.'}
             </p>
           </div>
         </div>
@@ -244,8 +281,8 @@ export function FeatureDefaultsSection({
             </Label>
             <p className="text-xs text-muted-foreground/80 leading-relaxed">
               When enabled, the Add Feature dialog will show only AI profiles
-              and hide advanced model tweaking options. This creates a cleaner, less
-              overwhelming UI.
+              and hide advanced model tweaking options. This creates a cleaner,
+              less overwhelming UI.
             </p>
           </div>
         </div>
@@ -273,8 +310,8 @@ export function FeatureDefaultsSection({
               Enable automated testing by default
             </Label>
             <p className="text-xs text-muted-foreground/80 leading-relaxed">
-              When enabled, new features will use TDD with automated tests. When disabled, features will
-              require manual verification.
+              When enabled, new features will use TDD with automated tests. When
+              disabled, features will require manual verification.
             </p>
           </div>
         </div>
@@ -302,9 +339,9 @@ export function FeatureDefaultsSection({
               Enable Dependency Blocking
             </Label>
             <p className="text-xs text-muted-foreground/80 leading-relaxed">
-              When enabled, features with incomplete dependencies will show blocked badges
-              and warnings. Auto mode and backlog ordering always respect dependencies
-              regardless of this setting.
+              When enabled, features with incomplete dependencies will show
+              blocked badges and warnings. Auto mode and backlog ordering always
+              respect dependencies regardless of this setting.
             </p>
           </div>
         </div>

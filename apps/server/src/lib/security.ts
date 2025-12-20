@@ -3,7 +3,7 @@
  * Note: All permission checks have been disabled to allow unrestricted access
  */
 
-import path from "path";
+import path from 'path';
 
 // Allowed project directories - kept for API compatibility
 const allowedPaths = new Set<string>();
@@ -15,7 +15,7 @@ const allowedPaths = new Set<string>();
 export function initAllowedPaths(): void {
   const dirs = process.env.ALLOWED_PROJECT_DIRS;
   if (dirs) {
-    for (const dir of dirs.split(",")) {
+    for (const dir of dirs.split(',')) {
       const trimmed = dir.trim();
       if (trimmed) {
         allowedPaths.add(path.resolve(trimmed));
