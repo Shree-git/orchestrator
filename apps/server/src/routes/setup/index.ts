@@ -12,18 +12,31 @@ import { createApiKeysHandler } from './routes/api-keys.js';
 import { createPlatformHandler } from './routes/platform.js';
 import { createVerifyClaudeAuthHandler } from './routes/verify-claude-auth.js';
 import { createGhStatusHandler } from './routes/gh-status.js';
+import { createCodexStatusHandler } from './routes/codex-status.js';
+import { createInstallCodexHandler } from './routes/install-codex.js';
+import { createVerifyCodexAuthHandler } from './routes/verify-codex-auth.js';
 
 export function createSetupRoutes(): Router {
   const router = Router();
 
+  // Claude CLI routes
   router.get('/claude-status', createClaudeStatusHandler());
   router.post('/install-claude', createInstallClaudeHandler());
   router.post('/auth-claude', createAuthClaudeHandler());
+  router.post('/verify-claude-auth', createVerifyClaudeAuthHandler());
+
+  // Codex CLI routes
+  router.get('/codex-status', createCodexStatusHandler());
+  router.post('/install-codex', createInstallCodexHandler());
+  router.post('/verify-codex-auth', createVerifyCodexAuthHandler());
+
+  // API keys routes
   router.post('/store-api-key', createStoreApiKeyHandler());
   router.post('/delete-api-key', createDeleteApiKeyHandler());
   router.get('/api-keys', createApiKeysHandler());
+
+  // Other routes
   router.get('/platform', createPlatformHandler());
-  router.post('/verify-claude-auth', createVerifyClaudeAuthHandler());
   router.get('/gh-status', createGhStatusHandler());
 
   return router;

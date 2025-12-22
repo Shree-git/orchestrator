@@ -8,30 +8,28 @@
 
 import { BaseProvider } from './base-provider.js';
 import { ClaudeProvider } from './claude-provider.js';
+import { CodexProvider } from './codex-provider.js';
 import type { InstallationStatus } from './types.js';
 
 export class ProviderFactory {
   /**
    * Get the appropriate provider for a given model ID
    *
-   * @param modelId Model identifier (e.g., "claude-opus-4-5-20251101", "gpt-5.2", "cursor-fast")
+   * @param modelId Model identifier (e.g., "claude-opus-4-5-20251101", "gpt-5.2-codex")
    * @returns Provider instance for the model
    */
   static getProviderForModel(modelId: string): BaseProvider {
     const lowerModel = modelId.toLowerCase();
 
+    // OpenAI/Codex models (gpt-*, codex-*)
+    if (lowerModel.startsWith('gpt-') || lowerModel.startsWith('codex-')) {
+      return new CodexProvider();
+    }
+
     // Claude models (claude-*, opus, sonnet, haiku)
     if (lowerModel.startsWith('claude-') || ['haiku', 'sonnet', 'opus'].includes(lowerModel)) {
       return new ClaudeProvider();
     }
-
-    // Future providers:
-    // if (lowerModel.startsWith("cursor-")) {
-    //   return new CursorProvider();
-    // }
-    // if (lowerModel.startsWith("opencode-")) {
-    //   return new OpenCodeProvider();
-    // }
 
     // Default to Claude for unknown models
     console.warn(`[ProviderFactory] Unknown model prefix for "${modelId}", defaulting to Claude`);
@@ -42,10 +40,7 @@ export class ProviderFactory {
    * Get all available providers
    */
   static getAllProviders(): BaseProvider[] {
-    return [
-      new ClaudeProvider(),
-      // Future providers...
-    ];
+    return [new ClaudeProvider(), new CodexProvider()];
   }
 
   /**
@@ -69,7 +64,7 @@ export class ProviderFactory {
   /**
    * Get provider by name (for direct access if needed)
    *
-   * @param name Provider name (e.g., "claude", "cursor")
+   * @param name Provider name (e.g., "claude", "codex", "openai")
    * @returns Provider instance or null if not found
    */
   static getProviderByName(name: string): BaseProvider | null {
@@ -80,11 +75,9 @@ export class ProviderFactory {
       case 'anthropic':
         return new ClaudeProvider();
 
-      // Future providers:
-      // case "cursor":
-      //   return new CursorProvider();
-      // case "opencode":
-      //   return new OpenCodeProvider();
+      case 'codex':
+      case 'openai':
+        return new CodexProvider();
 
       default:
         return null;

@@ -3,16 +3,17 @@
  *
  * Provides centralized model resolution logic:
  * - Maps Claude model aliases to full model strings
+ * - Maps Codex model aliases to full model strings
  * - Provides default models per provider
  * - Handles multiple model sources with priority
  */
 
-import { CLAUDE_MODEL_MAP, DEFAULT_MODELS } from '@automaker/types';
+import { CLAUDE_MODEL_MAP, CODEX_MODEL_MAP, DEFAULT_MODELS } from '@automaker/types';
 
 /**
  * Resolve a model key/alias to a full model string
  *
- * @param modelKey - Model key (e.g., "opus", "gpt-5.2", "claude-sonnet-4-20250514")
+ * @param modelKey - Model key (e.g., "opus", "o3", "gpt-4.1", "claude-sonnet-4-20250514")
  * @param defaultModel - Fallback model if modelKey is undefined
  * @returns Full model string
  */
@@ -31,11 +32,26 @@ export function resolveModelString(
     return modelKey;
   }
 
+  // Full Codex/OpenAI model string - pass through unchanged
+  if (modelKey.startsWith('gpt-') || modelKey.startsWith('codex-')) {
+    console.log(`[ModelResolver] Using full Codex/OpenAI model string: ${modelKey}`);
+    return modelKey;
+  }
+
   // Look up Claude model alias
-  const resolved = CLAUDE_MODEL_MAP[modelKey];
-  if (resolved) {
-    console.log(`[ModelResolver] Resolved model alias: "${modelKey}" -> "${resolved}"`);
-    return resolved;
+  const claudeResolved = CLAUDE_MODEL_MAP[modelKey];
+  if (claudeResolved) {
+    console.log(
+      `[ModelResolver] Resolved Claude model alias: "${modelKey}" -> "${claudeResolved}"`
+    );
+    return claudeResolved;
+  }
+
+  // Look up Codex model alias
+  const codexResolved = CODEX_MODEL_MAP[modelKey];
+  if (codexResolved) {
+    console.log(`[ModelResolver] Resolved Codex model alias: "${modelKey}" -> "${codexResolved}"`);
+    return codexResolved;
   }
 
   // Unknown model key - use default

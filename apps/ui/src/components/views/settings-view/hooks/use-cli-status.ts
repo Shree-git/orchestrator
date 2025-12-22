@@ -19,15 +19,17 @@ interface CliStatusResult {
 }
 
 /**
- * Custom hook for managing Claude CLI status
+ * Custom hook for managing CLI status (Claude and Codex)
  * Handles checking CLI installation, authentication, and refresh functionality
  */
 export function useCliStatus() {
-  const { setClaudeAuthStatus } = useSetupStore();
+  const { setClaudeAuthStatus, setCodexAuthStatus } = useSetupStore();
 
   const [claudeCliStatus, setClaudeCliStatus] = useState<CliStatusResult | null>(null);
+  const [codexCliStatus, setCodexCliStatus] = useState<CliStatusResult | null>(null);
 
   const [isCheckingClaudeCli, setIsCheckingClaudeCli] = useState(false);
+  const [isCheckingCodexCli, setIsCheckingCodexCli] = useState(false);
 
   // Check CLI status on mount
   useEffect(() => {
@@ -41,6 +43,16 @@ export function useCliStatus() {
           setClaudeCliStatus(status);
         } catch (error) {
           console.error('Failed to check Claude CLI status:', error);
+        }
+      }
+
+      // Check Codex CLI
+      if (api?.checkCodexCli) {
+        try {
+          const status = await api.checkCodexCli();
+          setCodexCliStatus(status);
+        } catch (error) {
+          console.error('Failed to check Codex CLI status:', error);
         }
       }
 
@@ -87,10 +99,37 @@ export function useCliStatus() {
           console.error('Failed to check Claude auth status:', error);
         }
       }
+
+      // Check Codex auth status
+      if (api?.setup?.getCodexStatus) {
+        try {
+          const result = await api.setup.getCodexStatus();
+          if (result.success && result.auth) {
+            const auth = result.auth;
+            const validMethods = ['api_key_env', 'api_key', 'cli_authenticated', 'none'] as const;
+            type CodexAuthMethod = (typeof validMethods)[number];
+            const method: CodexAuthMethod = validMethods.includes(auth.method as CodexAuthMethod)
+              ? (auth.method as CodexAuthMethod)
+              : auth.authenticated
+                ? 'api_key'
+                : 'none';
+            const authStatus = {
+              authenticated: auth.authenticated,
+              method,
+              hasCredentialsFile: auth.hasCredentialsFile ?? false,
+              apiKeyValid: auth.apiKeyValid,
+              hasEnvApiKey: auth.hasEnvApiKey,
+            };
+            setCodexAuthStatus(authStatus);
+          }
+        } catch (error) {
+          console.error('Failed to check Codex auth status:', error);
+        }
+      }
     };
 
     checkCliStatus();
-  }, [setClaudeAuthStatus]);
+  }, [setClaudeAuthStatus, setCodexAuthStatus]);
 
   // Refresh Claude CLI status
   const handleRefreshClaudeCli = useCallback(async () => {
@@ -108,9 +147,28 @@ export function useCliStatus() {
     }
   }, []);
 
+  // Refresh Codex CLI status
+  const handleRefreshCodexCli = useCallback(async () => {
+    setIsCheckingCodexCli(true);
+    try {
+      const api = getElectronAPI();
+      if (api?.checkCodexCli) {
+        const status = await api.checkCodexCli();
+        setCodexCliStatus(status);
+      }
+    } catch (error) {
+      console.error('Failed to refresh Codex CLI status:', error);
+    } finally {
+      setIsCheckingCodexCli(false);
+    }
+  }, []);
+
   return {
     claudeCliStatus,
+    codexCliStatus,
     isCheckingClaudeCli,
+    isCheckingCodexCli,
     handleRefreshClaudeCli,
+    handleRefreshCodexCli,
   };
 }

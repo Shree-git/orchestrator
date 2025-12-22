@@ -1855,7 +1855,7 @@ This mock response was generated because AUTOMAKER_MOCK_AGENT=true was set.
     streamLoop: for await (const msg of stream) {
       if (msg.type === 'assistant' && msg.message?.content) {
         for (const block of msg.message.content) {
-          if (block.type === 'text') {
+          if (block.type === 'text' || block.type === 'thinking') {
             // Add separator before new text if we already have content and it doesn't end with newlines
             if (responseText.length > 0 && !responseText.endsWith('\n\n')) {
               if (responseText.endsWith('\n')) {
@@ -1864,7 +1864,25 @@ This mock response was generated because AUTOMAKER_MOCK_AGENT=true was set.
                 responseText += '\n\n';
               }
             }
-            responseText += block.text || '';
+            // For thinking blocks, format them with a marker
+            let contentToEmit = '';
+            if (block.type === 'thinking' && 'thinking' in block) {
+              const thinkingContent = `🧠 **Thinking:**\n${block.thinking || ''}\n`;
+              responseText += thinkingContent;
+              contentToEmit = thinkingContent;
+            } else if (block.type === 'text') {
+              responseText += block.text || '';
+              contentToEmit = block.text || '';
+            }
+
+            // Emit progress event for real-time UI updates
+            if (contentToEmit && !specDetected) {
+              this.emitAutoModeEvent('auto_mode_progress', {
+                featureId,
+                content: contentToEmit,
+                projectPath,
+              });
+            }
 
             // Check for authentication errors in the response
             if (
@@ -2295,14 +2313,6 @@ Implement all the changes described in the plan above.`;
               console.log(`[AutoMode] Implementation completed for feature ${featureId}`);
               // Exit the original stream loop since continuation is done
               break streamLoop;
-            }
-
-            // Only emit progress for non-marker text (marker was already handled above)
-            if (!specDetected) {
-              this.emitAutoModeEvent('auto_mode_progress', {
-                featureId,
-                content: block.text,
-              });
             }
           } else if (block.type === 'tool_use') {
             // Emit event for real-time UI

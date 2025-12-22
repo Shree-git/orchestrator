@@ -242,8 +242,13 @@ export class AgentService {
         if (msg.type === 'assistant') {
           if (msg.message?.content) {
             for (const block of msg.message.content) {
-              if (block.type === 'text') {
-                responseText += block.text;
+              if (block.type === 'text' || block.type === 'thinking') {
+                // Handle both text and thinking blocks
+                if (block.type === 'thinking' && 'thinking' in block) {
+                  responseText += `\n\n🧠 **Thinking:**\n${block.thinking}\n\n`;
+                } else if (block.type === 'text' && 'text' in block) {
+                  responseText += block.text;
+                }
 
                 if (!currentAssistantMessage) {
                   currentAssistantMessage = {

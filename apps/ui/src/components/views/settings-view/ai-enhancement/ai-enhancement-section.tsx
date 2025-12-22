@@ -1,11 +1,63 @@
 import { Label } from '@/components/ui/label';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Brain, Cpu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/app-store';
-import { CLAUDE_MODELS } from '@/components/views/board-view/shared/model-constants';
+import {
+  CLAUDE_MODELS,
+  CODEX_MODELS,
+  type ModelOption,
+} from '@/components/views/board-view/shared/model-constants';
 
 export function AIEnhancementSection() {
   const { enhancementModel, setEnhancementModel } = useAppStore();
+
+  const renderModelCard = (model: ModelOption, isActive: boolean) => (
+    <button
+      key={model.id}
+      onClick={() => setEnhancementModel(model.id)}
+      className={cn(
+        'group flex flex-col items-start gap-2 px-4 py-4 rounded-xl text-left',
+        'transition-all duration-200 ease-out',
+        isActive
+          ? [
+              'bg-gradient-to-br from-brand-500/15 to-brand-600/10',
+              'border-2 border-brand-500/40',
+              'text-foreground',
+              'shadow-md shadow-brand-500/10',
+            ]
+          : [
+              'bg-accent/30 hover:bg-accent/50',
+              'border border-border/50 hover:border-border',
+              'text-muted-foreground hover:text-foreground',
+              'hover:shadow-sm',
+            ],
+        'hover:scale-[1.02] active:scale-[0.98]'
+      )}
+      data-testid={`enhancement-model-${model.id}`}
+    >
+      <div className="flex items-center gap-2 w-full">
+        <span
+          className={cn(
+            'font-medium text-sm',
+            isActive ? 'text-foreground' : 'group-hover:text-foreground'
+          )}
+        >
+          {model.label}
+        </span>
+        {model.badge && (
+          <span
+            className={cn(
+              'ml-auto text-xs px-2 py-0.5 rounded-full',
+              isActive ? 'bg-brand-500/20 text-brand-500' : 'bg-accent text-muted-foreground'
+            )}
+          >
+            {model.badge}
+          </span>
+        )}
+      </div>
+      <span className="text-xs text-muted-foreground/80">{model.description}</span>
+    </button>
+  );
 
   return (
     <div
@@ -27,62 +79,32 @@ export function AIEnhancementSection() {
           Choose the model used when enhancing feature descriptions.
         </p>
       </div>
-      <div className="p-6 space-y-4">
+      <div className="p-6 space-y-6">
+        {/* Claude Models */}
         <div className="space-y-4">
-          <Label className="text-foreground font-medium">Enhancement Model</Label>
+          <div className="flex items-center gap-2">
+            <Brain className="w-4 h-4 text-brand-500" />
+            <Label className="text-foreground font-medium">Claude Models</Label>
+            <span className="text-xs px-2 py-0.5 rounded-full border border-brand-500/40 text-brand-500">
+              SDK
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {CLAUDE_MODELS.map(({ id, label, description, badge }) => {
-              const isActive = enhancementModel === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => setEnhancementModel(id)}
-                  className={cn(
-                    'group flex flex-col items-start gap-2 px-4 py-4 rounded-xl text-left',
-                    'transition-all duration-200 ease-out',
-                    isActive
-                      ? [
-                          'bg-gradient-to-br from-brand-500/15 to-brand-600/10',
-                          'border-2 border-brand-500/40',
-                          'text-foreground',
-                          'shadow-md shadow-brand-500/10',
-                        ]
-                      : [
-                          'bg-accent/30 hover:bg-accent/50',
-                          'border border-border/50 hover:border-border',
-                          'text-muted-foreground hover:text-foreground',
-                          'hover:shadow-sm',
-                        ],
-                    'hover:scale-[1.02] active:scale-[0.98]'
-                  )}
-                  data-testid={`enhancement-model-${id}`}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <span
-                      className={cn(
-                        'font-medium text-sm',
-                        isActive ? 'text-foreground' : 'group-hover:text-foreground'
-                      )}
-                    >
-                      {label}
-                    </span>
-                    {badge && (
-                      <span
-                        className={cn(
-                          'ml-auto text-xs px-2 py-0.5 rounded-full',
-                          isActive
-                            ? 'bg-brand-500/20 text-brand-500'
-                            : 'bg-accent text-muted-foreground'
-                        )}
-                      >
-                        {badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-muted-foreground/80">{description}</span>
-                </button>
-              );
-            })}
+            {CLAUDE_MODELS.map((model) => renderModelCard(model, enhancementModel === model.id))}
+          </div>
+        </div>
+
+        {/* Codex Models */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-green-500" />
+            <Label className="text-foreground font-medium">OpenAI Models</Label>
+            <span className="text-xs px-2 py-0.5 rounded-full border border-green-500/40 text-green-500">
+              CLI
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {CODEX_MODELS.map((model) => renderModelCard(model, enhancementModel === model.id))}
           </div>
         </div>
       </div>

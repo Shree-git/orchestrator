@@ -237,10 +237,11 @@ export interface FeatureImagePath {
 
 // Available models for feature execution
 export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
-export type AgentModel = ClaudeModel;
+export type CodexModel = 'gpt-5.2-codex' | 'gpt-5.1-codex-max' | 'gpt-5.1-codex-mini' | 'gpt-5.2';
+export type AgentModel = ClaudeModel | CodexModel;
 
 // Model provider type
-export type ModelProvider = 'claude';
+export type ModelProvider = 'claude' | 'openai';
 
 // Thinking level (budget_tokens) options
 export type ThinkingLevel = 'none' | 'low' | 'medium' | 'high' | 'ultrathink';

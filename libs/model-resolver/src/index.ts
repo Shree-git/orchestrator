@@ -4,7 +4,15 @@
  */
 
 // Re-export constants from types
-export { CLAUDE_MODEL_MAP, DEFAULT_MODELS, type ModelAlias } from '@automaker/types';
+export {
+  CLAUDE_MODEL_MAP,
+  CODEX_MODEL_MAP,
+  DEFAULT_MODELS,
+  type ModelAlias,
+  type ClaudeModelAlias,
+  type CodexModelAlias,
+  type ModelProvider,
+} from '@automaker/types';
 
 // Export resolver functions
 export { resolveModelString, getEffectiveModel } from './resolver.js';

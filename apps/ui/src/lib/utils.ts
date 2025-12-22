@@ -9,9 +9,13 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Determine if the current model supports extended thinking controls
  */
-export function modelSupportsThinking(_model?: AgentModel | string): boolean {
-  // All Claude models support thinking
-  return true;
+export function modelSupportsThinking(model?: AgentModel | string): boolean {
+  // Claude models support thinking
+  // OpenAI Codex models (o3, o4-mini) have built-in reasoning
+  if (!model) return true;
+  const codexModels = ['o3', 'o4-mini', 'gpt-4.1', 'codex-mini'];
+  // Codex models don't use the same thinking level system
+  return !codexModels.includes(model as string);
 }
 
 /**
@@ -22,6 +26,10 @@ export function getModelDisplayName(model: AgentModel | string): string {
     haiku: 'Claude Haiku',
     sonnet: 'Claude Sonnet',
     opus: 'Claude Opus',
+    'gpt-5.2-codex': 'GPT-5.2 Codex',
+    'gpt-5.1-codex-max': 'GPT-5.1 Codex Max',
+    'gpt-5.1-codex-mini': 'GPT-5.1 Codex Mini',
+    'gpt-5.2': 'GPT-5.2',
   };
   return displayNames[model] || model;
 }

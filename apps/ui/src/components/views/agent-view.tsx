@@ -33,7 +33,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CLAUDE_MODELS } from '@/components/views/board-view/shared/model-constants';
+import {
+  CLAUDE_MODELS,
+  CODEX_MODELS,
+  ALL_MODELS,
+} from '@/components/views/board-view/shared/model-constants';
 
 export function AgentView() {
   const { currentProject, setLastSelectedSession, getLastSelectedSession } = useAppStore();
@@ -503,15 +507,32 @@ export function AgentView() {
                   data-testid="model-selector"
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  {CLAUDE_MODELS.find((m) => m.id === selectedModel)?.label.replace(
-                    'Claude ',
-                    ''
-                  ) || 'Sonnet'}
+                  {ALL_MODELS.find((m) => m.id === selectedModel)?.label.replace('Claude ', '') ||
+                    'Sonnet'}
                   <ChevronDown className="w-3 h-3 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Claude
+                </div>
                 {CLAUDE_MODELS.map((model) => (
+                  <DropdownMenuItem
+                    key={model.id}
+                    onClick={() => setSelectedModel(model.id)}
+                    className={cn('cursor-pointer', selectedModel === model.id && 'bg-accent')}
+                    data-testid={`model-option-${model.id}`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium">{model.label}</span>
+                      <span className="text-xs text-muted-foreground">{model.description}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-1 border-t">
+                  OpenAI Codex
+                </div>
+                {CODEX_MODELS.map((model) => (
                   <DropdownMenuItem
                     key={model.id}
                     onClick={() => setSelectedModel(model.id)}

@@ -11,6 +11,20 @@ import fs from 'fs';
 import http, { Server } from 'http';
 import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 
+// Global error handlers to prevent EPIPE crashes
+process.on('uncaughtException', (error) => {
+  // Ignore EPIPE errors - they happen when writing to closed pipes
+  if ((error as NodeJS.ErrnoException).code === 'EPIPE') {
+    console.warn('[Electron] EPIPE error ignored (pipe closed)');
+    return;
+  }
+  console.error('[Electron] Uncaught exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Electron] Unhandled rejection at:', promise, 'reason:', reason);
+});
+
 // Development environment
 const isDev = !app.isPackaged;
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
@@ -57,9 +71,47 @@ function getIconPath(): string | null {
 }
 
 /**
+ * Check if a port is in use
+ */
+function isPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = http.createServer();
+    server.once('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+    server.once('listening', () => {
+      server.close();
+      resolve(false);
+    });
+    server.listen(port);
+  });
+}
+
+/**
+ * Wait for port to be available
+ */
+async function waitForPort(port: number, maxWait = 5000): Promise<void> {
+  const start = Date.now();
+  while (Date.now() - start < maxWait) {
+    if (!(await isPortInUse(port))) {
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  console.warn(`[Electron] Port ${port} still in use after ${maxWait}ms`);
+}
+
+/**
  * Start static file server for production builds
  */
 async function startStaticServer(): Promise<void> {
+  // Wait for port to be available
+  await waitForPort(STATIC_PORT);
+
   const staticPath = path.join(__dirname, '../dist');
 
   staticServer = http.createServer((request, response) => {
@@ -127,6 +179,9 @@ async function startStaticServer(): Promise<void> {
  * Start the backend server
  */
 async function startServer(): Promise<void> {
+  // Wait for port to be available
+  await waitForPort(SERVER_PORT);
+
   let command: string;
   let args: string[];
   let serverPath: string;
@@ -190,21 +245,50 @@ async function startServer(): Promise<void> {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
-  serverProcess.stdout?.on('data', (data) => {
-    console.log(`[Server] ${data.toString().trim()}`);
-  });
+  // Safe logging function that handles EPIPE errors
+  const safeLog = (prefix: string, data: Buffer) => {
+    try {
+      const message = data.toString().trim();
+      if (message) {
+        console.log(`${prefix} ${message}`);
+      }
+    } catch {
+      // Ignore logging errors
+    }
+  };
 
-  serverProcess.stderr?.on('data', (data) => {
-    console.error(`[Server Error] ${data.toString().trim()}`);
-  });
+  // Handle stdout with error protection
+  if (serverProcess.stdout) {
+    serverProcess.stdout.on('data', (data) => safeLog('[Server]', data));
+    serverProcess.stdout.on('error', (err) => {
+      if ((err as NodeJS.ErrnoException).code !== 'EPIPE') {
+        console.warn('[Electron] Server stdout error:', err.message);
+      }
+    });
+  }
+
+  // Handle stderr with error protection
+  if (serverProcess.stderr) {
+    serverProcess.stderr.on('data', (data) => safeLog('[Server Error]', data));
+    serverProcess.stderr.on('error', (err) => {
+      if ((err as NodeJS.ErrnoException).code !== 'EPIPE') {
+        console.warn('[Electron] Server stderr error:', err.message);
+      }
+    });
+  }
 
   serverProcess.on('close', (code) => {
+    // Remove stream listeners to prevent EPIPE errors after process closes
+    serverProcess?.stdout?.removeAllListeners();
+    serverProcess?.stderr?.removeAllListeners();
     console.log(`[Server] Process exited with code ${code}`);
     serverProcess = null;
   });
 
   serverProcess.on('error', (err) => {
     console.error(`[Server] Failed to start server process:`, err);
+    serverProcess?.stdout?.removeAllListeners();
+    serverProcess?.stderr?.removeAllListeners();
     serverProcess = null;
   });
 
@@ -251,6 +335,7 @@ function createWindow(): void {
     height: 950,
     minWidth: 1280,
     minHeight: 768,
+    show: true, // Explicitly show window
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -265,6 +350,30 @@ function createWindow(): void {
   }
 
   mainWindow = new BrowserWindow(windowOptions);
+
+  // Ensure window shows when ready
+  mainWindow.once('ready-to-show', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show();
+      mainWindow.focus();
+      // On macOS, bring the app to front
+      if (process.platform === 'darwin') {
+        app.focus({ steal: true });
+      }
+    }
+  });
+
+  // Fallback: also show on did-finish-load
+  mainWindow.webContents.once('did-finish-load', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show();
+      mainWindow.focus();
+      // On macOS, bring the app to front
+      if (process.platform === 'darwin') {
+        app.focus({ steal: true });
+      }
+    }
+  });
 
   // Load Vite dev server in development or static server in production
   if (VITE_DEV_SERVER_URL) {
@@ -331,13 +440,17 @@ app.whenReady().then(async () => {
   }
 
   app.on('activate', () => {
+    // macOS: Re-create window when dock icon is clicked and no windows exist
+    console.log('[Electron] ACTIVATE event - windows:', BrowserWindow.getAllWindows().length);
     if (BrowserWindow.getAllWindows().length === 0) {
+      console.log('[Electron] Creating new window from activate');
       createWindow();
     }
   });
 });
 
 app.on('window-all-closed', () => {
+  // On macOS, keep app running even when all windows are closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -346,7 +459,12 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   if (serverProcess) {
     console.log('[Electron] Stopping server...');
-    serverProcess.kill();
+    // Remove stream listeners first to prevent EPIPE errors during shutdown
+    serverProcess.stdout?.removeAllListeners();
+    serverProcess.stderr?.removeAllListeners();
+    serverProcess.removeAllListeners();
+    // Use SIGKILL to ensure the process actually dies
+    serverProcess.kill('SIGKILL');
     serverProcess = null;
   }
 
@@ -354,6 +472,19 @@ app.on('before-quit', () => {
     console.log('[Electron] Stopping static server...');
     staticServer.close();
     staticServer = null;
+  }
+});
+
+// Also handle quit event to ensure cleanup
+app.on('quit', () => {
+  // Final cleanup - kill any remaining server process
+  if (serverProcess && serverProcess.pid) {
+    try {
+      process.kill(serverProcess.pid, 'SIGKILL');
+    } catch {
+      // Process already dead
+    }
+    serverProcess = null;
   }
 });
 

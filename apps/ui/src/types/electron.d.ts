@@ -539,6 +539,27 @@ export interface ElectronAPI {
     error?: string;
   }>;
 
+  // Codex CLI Detection API
+  checkCodexCli: () => Promise<{
+    success: boolean;
+    status?: string;
+    method?: string;
+    version?: string;
+    path?: string;
+    recommendation?: string;
+    installCommands?: {
+      npm?: string;
+    };
+    auth?: {
+      authenticated: boolean;
+      method: string;
+      hasCredentialsFile?: boolean;
+      apiKeyValid?: boolean;
+      hasEnvApiKey?: boolean;
+    };
+    error?: string;
+  }>;
+
   // Model Management APIs
   model: {
     // Get all available models from all providers

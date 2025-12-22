@@ -393,6 +393,28 @@ export class HttpApiClient implements ElectronAPI {
     return this.get('/api/setup/claude-status');
   }
 
+  async checkCodexCli(): Promise<{
+    success: boolean;
+    status?: string;
+    method?: string;
+    version?: string;
+    path?: string;
+    recommendation?: string;
+    installCommands?: {
+      npm?: string;
+    };
+    auth?: {
+      authenticated: boolean;
+      method: string;
+      hasCredentialsFile?: boolean;
+      apiKeyValid?: boolean;
+      hasEnvApiKey?: boolean;
+    };
+    error?: string;
+  }> {
+    return this.get('/api/setup/codex-status');
+  }
+
   // Model API
   model = {
     getAvailable: async (): Promise<{
@@ -451,6 +473,45 @@ export class HttpApiClient implements ElectronAPI {
       message?: string;
       output?: string;
     }> => this.post('/api/setup/auth-claude'),
+
+    getCodexStatus: (): Promise<{
+      success: boolean;
+      status?: string;
+      installed?: boolean;
+      method?: string;
+      version?: string;
+      path?: string;
+      auth?: {
+        authenticated: boolean;
+        method: string;
+        hasCredentialsFile?: boolean;
+        apiKeyValid?: boolean;
+        hasEnvApiKey?: boolean;
+        hasCliAuth?: boolean;
+      };
+      recommendation?: string;
+      installCommands?: {
+        npm?: string;
+      };
+      error?: string;
+    }> => this.get('/api/setup/codex-status'),
+
+    installCodex: (): Promise<{
+      success: boolean;
+      message?: string;
+      installCommands?: {
+        npm?: string;
+      };
+      error?: string;
+    }> => this.post('/api/setup/install-codex'),
+
+    verifyCodexAuth: (
+      authMethod?: 'cli' | 'api_key'
+    ): Promise<{
+      success: boolean;
+      authenticated: boolean;
+      error?: string;
+    }> => this.post('/api/setup/verify-codex-auth', { authMethod }),
 
     storeApiKey: (
       provider: string,

@@ -19,6 +19,7 @@ export function createAvailableHandler() {
   return async (_req: Request, res: Response): Promise<void> => {
     try {
       const models: ModelDefinition[] = [
+        // Claude models
         {
           id: 'claude-opus-4-5-20251101',
           name: 'Claude Opus 4.5',
@@ -52,6 +53,43 @@ export function createAvailableHandler() {
           provider: 'anthropic',
           contextWindow: 200000,
           maxOutputTokens: 8192,
+          supportsVision: true,
+          supportsTools: true,
+        },
+        // OpenAI Codex models
+        {
+          id: 'gpt-5.2-codex',
+          name: 'GPT-5.2 Codex',
+          provider: 'openai',
+          contextWindow: 200000,
+          maxOutputTokens: 100000,
+          supportsVision: true,
+          supportsTools: true,
+        },
+        {
+          id: 'gpt-5.1-codex-max',
+          name: 'GPT-5.1 Codex Max',
+          provider: 'openai',
+          contextWindow: 200000,
+          maxOutputTokens: 100000,
+          supportsVision: true,
+          supportsTools: true,
+        },
+        {
+          id: 'gpt-5.1-codex-mini',
+          name: 'GPT-5.1 Codex Mini',
+          provider: 'openai',
+          contextWindow: 200000,
+          maxOutputTokens: 32768,
+          supportsVision: true,
+          supportsTools: true,
+        },
+        {
+          id: 'gpt-5.2',
+          name: 'GPT-5.2',
+          provider: 'openai',
+          contextWindow: 200000,
+          maxOutputTokens: 100000,
           supportsVision: true,
           supportsTools: true,
         },

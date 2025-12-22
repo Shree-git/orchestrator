@@ -1,4 +1,4 @@
-import type { AgentModel, ThinkingLevel } from '@/store/app-store';
+import type { AgentModel, ThinkingLevel, ModelProvider } from '@/store/app-store';
 import { Brain, Zap, Scale, Cpu, Rocket, Sparkles } from 'lucide-react';
 
 export type ModelOption = {
@@ -6,7 +6,7 @@ export type ModelOption = {
   label: string;
   description: string;
   badge?: string;
-  provider: 'claude';
+  provider: ModelProvider;
 };
 
 export const CLAUDE_MODELS: ModelOption[] = [
@@ -32,6 +32,40 @@ export const CLAUDE_MODELS: ModelOption[] = [
     provider: 'claude',
   },
 ];
+
+export const CODEX_MODELS: ModelOption[] = [
+  {
+    id: 'gpt-5.2-codex',
+    label: 'GPT-5.2 Codex',
+    description: 'Latest frontier agentic coding model.',
+    badge: 'Premium',
+    provider: 'openai',
+  },
+  {
+    id: 'gpt-5.1-codex-max',
+    label: 'GPT-5.1 Codex Max',
+    description: 'Deep and fast reasoning flagship.',
+    badge: 'Balanced',
+    provider: 'openai',
+  },
+  {
+    id: 'gpt-5.1-codex-mini',
+    label: 'GPT-5.1 Codex Mini',
+    description: 'Cheaper, faster, optimized for codex.',
+    badge: 'Speed',
+    provider: 'openai',
+  },
+  {
+    id: 'gpt-5.2',
+    label: 'GPT-5.2',
+    description: 'Latest frontier model for all tasks.',
+    badge: 'General',
+    provider: 'openai',
+  },
+];
+
+// All available models across providers
+export const ALL_MODELS: ModelOption[] = [...CLAUDE_MODELS, ...CODEX_MODELS];
 
 export const THINKING_LEVELS: ThinkingLevel[] = ['none', 'low', 'medium', 'high', 'ultrathink'];
 

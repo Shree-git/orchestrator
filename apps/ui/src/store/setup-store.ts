@@ -42,6 +42,23 @@ export interface ClaudeAuthStatus {
   error?: string;
 }
 
+// Codex Auth Method - all possible authentication sources
+export type CodexAuthMethod =
+  | 'api_key_env' // OPENAI_API_KEY environment variable
+  | 'api_key' // Manually stored API key
+  | 'cli_authenticated' // Codex CLI is installed and authenticated
+  | 'none';
+
+// Codex Auth Status
+export interface CodexAuthStatus {
+  authenticated: boolean;
+  method: CodexAuthMethod;
+  hasCredentialsFile?: boolean;
+  apiKeyValid?: boolean;
+  hasEnvApiKey?: boolean;
+  error?: string;
+}
+
 // Installation Progress
 export interface InstallProgress {
   isInstalling: boolean;
@@ -70,6 +87,11 @@ export interface SetupState {
   claudeAuthStatus: ClaudeAuthStatus | null;
   claudeInstallProgress: InstallProgress;
 
+  // Codex CLI state
+  codexCliStatus: CliStatus | null;
+  codexAuthStatus: CodexAuthStatus | null;
+  codexInstallProgress: InstallProgress;
+
   // GitHub CLI state
   ghCliStatus: GhCliStatus | null;
 
@@ -90,6 +112,12 @@ export interface SetupActions {
   setClaudeAuthStatus: (status: ClaudeAuthStatus | null) => void;
   setClaudeInstallProgress: (progress: Partial<InstallProgress>) => void;
   resetClaudeInstallProgress: () => void;
+
+  // Codex CLI
+  setCodexCliStatus: (status: CliStatus | null) => void;
+  setCodexAuthStatus: (status: CodexAuthStatus | null) => void;
+  setCodexInstallProgress: (progress: Partial<InstallProgress>) => void;
+  resetCodexInstallProgress: () => void;
 
   // GitHub CLI
   setGhCliStatus: (status: GhCliStatus | null) => void;
@@ -116,6 +144,10 @@ const initialState: SetupState = {
   claudeCliStatus: null,
   claudeAuthStatus: null,
   claudeInstallProgress: { ...initialInstallProgress },
+
+  codexCliStatus: null,
+  codexAuthStatus: null,
+  codexInstallProgress: { ...initialInstallProgress },
 
   ghCliStatus: null,
 
@@ -162,6 +194,24 @@ export const useSetupStore = create<SetupState & SetupActions>()(
       resetClaudeInstallProgress: () =>
         set({
           claudeInstallProgress: { ...initialInstallProgress },
+        }),
+
+      // Codex CLI
+      setCodexCliStatus: (status) => set({ codexCliStatus: status }),
+
+      setCodexAuthStatus: (status) => set({ codexAuthStatus: status }),
+
+      setCodexInstallProgress: (progress) =>
+        set({
+          codexInstallProgress: {
+            ...get().codexInstallProgress,
+            ...progress,
+          },
+        }),
+
+      resetCodexInstallProgress: () =>
+        set({
+          codexInstallProgress: { ...initialInstallProgress },
         }),
 
       // GitHub CLI

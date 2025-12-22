@@ -10,6 +10,7 @@ import { SettingsNavigation } from './settings-view/components/settings-navigati
 import { ApiKeysSection } from './settings-view/api-keys/api-keys-section';
 import { ClaudeUsageSection } from './settings-view/api-keys/claude-usage-section';
 import { ClaudeCliStatus } from './settings-view/cli-status/claude-cli-status';
+import { CodexCliStatus } from './settings-view/cli-status/codex-cli-status';
 import { AIEnhancementSection } from './settings-view/ai-enhancement';
 import { AppearanceSection } from './settings-view/appearance/appearance-section';
 import { TerminalSection } from './settings-view/terminal/terminal-section';
@@ -81,7 +82,14 @@ export function SettingsView() {
   };
 
   // Use CLI status hook
-  const { claudeCliStatus, isCheckingClaudeCli, handleRefreshClaudeCli } = useCliStatus();
+  const {
+    claudeCliStatus,
+    isCheckingClaudeCli,
+    handleRefreshClaudeCli,
+    codexCliStatus,
+    isCheckingCodexCli,
+    handleRefreshCodexCli,
+  } = useCliStatus();
 
   // Use settings view navigation hook
   const { activeView, navigateTo } = useSettingsView();
@@ -101,6 +109,16 @@ export function SettingsView() {
               onRefresh={handleRefreshClaudeCli}
             />
             {showUsageTracking && <ClaudeUsageSection />}
+          </div>
+        );
+      case 'codex':
+        return (
+          <div className="space-y-6">
+            <CodexCliStatus
+              status={codexCliStatus}
+              isChecking={isCheckingCodexCli}
+              onRefresh={handleRefreshCodexCli}
+            />
           </div>
         );
       case 'ai-enhancement':

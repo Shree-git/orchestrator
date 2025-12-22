@@ -307,6 +307,25 @@ export interface ElectronAPI {
     };
     error?: string;
   }>;
+  checkCodexCli?: () => Promise<{
+    success: boolean;
+    status?: string;
+    method?: string;
+    version?: string;
+    path?: string;
+    recommendation?: string;
+    installCommands?: {
+      npm?: string;
+    };
+    auth?: {
+      authenticated: boolean;
+      method: string;
+      hasCredentialsFile?: boolean;
+      apiKeyValid?: boolean;
+      hasEnvApiKey?: boolean;
+    };
+    error?: string;
+  }>;
   model?: {
     getAvailable: () => Promise<{
       success: boolean;
@@ -372,6 +391,35 @@ export interface ElectronAPI {
       message?: string;
       output?: string;
     }>;
+    getCodexStatus: () => Promise<{
+      success: boolean;
+      status?: string;
+      installed?: boolean;
+      method?: string;
+      version?: string;
+      path?: string;
+      auth?: {
+        authenticated: boolean;
+        method: string;
+        hasCredentialsFile?: boolean;
+        apiKeyValid?: boolean;
+        hasEnvApiKey?: boolean;
+        hasCliAuth?: boolean;
+      };
+      recommendation?: string;
+      installCommands?: {
+        npm?: string;
+      };
+      error?: string;
+    }>;
+    installCodex: () => Promise<{
+      success: boolean;
+      message?: string;
+      installCommands?: {
+        npm?: string;
+      };
+      error?: string;
+    }>;
     storeApiKey: (
       provider: string,
       apiKey: string
@@ -394,6 +442,11 @@ export interface ElectronAPI {
       isLinux: boolean;
     }>;
     verifyClaudeAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
+      success: boolean;
+      authenticated: boolean;
+      error?: string;
+    }>;
+    verifyCodexAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
       success: boolean;
       authenticated: boolean;
       error?: string;
@@ -832,6 +885,12 @@ const getMockElectronAPI = (): ElectronAPI => {
       recommendation: 'Claude CLI checks are unavailable in the web preview.',
     }),
 
+    checkCodexCli: async () => ({
+      success: false,
+      status: 'not_installed',
+      recommendation: 'Codex CLI checks are unavailable in the web preview.',
+    }),
+
     model: {
       getAvailable: async () => ({ success: true, models: [] }),
       checkProviders: async () => ({ success: true, providers: {} }),
@@ -928,11 +987,41 @@ interface SetupAPI {
     message?: string;
     output?: string;
   }>;
+  getCodexStatus: () => Promise<{
+    success: boolean;
+    status?: string;
+    installed?: boolean;
+    method?: string;
+    version?: string;
+    path?: string;
+    auth?: {
+      authenticated: boolean;
+      method: string;
+      hasCredentialsFile?: boolean;
+      apiKeyValid?: boolean;
+      hasEnvApiKey?: boolean;
+      hasCliAuth?: boolean;
+    };
+    recommendation?: string;
+    installCommands?: {
+      npm?: string;
+    };
+    error?: string;
+  }>;
+  installCodex: () => Promise<{
+    success: boolean;
+    message?: string;
+    installCommands?: {
+      npm?: string;
+    };
+    error?: string;
+  }>;
   storeApiKey: (provider: string, apiKey: string) => Promise<{ success: boolean; error?: string }>;
   getApiKeys: () => Promise<{
     success: boolean;
     hasAnthropicKey: boolean;
     hasGoogleKey: boolean;
+    hasOpenAIKey?: boolean;
   }>;
   deleteApiKey: (
     provider: string
@@ -947,6 +1036,11 @@ interface SetupAPI {
     isLinux: boolean;
   }>;
   verifyClaudeAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
+    success: boolean;
+    authenticated: boolean;
+    error?: string;
+  }>;
+  verifyCodexAuth: (authMethod?: 'cli' | 'api_key') => Promise<{
     success: boolean;
     authenticated: boolean;
     error?: string;
@@ -1004,6 +1098,40 @@ function createMockSetupAPI(): SetupAPI {
       };
     },
 
+    getCodexStatus: async () => {
+      console.log('[Mock] Getting Codex status');
+      return {
+        success: true,
+        status: 'not_installed',
+        installed: false,
+        auth: {
+          authenticated: false,
+          method: 'none',
+          hasCredentialsFile: false,
+          apiKeyValid: false,
+          hasEnvApiKey: false,
+          hasCliAuth: false,
+        },
+        recommendation: 'Install Codex CLI using: npm install -g @openai/codex',
+        installCommands: {
+          npm: 'npm install -g @openai/codex',
+        },
+      };
+    },
+
+    installCodex: async () => {
+      console.log('[Mock] Installing Codex CLI');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return {
+        success: false,
+        error:
+          'CLI installation is only available in the Electron app. Please run the command manually.',
+        installCommands: {
+          npm: 'npm install -g @openai/codex',
+        },
+      };
+    },
+
     storeApiKey: async (provider: string, apiKey: string) => {
       console.log('[Mock] Storing API key for:', provider);
       // In mock mode, we just pretend to store it (it's already in the app store)
@@ -1016,6 +1144,7 @@ function createMockSetupAPI(): SetupAPI {
         success: true,
         hasAnthropicKey: false,
         hasGoogleKey: false,
+        hasOpenAIKey: false,
       };
     },
 
@@ -1038,6 +1167,16 @@ function createMockSetupAPI(): SetupAPI {
 
     verifyClaudeAuth: async (authMethod?: 'cli' | 'api_key') => {
       console.log('[Mock] Verifying Claude auth with method:', authMethod);
+      // Mock always returns not authenticated
+      return {
+        success: true,
+        authenticated: false,
+        error: 'Mock environment - authentication not available',
+      };
+    },
+
+    verifyCodexAuth: async (authMethod?: 'cli' | 'api_key') => {
+      console.log('[Mock] Verifying Codex auth with method:', authMethod);
       // Mock always returns not authenticated
       return {
         success: true,

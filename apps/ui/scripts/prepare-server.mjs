@@ -7,7 +7,7 @@
  */
 
 import { execSync } from 'child_process';
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync, readFileSync, lstatSync, readdirSync, unlinkSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -111,6 +111,28 @@ execSync('npm install --omit=dev', {
     npm_config_workspace: '',
   },
 });
+
+// Step 6.5: Replace symlinks with actual files
+// npm creates symlinks for file: dependencies, but these break in the app bundle
+console.log('🔗 Replacing symlinks with actual files...');
+const automakerModulesDir = join(BUNDLE_DIR, 'node_modules', '@automaker');
+if (existsSync(automakerModulesDir)) {
+  const entries = readdirSync(automakerModulesDir);
+  for (const entry of entries) {
+    const entryPath = join(automakerModulesDir, entry);
+    const stat = lstatSync(entryPath);
+    if (stat.isSymbolicLink()) {
+      // Remove symlink
+      unlinkSync(entryPath);
+      // Copy actual files from libs
+      const srcDir = join(bundleLibsDir, entry);
+      if (existsSync(srcDir)) {
+        cpSync(srcDir, entryPath, { recursive: true });
+        console.log(`   ✓ Replaced symlink: @automaker/${entry}`);
+      }
+    }
+  }
+}
 
 // Step 7: Rebuild native modules for current architecture
 // This is critical for modules like node-pty that have native bindings

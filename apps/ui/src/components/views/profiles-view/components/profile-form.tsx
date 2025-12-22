@@ -9,7 +9,7 @@ import { DialogFooter } from '@/components/ui/dialog';
 import { Brain } from 'lucide-react';
 import { toast } from 'sonner';
 import type { AIProfile, AgentModel, ThinkingLevel } from '@/store/app-store';
-import { CLAUDE_MODELS, THINKING_LEVELS, ICON_OPTIONS } from '../constants';
+import { CLAUDE_MODELS, CODEX_MODELS, THINKING_LEVELS, ICON_OPTIONS } from '../constants';
 import { getProviderFromModel } from '../utils';
 
 interface ProfileFormProps {
@@ -114,28 +114,56 @@ export function ProfileForm({
         </div>
 
         {/* Model Selection */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label className="flex items-center gap-2">
             <Brain className="w-4 h-4 text-primary" />
             Model
           </Label>
-          <div className="flex gap-2 flex-wrap">
-            {CLAUDE_MODELS.map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => handleModelChange(id)}
-                className={cn(
-                  'flex-1 min-w-[100px] px-3 py-2 rounded-md border text-sm font-medium transition-colors',
-                  formData.model === id
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-background hover:bg-accent border-border'
-                )}
-                data-testid={`model-select-${id}`}
-              >
-                {label.replace('Claude ', '')}
-              </button>
-            ))}
+          <div className="space-y-3">
+            {/* Claude Models */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Claude (SDK)</p>
+              <div className="flex gap-2 flex-wrap">
+                {CLAUDE_MODELS.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleModelChange(id)}
+                    className={cn(
+                      'flex-1 min-w-[80px] px-3 py-2 rounded-md border text-sm font-medium transition-colors',
+                      formData.model === id
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background hover:bg-accent border-border'
+                    )}
+                    data-testid={`model-select-${id}`}
+                  >
+                    {label.replace('Claude ', '')}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Codex Models */}
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">OpenAI Codex (CLI)</p>
+              <div className="flex gap-2 flex-wrap">
+                {CODEX_MODELS.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleModelChange(id)}
+                    className={cn(
+                      'flex-1 min-w-[80px] px-3 py-2 rounded-md border text-sm font-medium transition-colors',
+                      formData.model === id
+                        ? 'bg-green-600 text-white border-green-600'
+                        : 'bg-background hover:bg-accent border-border'
+                    )}
+                    data-testid={`model-select-${id}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

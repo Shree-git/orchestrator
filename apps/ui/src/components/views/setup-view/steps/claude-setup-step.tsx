@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   XCircle,
   Trash2,
+  Cpu,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { StatusBadge, TerminalOutput } from '../components';
@@ -51,10 +52,16 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
     setClaudeCliStatus,
     setClaudeAuthStatus,
     setClaudeInstallProgress,
+    codexCliStatus,
+    codexAuthStatus,
+    setCodexCliStatus,
+    setCodexAuthStatus,
+    setCodexInstallProgress,
   } = useSetupStore();
   const { setApiKeys, apiKeys } = useAppStore();
 
   const [apiKey, setApiKey] = useState('');
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
 
   // CLI Verification state
   const [cliVerificationStatus, setCliVerificationStatus] = useState<VerificationStatus>('idle');
@@ -67,6 +74,13 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
 
   // Delete API Key state
   const [isDeletingApiKey, setIsDeletingApiKey] = useState(false);
+
+  // Codex CLI Verification state
+  const [codexCliVerificationStatus, setCodexCliVerificationStatus] =
+    useState<VerificationStatus>('idle');
+  const [codexCliVerificationError, setCodexCliVerificationError] = useState<string | null>(null);
+  const [isCheckingCodex, setIsCheckingCodex] = useState(false);
+  const [isSavingOpenaiKey, setIsSavingOpenaiKey] = useState(false);
 
   // Memoize API functions to prevent infinite loops
   const statusApi = useCallback(
@@ -240,6 +254,118 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
     }
   }, [apiKeys, setApiKeys, claudeAuthStatus, setClaudeAuthStatus]);
 
+  // Check Codex CLI status
+  const checkCodexStatus = useCallback(async () => {
+    setIsCheckingCodex(true);
+    try {
+      const api = getElectronAPI();
+      if (!api.setup?.getCodexStatus) {
+        console.error('Codex status API not available');
+        return;
+      }
+
+      const result = await api.setup.getCodexStatus();
+      if (result.success) {
+        setCodexCliStatus({
+          installed: result.status === 'installed',
+          path: result.path || null,
+          version: result.version || null,
+          method: result.method || 'none',
+        });
+
+        if (result.auth) {
+          setCodexAuthStatus({
+            authenticated: result.auth.authenticated,
+            method: result.auth.method as any,
+            hasCredentialsFile: result.auth.hasCredentialsFile || false,
+            apiKeyValid: result.auth.apiKeyValid,
+            hasEnvApiKey: result.auth.hasEnvApiKey,
+          });
+
+          // Auto-verify if already authenticated
+          if (result.auth.authenticated) {
+            setCodexCliVerificationStatus('verified');
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check Codex status:', error);
+    } finally {
+      setIsCheckingCodex(false);
+    }
+  }, [setCodexCliStatus, setCodexAuthStatus]);
+
+  // Save OpenAI API Key
+  const saveOpenaiApiKey = useCallback(async () => {
+    if (!openaiApiKey.trim()) return;
+
+    setIsSavingOpenaiKey(true);
+    try {
+      const api = getElectronAPI();
+      if (!api.setup?.storeApiKey) {
+        toast.error('Store API key not available');
+        return;
+      }
+
+      const result = await api.setup.storeApiKey('openai', openaiApiKey);
+      if (result.success) {
+        setCodexAuthStatus({
+          authenticated: true,
+          method: 'api_key',
+          hasCredentialsFile: false,
+          apiKeyValid: true,
+        });
+        toast.success('OpenAI API key saved! Click "Verify" to test it.');
+      } else {
+        toast.error(result.error || 'Failed to save API key');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save API key';
+      toast.error(errorMessage);
+    } finally {
+      setIsSavingOpenaiKey(false);
+    }
+  }, [openaiApiKey, setCodexAuthStatus]);
+
+  // Verify Codex CLI authentication by running a test query
+  const verifyCodexAuth = useCallback(async () => {
+    setCodexCliVerificationStatus('verifying');
+    setCodexCliVerificationError(null);
+
+    try {
+      const api = getElectronAPI();
+      if (!api.setup?.verifyCodexAuth) {
+        setCodexCliVerificationStatus('error');
+        setCodexCliVerificationError('Verification API not available');
+        return;
+      }
+
+      const result = await api.setup.verifyCodexAuth();
+
+      if (result.authenticated) {
+        setCodexCliVerificationStatus('verified');
+        setCodexAuthStatus({
+          authenticated: true,
+          method: 'cli_authenticated',
+          hasCredentialsFile: codexAuthStatus?.hasCredentialsFile || false,
+        });
+        toast.success('Codex CLI authentication verified!');
+      } else {
+        setCodexCliVerificationStatus('error');
+        setCodexCliVerificationError(result.error || 'Authentication failed');
+        setCodexAuthStatus({
+          authenticated: false,
+          method: 'none',
+          hasCredentialsFile: codexAuthStatus?.hasCredentialsFile || false,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Verification failed';
+      setCodexCliVerificationStatus('error');
+      setCodexCliVerificationError(errorMessage);
+    }
+  }, [codexAuthStatus, setCodexAuthStatus]);
+
   // Sync install progress to store
   useEffect(() => {
     setClaudeInstallProgress({
@@ -251,7 +377,8 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
   // Check status on mount
   useEffect(() => {
     checkStatus();
-  }, [checkStatus]);
+    checkCodexStatus();
+  }, [checkStatus, checkCodexStatus]);
 
   const copyCommand = (command: string) => {
     navigator.clipboard.writeText(command);
@@ -265,11 +392,13 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
     claudeAuthStatus?.method === 'api_key_env';
   const isCliVerified = cliVerificationStatus === 'verified';
   const isApiKeyVerified = apiKeyVerificationStatus === 'verified';
-  const isReady = isCliVerified || isApiKeyVerified;
+  const isCodexVerified = codexCliVerificationStatus === 'verified';
+  const isReady = isCliVerified || isApiKeyVerified || isCodexVerified;
 
   const getAuthMethodLabel = () => {
     if (isApiKeyVerified) return 'API Key';
     if (isCliVerified) return 'Claude CLI';
+    if (isCodexVerified) return 'Codex CLI';
     return null;
   };
 
@@ -304,6 +433,24 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
       return <StatusBadge status="unverified" label="Unverified" />;
     }
     return <StatusBadge status="not_authenticated" label="Not Set" />;
+  };
+
+  // Helper to get status badge for Codex CLI
+  const getCodexStatusBadge = () => {
+    if (codexCliVerificationStatus === 'verified') {
+      return <StatusBadge status="authenticated" label="Verified" />;
+    }
+    if (codexCliVerificationStatus === 'error') {
+      return <StatusBadge status="error" label="Error" />;
+    }
+    if (isCheckingCodex) {
+      return <StatusBadge status="checking" label="Checking..." />;
+    }
+    if (codexCliStatus?.installed || codexAuthStatus?.authenticated) {
+      // Installed but not yet verified - show yellow unverified badge
+      return <StatusBadge status="unverified" label="Unverified" />;
+    }
+    return <StatusBadge status="not_installed" label="Not Installed" />;
   };
 
   return (
@@ -649,6 +796,197 @@ export function ClaudeSetupStep({ onNext, onBack, onSkip }: ClaudeSetupStepProps
                       <>
                         <ShieldCheck className="w-4 h-4 mr-2" />
                         Verify API Key
+                      </>
+                    )}
+                  </Button>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Option 3: OpenAI Codex CLI */}
+            <AccordionItem value="codex-cli" className="border-border">
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center justify-between w-full pr-4">
+                  <div className="flex items-center gap-3">
+                    <Cpu
+                      className={`w-5 h-5 ${
+                        codexCliVerificationStatus === 'verified'
+                          ? 'text-green-500'
+                          : 'text-muted-foreground'
+                      }`}
+                    />
+                    <div className="text-left">
+                      <p className="font-medium text-foreground">OpenAI Codex CLI</p>
+                      <p className="text-sm text-muted-foreground">
+                        Use ChatGPT/OpenAI models via Codex CLI
+                      </p>
+                    </div>
+                  </div>
+                  {getCodexStatusBadge()}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-4 space-y-4">
+                {/* Codex CLI Install Section */}
+                {!codexCliStatus?.installed && !codexAuthStatus?.authenticated && (
+                  <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
+                    <div className="flex items-center gap-2">
+                      <Download className="w-4 h-4 text-muted-foreground" />
+                      <p className="font-medium text-foreground">Install Codex CLI</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">npm (Recommended)</Label>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
+                          npm install -g @openai/codex
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyCommand('npm install -g @openai/codex')}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground">macOS (Homebrew)</Label>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono text-foreground">
+                          brew install openai/codex/codex
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyCommand('brew install openai/codex/codex')}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      After installing, run{' '}
+                      <code className="bg-muted px-1 py-0.5 rounded">codex login</code> to
+                      authenticate.
+                    </p>
+                  </div>
+                )}
+
+                {/* OpenAI API Key Input */}
+                <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
+                  <div className="flex items-center gap-2">
+                    <Key className="w-4 h-4 text-muted-foreground" />
+                    <p className="font-medium text-foreground">OpenAI API Key (Alternative)</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="openai-key" className="text-foreground">
+                      API Key
+                    </Label>
+                    <Input
+                      id="openai-key"
+                      type="password"
+                      placeholder="sk-..."
+                      value={openaiApiKey}
+                      onChange={(e) => setOpenaiApiKey(e.target.value)}
+                      className="bg-input border-border text-foreground"
+                      data-testid="openai-api-key-input"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Don&apos;t have an API key?{' '}
+                      <a
+                        href="https://platform.openai.com/api-keys"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-500 hover:underline"
+                      >
+                        Get one from OpenAI Platform
+                        <ExternalLink className="w-3 h-3 inline ml-1" />
+                      </a>
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={saveOpenaiApiKey}
+                    disabled={isSavingOpenaiKey || !openaiApiKey.trim()}
+                    className="w-full bg-brand-500 hover:bg-brand-600 text-white"
+                    data-testid="save-openai-key-button"
+                  >
+                    {isSavingOpenaiKey ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Save OpenAI API Key'
+                    )}
+                  </Button>
+                </div>
+
+                {/* Codex CLI Version Info */}
+                {codexCliStatus?.installed && codexCliStatus?.version && (
+                  <p className="text-sm text-muted-foreground">Version: {codexCliStatus.version}</p>
+                )}
+
+                {/* Codex CLI Verification Status */}
+                {codexCliVerificationStatus === 'verifying' && (
+                  <div className="flex items-center gap-3 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                    <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                    <div>
+                      <p className="font-medium text-foreground">
+                        Verifying Codex authentication...
+                      </p>
+                      <p className="text-sm text-muted-foreground">Running a test query</p>
+                    </div>
+                  </div>
+                )}
+
+                {codexCliVerificationStatus === 'verified' && (
+                  <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <div>
+                      <p className="font-medium text-foreground">Codex CLI ready!</p>
+                      <p className="text-sm text-muted-foreground">
+                        You can now use OpenAI models.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {codexCliVerificationStatus === 'error' && codexCliVerificationError && (
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">Verification failed</p>
+                      <p className="text-sm text-red-400 mt-1">{codexCliVerificationError}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Codex Verify Button */}
+                {codexCliVerificationStatus !== 'verified' && (
+                  <Button
+                    onClick={verifyCodexAuth}
+                    disabled={codexCliVerificationStatus === 'verifying'}
+                    className="w-full bg-brand-500 hover:bg-brand-600 text-white"
+                    data-testid="verify-codex-button"
+                  >
+                    {codexCliVerificationStatus === 'verifying' ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : codexCliVerificationStatus === 'error' ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Retry Verification
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="w-4 h-4 mr-2" />
+                        Verify Codex Authentication
                       </>
                     )}
                   </Button>

@@ -28,6 +28,15 @@ export const CLAUDE_MODELS: { id: AgentModel; label: string }[] = [
   { id: 'opus', label: 'Claude Opus' },
 ];
 
+export const CODEX_MODELS: { id: AgentModel; label: string }[] = [
+  { id: 'gpt-5.2-codex', label: 'GPT-5.2 Codex' },
+  { id: 'gpt-5.1-codex-max', label: 'GPT-5.1 Codex Max' },
+  { id: 'gpt-5.1-codex-mini', label: 'GPT-5.1 Codex Mini' },
+  { id: 'gpt-5.2', label: 'GPT-5.2' },
+];
+
+export const ALL_MODELS: { id: AgentModel; label: string }[] = [...CLAUDE_MODELS, ...CODEX_MODELS];
+
 export const THINKING_LEVELS: { id: ThinkingLevel; label: string }[] = [
   { id: 'none', label: 'None' },
   { id: 'low', label: 'Low' },
