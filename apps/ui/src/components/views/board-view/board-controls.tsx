@@ -1,6 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ImageIcon, Archive, Minimize2, Square, Maximize2 } from 'lucide-react';
+import {
+  ImageIcon,
+  Archive,
+  Minimize2,
+  Square,
+  Maximize2,
+  CheckSquare,
+  Trash2,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BoardControlsProps {
@@ -10,6 +18,10 @@ interface BoardControlsProps {
   completedCount: number;
   kanbanCardDetailLevel: 'minimal' | 'standard' | 'detailed';
   onDetailLevelChange: (level: 'minimal' | 'standard' | 'detailed') => void;
+  isSelectionMode: boolean;
+  onToggleSelectionMode: () => void;
+  selectedCount: number;
+  onBatchDelete: () => void;
 }
 
 export function BoardControls({
@@ -19,6 +31,10 @@ export function BoardControls({
   completedCount,
   kanbanCardDetailLevel,
   onDetailLevelChange,
+  isSelectionMode,
+  onToggleSelectionMode,
+  selectedCount,
+  onBatchDelete,
 }: BoardControlsProps) {
   if (!isMounted) return null;
 
@@ -65,6 +81,62 @@ export function BoardControls({
             <p>Completed Features ({completedCount})</p>
           </TooltipContent>
         </Tooltip>
+
+        {/* Selection Mode Toggle Button */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isSelectionMode ? 'default' : 'outline'}
+              size="sm"
+              onClick={onToggleSelectionMode}
+              className={cn(
+                'h-8 px-3 relative gap-1.5',
+                isSelectionMode && 'bg-brand-500 hover:bg-brand-600 text-white'
+              )}
+              data-testid="selection-mode-button"
+            >
+              <CheckSquare className="w-4 h-4" />
+              <span className="text-xs font-medium">
+                {isSelectionMode ? 'Exit Select' : 'Select'}
+              </span>
+              {isSelectionMode && selectedCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-brand-500 text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">
+                  {selectedCount > 99 ? '99+' : selectedCount}
+                </span>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              {isSelectionMode
+                ? `Selection Mode (${selectedCount} selected)`
+                : 'Enable Selection Mode'}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Batch Delete Button - Only shown when in selection mode with items selected */}
+        {isSelectionMode && selectedCount > 0 && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={onBatchDelete}
+                className="h-8 px-3 gap-1.5"
+                data-testid="batch-delete-button"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="text-xs font-medium">Delete ({selectedCount})</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                Delete {selectedCount} selected feature{selectedCount !== 1 ? 's' : ''}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         {/* Kanban Card Detail Level Toggle */}
         <div

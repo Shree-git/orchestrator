@@ -25,6 +25,64 @@ import type {
 import type { Message, SessionListItem } from '@/types/electron';
 import type { Feature, ClaudeUsageResponse } from '@/store/app-store';
 import type { WorktreeAPI, GitAPI, ModelDefinition, ProviderStatus } from '@/types/electron';
+
+// Codex usage types
+export type CodexUsage = {
+  dailyTokensUsed: number;
+  dailyLimit: number;
+  dailyPercentage: number;
+  dailyResetTime: string;
+  dailyResetText: string;
+  monthlyTokensUsed: number;
+  monthlyLimit: number;
+  monthlyPercentage: number;
+  monthlyResetTime: string;
+  monthlyResetText: string;
+  costUsed: number | null;
+  costLimit: number | null;
+  costCurrency: string | null;
+  requestsUsed: number;
+  requestsLimit: number;
+  requestsPercentage: number;
+  requestsResetTime: string;
+  requestsResetText: string;
+  lastUpdated: string;
+  userTimezone: string;
+  authenticationRequired: boolean;
+};
+
+export type CodexStatus = {
+  indicator: {
+    color: 'green' | 'yellow' | 'orange' | 'red' | 'gray';
+  };
+  description: string;
+};
+
+export type CodexUsageResponse = {
+  success: boolean;
+  data?: CodexUsage;
+  error?: string;
+  message?: string;
+};
+
+export type CodexStatusResponse = {
+  success: boolean;
+  data?: CodexStatus;
+  error?: string;
+  message?: string;
+};
+
+export type CodexAuthStatusResponse = {
+  success: boolean;
+  data?: {
+    available: boolean;
+    authenticated: boolean;
+    method: 'none' | 'api_key' | 'api_key_env' | 'cli_authenticated';
+    hasApiKey: boolean;
+    hasCliAccess: boolean;
+  };
+  error?: string;
+};
 import { getGlobalFileBrowser } from '@/contexts/file-browser-context';
 
 // Server URL - configurable via environment variable
@@ -1061,6 +1119,15 @@ export class HttpApiClient implements ElectronAPI {
   // Claude API
   claude = {
     getUsage: (): Promise<ClaudeUsageResponse> => this.get('/api/claude/usage'),
+  };
+
+  // Codex API
+  codex = {
+    getUsage: (): Promise<CodexUsageResponse> => this.get('/api/codex/usage'),
+    refreshUsage: (forceRefresh?: boolean): Promise<CodexUsageResponse> =>
+      this.post('/api/codex/usage/refresh', { forceRefresh }),
+    getStatus: (): Promise<CodexStatusResponse> => this.get('/api/codex/status'),
+    getAuthStatus: (): Promise<CodexAuthStatusResponse> => this.get('/api/codex/auth'),
   };
 }
 

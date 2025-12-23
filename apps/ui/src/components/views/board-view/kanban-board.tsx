@@ -48,6 +48,11 @@ interface KanbanBoardProps {
   onShowSuggestions: () => void;
   suggestionsCount: number;
   onArchiveAllVerified: () => void;
+  // Batch selection props
+  isSelectionMode: boolean;
+  selectedFeatureIds: string[];
+  onSelectFeatures: (featureIds: string[]) => void;
+  onDeselectFeatures: (featureIds: string[]) => void;
 }
 
 export function KanbanBoard({
@@ -80,6 +85,10 @@ export function KanbanBoard({
   onShowSuggestions,
   suggestionsCount,
   onArchiveAllVerified,
+  isSelectionMode,
+  selectedFeatureIds,
+  onSelectFeatures,
+  onDeselectFeatures,
 }: KanbanBoardProps) {
   // Use responsive column widths based on window size
   const { columnWidth } = useResponsiveKanban(COLUMNS.length);
@@ -106,6 +115,11 @@ export function KanbanBoard({
                 opacity={backgroundSettings.columnOpacity}
                 showBorder={backgroundSettings.columnBorderEnabled}
                 hideScrollbar={backgroundSettings.hideScrollbar}
+                featureIds={columnFeatures.map((f) => f.id)}
+                isSelectionMode={isSelectionMode}
+                selectedFeatureIds={selectedFeatureIds}
+                onSelectAll={onSelectFeatures}
+                onDeselectAll={onDeselectFeatures}
                 headerAction={
                   column.id === 'verified' && columnFeatures.length > 0 ? (
                     <Button

@@ -46,6 +46,8 @@ import { SettingsService } from './services/settings-service.js';
 import { createSpecRegenerationRoutes } from './routes/app-spec/index.js';
 import { createClaudeRoutes } from './routes/claude/index.js';
 import { ClaudeUsageService } from './services/claude-usage-service.js';
+import { createCodexRoutes } from './routes/codex/index.js';
+import { CodexUsageService } from './services/codex-usage-service.js';
 
 // Load environment variables
 dotenv.config();
@@ -114,6 +116,7 @@ const featureLoader = new FeatureLoader();
 const autoModeService = new AutoModeService(events);
 const settingsService = new SettingsService(DATA_DIR);
 const claudeUsageService = new ClaudeUsageService();
+const codexUsageService = new CodexUsageService();
 
 // Initialize services
 (async () => {
@@ -145,6 +148,7 @@ app.use('/api/templates', createTemplatesRoutes());
 app.use('/api/terminal', createTerminalRoutes());
 app.use('/api/settings', createSettingsRoutes(settingsService));
 app.use('/api/claude', createClaudeRoutes(claudeUsageService));
+app.use('/api/codex', createCodexRoutes(codexUsageService));
 
 // Create HTTP server
 const server = createServer(app);

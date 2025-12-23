@@ -1,5 +1,6 @@
 export { AddFeatureDialog } from './add-feature-dialog';
 export { AgentOutputModal } from './agent-output-modal';
+export { BatchDeleteDialog } from './batch-delete-dialog';
 export { CompletedFeaturesModal } from './completed-features-modal';
 export { ArchiveAllVerifiedDialog } from './archive-all-verified-dialog';
 export { DeleteCompletedFeatureDialog } from './delete-completed-feature-dialog';

@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Feature, useAppStore } from '@/store/app-store';
 import { CardBadges, PriorityBadges } from './card-badges';
 import { CardHeaderSection } from './card-header';
@@ -61,7 +62,33 @@ export const KanbanCard = memo(function KanbanCard({
   cardBorderEnabled = true,
   cardBorderOpacity = 100,
 }: KanbanCardProps) {
-  const { kanbanCardDetailLevel, useWorktrees } = useAppStore();
+  const {
+    kanbanCardDetailLevel,
+    useWorktrees,
+    isSelectionMode,
+    selectedFeatureIds,
+    toggleFeatureSelection,
+  } = useAppStore();
+
+  const isSelected = selectedFeatureIds.includes(feature.id);
+
+  const handleCheckboxClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      toggleFeatureSelection(feature.id);
+    },
+    [feature.id, toggleFeatureSelection]
+  );
+
+  const handleCheckboxChange = useCallback(
+    (checked: boolean) => {
+      // Only toggle if the state actually changes
+      if (checked !== isSelected) {
+        toggleFeatureSelection(feature.id);
+      }
+    },
+    [feature.id, isSelected, toggleFeatureSelection]
+  );
 
   const showSteps = kanbanCardDetailLevel === 'standard' || kanbanCardDetailLevel === 'detailed';
 
@@ -111,7 +138,9 @@ export const KanbanCard = memo(function KanbanCard({
         feature.error &&
           !isCurrentAutoTask &&
           'border-[var(--status-error)] border-2 shadow-[var(--status-error-bg)] shadow-lg',
-        !isDraggable && 'cursor-default'
+        !isDraggable && 'cursor-default',
+        // Selection state
+        isSelectionMode && isSelected && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
       )}
       data-testid={`kanban-card-${feature.id}`}
       onDoubleClick={onEdit}
@@ -127,6 +156,27 @@ export const KanbanCard = memo(function KanbanCard({
           )}
           style={{ opacity: opacity / 100 }}
         />
+      )}
+
+      {/* Selection Checkbox - only shown in selection mode */}
+      {isSelectionMode && (
+        <div
+          className="absolute top-2 left-2 z-10"
+          onClick={handleCheckboxClick}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={handleCheckboxChange}
+            className={cn(
+              'h-5 w-5 rounded border-2',
+              'bg-background/90 backdrop-blur-sm',
+              'transition-all duration-150',
+              isSelected && 'bg-primary border-primary'
+            )}
+            aria-label={`Select ${feature.title || 'feature'}`}
+          />
+        </div>
       )}
 
       {/* Status Badges Row */}

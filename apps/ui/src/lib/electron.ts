@@ -1,6 +1,7 @@
 // Type definitions for Electron IPC API
 import type { SessionListItem, Message } from '@/types/electron';
 import type { ClaudeUsageResponse } from '@/store/app-store';
+import type { CodexUsageResponse } from '../../server/src/routes/codex/types';
 import { getJSON, setJSON, removeItem } from './storage';
 
 export interface FileEntry {
@@ -523,6 +524,19 @@ export interface ElectronAPI {
   claude?: {
     getUsage: () => Promise<ClaudeUsageResponse>;
   };
+  codex?: {
+    getUsage: () => Promise<CodexUsageResponse>;
+    getStatus: () => Promise<{
+      success: boolean;
+      data?: {
+        indicator: { color: 'green' | 'yellow' | 'orange' | 'red' | 'gray' };
+        description: string;
+      };
+      error?: string;
+      message?: string;
+    }>;
+    refreshUsage: (options?: { forceRefresh?: boolean }) => Promise<CodexUsageResponse>;
+  };
 }
 
 // Note: Window interface is declared in @/types/electron.d.ts
@@ -943,6 +957,82 @@ const getMockElectronAPI = (): ElectronAPI => {
           costCurrency: null,
           lastUpdated: new Date().toISOString(),
           userTimezone: 'UTC',
+        };
+      },
+    },
+
+    // Mock Codex API
+    codex: {
+      getUsage: async () => {
+        console.log('[Mock] Getting Codex usage');
+        return {
+          success: true,
+          data: {
+            dailyTokensUsed: 1250,
+            dailyLimit: 10000,
+            dailyPercentage: 12.5,
+            dailyResetTime: new Date(Date.now() + 43200000).toISOString(), // 12 hours
+            dailyResetText: 'Resets daily at midnight UTC',
+            monthlyTokensUsed: 25000,
+            monthlyLimit: 100000,
+            monthlyPercentage: 25,
+            monthlyResetTime: new Date(Date.now() + 86400000 * 7).toISOString(), // 7 days
+            monthlyResetText: 'Resets on Jan 1',
+            costUsed: 5.25,
+            costLimit: 50.0,
+            costCurrency: 'USD',
+            requestsUsed: 420,
+            requestsLimit: 3000,
+            requestsPercentage: 14,
+            requestsResetTime: new Date(Date.now() + 3600000).toISOString(), // 1 hour
+            requestsResetText: 'Resets every hour',
+            lastUpdated: new Date().toISOString(),
+            userTimezone: 'UTC',
+            authenticationRequired: false,
+          },
+        };
+      },
+
+      getStatus: async () => {
+        console.log('[Mock] Getting Codex status');
+        return {
+          success: true,
+          data: {
+            indicator: { color: 'green' as const },
+            description: 'OpenAI API operational - usage within normal limits',
+          },
+        };
+      },
+
+      refreshUsage: async (options?: { forceRefresh?: boolean }) => {
+        console.log('[Mock] Refreshing Codex usage', options);
+        // Simulate a slight delay for refresh
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return {
+          success: true,
+          data: {
+            dailyTokensUsed: 1275, // Slightly updated values
+            dailyLimit: 10000,
+            dailyPercentage: 12.75,
+            dailyResetTime: new Date(Date.now() + 43200000).toISOString(),
+            dailyResetText: 'Resets daily at midnight UTC',
+            monthlyTokensUsed: 25025,
+            monthlyLimit: 100000,
+            monthlyPercentage: 25.03,
+            monthlyResetTime: new Date(Date.now() + 86400000 * 7).toISOString(),
+            monthlyResetText: 'Resets on Jan 1',
+            costUsed: 5.27,
+            costLimit: 50.0,
+            costCurrency: 'USD',
+            requestsUsed: 422,
+            requestsLimit: 3000,
+            requestsPercentage: 14.07,
+            requestsResetTime: new Date(Date.now() + 3600000).toISOString(),
+            requestsResetText: 'Resets every hour',
+            lastUpdated: new Date().toISOString(),
+            userTimezone: 'UTC',
+            authenticationRequired: false,
+          },
         };
       },
     },

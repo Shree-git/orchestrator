@@ -24,6 +24,7 @@ import { KanbanBoard } from './board-view/kanban-board';
 import {
   AddFeatureDialog,
   AgentOutputModal,
+  BatchDeleteDialog,
   CompletedFeaturesModal,
   ArchiveAllVerifiedDialog,
   DeleteCompletedFeatureDialog,
@@ -82,6 +83,13 @@ export function BoardView() {
     enableDependencyBlocking,
     isPrimaryWorktreeBranch,
     getPrimaryWorktreeBranch,
+    // Batch selection state and actions
+    isSelectionMode,
+    selectedFeatureIds,
+    setSelectionMode,
+    selectFeatures,
+    deselectFeatures,
+    clearSelection,
   } = useAppStore();
   const shortcuts = useKeyboardShortcutsConfig();
   const {
@@ -103,6 +111,9 @@ export function BoardView() {
   const [deleteCompletedFeature, setDeleteCompletedFeature] = useState<Feature | null>(null);
   // State for viewing plan in read-only mode
   const [viewPlanFeature, setViewPlanFeature] = useState<Feature | null>(null);
+  // Batch delete dialog state
+  const [showBatchDeleteDialog, setShowBatchDeleteDialog] = useState(false);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
   // Worktree dialog states
   const [showCreateWorktreeDialog, setShowCreateWorktreeDialog] = useState(false);
@@ -360,6 +371,7 @@ export function BoardView() {
     handleAddFeature,
     handleUpdateFeature,
     handleDeleteFeature,
+    handleBatchDelete,
     handleStartImplementation,
     handleVerifyFeature,
     handleResumeFeature,
@@ -731,6 +743,40 @@ export function BoardView() {
     onViewOutput: handleViewOutput,
   });
 
+  // Selection mode handlers
+  const handleToggleSelectionMode = useCallback(() => {
+    setSelectionMode(!isSelectionMode);
+  }, [isSelectionMode, setSelectionMode]);
+
+  const handleConfirmBatchDelete = useCallback(async () => {
+    setIsBatchDeleting(true);
+    try {
+      await handleBatchDelete();
+      setShowBatchDeleteDialog(false);
+    } finally {
+      setIsBatchDeleting(false);
+    }
+  }, [handleBatchDelete]);
+
+  // Get selected features for the batch delete dialog
+  const selectedFeatures = useMemo(() => {
+    return hookFeatures.filter((f) => selectedFeatureIds.includes(f.id));
+  }, [hookFeatures, selectedFeatureIds]);
+
+  // Escape key to exit selection mode
+  useEffect(() => {
+    if (!isSelectionMode) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectionMode(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSelectionMode, setSelectionMode]);
+
   // Use drag and drop hook
   const { activeFeature, handleDragStart, handleDragEnd } = useBoardDragDrop({
     features: hookFeatures,
@@ -989,6 +1035,10 @@ export function BoardView() {
             completedCount={completedFeatures.length}
             kanbanCardDetailLevel={kanbanCardDetailLevel}
             onDetailLevelChange={setKanbanCardDetailLevel}
+            isSelectionMode={isSelectionMode}
+            onToggleSelectionMode={handleToggleSelectionMode}
+            selectedCount={selectedFeatureIds.length}
+            onBatchDelete={() => setShowBatchDeleteDialog(true)}
           />
         </div>
         {/* Kanban Columns */}
@@ -1022,6 +1072,10 @@ export function BoardView() {
           onShowSuggestions={() => setShowSuggestionsDialog(true)}
           suggestionsCount={suggestionsCount}
           onArchiveAllVerified={() => setShowArchiveAllVerifiedDialog(true)}
+          isSelectionMode={isSelectionMode}
+          selectedFeatureIds={selectedFeatureIds}
+          onSelectFeatures={selectFeatures}
+          onDeselectFeatures={deselectFeatures}
         />
       </div>
 
@@ -1102,6 +1156,15 @@ export function BoardView() {
           await handleArchiveAllVerified();
           setShowArchiveAllVerifiedDialog(false);
         }}
+      />
+
+      {/* Batch Delete Dialog */}
+      <BatchDeleteDialog
+        open={showBatchDeleteDialog}
+        onOpenChange={setShowBatchDeleteDialog}
+        selectedFeatures={selectedFeatures}
+        onConfirm={handleConfirmBatchDelete}
+        isDeleting={isBatchDeleting}
       />
 
       {/* Follow-Up Prompt Dialog */}

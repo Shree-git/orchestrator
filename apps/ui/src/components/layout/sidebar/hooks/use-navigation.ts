@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { NavigateOptions } from '@tanstack/react-router';
-import { FileText, LayoutGrid, Bot, BookOpen, UserCircle, Terminal } from 'lucide-react';
+import { FileText, LayoutGrid, Bot, BookOpen, UserCircle, Terminal, BarChart } from 'lucide-react';
 import type { NavSection, NavItem } from '../types';
 import type { KeyboardShortcut } from '@/hooks/use-keyboard-shortcuts';
 import type { Project } from '@/lib/electron';
@@ -18,6 +18,7 @@ interface UseNavigationProps {
     board: string;
     agent: string;
     terminal: string;
+    usage: string;
     settings: string;
   };
   hideSpecEditor: boolean;
@@ -71,6 +72,12 @@ export function useNavigation({
         label: 'AI Profiles',
         icon: UserCircle,
         shortcut: shortcuts.profiles,
+      },
+      {
+        id: 'usage',
+        label: 'Usage',
+        icon: BarChart,
+        shortcut: shortcuts.usage,
       },
     ];
 

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Project, TrashedProject } from '@/lib/electron';
+import type { CodexUsage } from '../../server/src/routes/codex/types';
 
 export type ViewMode =
   | 'welcome'
@@ -14,6 +15,7 @@ export type ViewMode =
   | 'profiles'
   | 'running-agents'
   | 'terminal'
+  | 'usage'
   | 'wiki';
 
 export type ThemeMode =
@@ -41,6 +43,39 @@ export interface ApiKeys {
   anthropic: string;
   google: string;
   openai: string;
+}
+
+// Claude Usage Types
+export interface ClaudeUsage {
+  sessionPercentage: number;
+  sessionResetText: string;
+  weeklyPercentage: number;
+  weeklyResetText: string;
+  sonnetWeeklyPercentage: number;
+  sonnetResetText: string;
+  costUsed?: number;
+  costLimit?: number;
+  costCurrency?: string;
+  lastUpdated: string;
+}
+
+export interface ClaudeUsageResponse {
+  success?: boolean;
+  sessionTokensUsed?: number;
+  sessionLimit?: number;
+  sessionPercentage?: number;
+  sessionResetText?: string;
+  weeklyTokensUsed?: number;
+  weeklyLimit?: number;
+  weeklyPercentage?: number;
+  weeklyResetText?: string;
+  sonnetWeeklyPercentage?: number;
+  sonnetResetText?: string;
+  costUsed?: number;
+  costLimit?: number;
+  costCurrency?: string;
+  error?: string;
+  message?: string;
 }
 
 // Keyboard Shortcut with optional modifiers
@@ -137,6 +172,7 @@ export interface KeyboardShortcuts {
   settings: string;
   profiles: string;
   terminal: string;
+  usage: string;
 
   // UI shortcuts
   toggleSidebar: string;
@@ -169,6 +205,7 @@ export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
   settings: 'S',
   profiles: 'M',
   terminal: 'T',
+  usage: 'U',
 
   // UI
   toggleSidebar: '`',
@@ -537,6 +574,16 @@ export interface AppState {
     planContent: string;
     planningMode: 'lite' | 'spec' | 'full';
   } | null;
+
+  // Usage Data State
+  claudeUsage: ClaudeUsage | null; // Current Claude usage data
+  claudeUsageLastUpdated: number | null; // Timestamp of last update
+  codexUsage: CodexUsage | null; // Current Codex usage data
+  codexUsageLastUpdated: number | null; // Timestamp of last update
+
+  // Batch Selection State (for multi-select operations on board)
+  isSelectionMode: boolean; // Whether batch selection mode is active
+  selectedFeatureIds: string[]; // Array of selected feature IDs
 }
 
 // Default background settings for board backgrounds
@@ -789,6 +836,14 @@ export interface AppActions {
     } | null
   ) => void;
 
+  // Batch Selection actions
+  setSelectionMode: (enabled: boolean) => void;
+  toggleFeatureSelection: (featureId: string) => void;
+  selectFeatures: (featureIds: string[]) => void;
+  deselectFeatures: (featureIds: string[]) => void;
+  selectAllFeatures: (featureIds: string[]) => void;
+  clearSelection: () => void;
+
   // Reset
   reset: () => void;
 }
@@ -888,6 +943,8 @@ const initialState: AppState = {
   defaultRequirePlanApproval: false,
   defaultAIProfileId: null,
   pendingPlanApproval: null,
+  isSelectionMode: false,
+  selectedFeatureIds: [],
 };
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -2487,6 +2544,47 @@ export const useAppStore = create<AppState & AppActions>()(
 
       // Plan Approval actions
       setPendingPlanApproval: (approval) => set({ pendingPlanApproval: approval }),
+
+      // Batch Selection actions
+      setSelectionMode: (enabled) =>
+        set({
+          isSelectionMode: enabled,
+          // Clear selection when exiting selection mode
+          selectedFeatureIds: enabled ? get().selectedFeatureIds : [],
+        }),
+
+      toggleFeatureSelection: (featureId) =>
+        set((state) => {
+          const isSelected = state.selectedFeatureIds.includes(featureId);
+          return {
+            selectedFeatureIds: isSelected
+              ? state.selectedFeatureIds.filter((id) => id !== featureId)
+              : [...state.selectedFeatureIds, featureId],
+          };
+        }),
+
+      selectFeatures: (featureIds) =>
+        set((state) => {
+          const newIds = featureIds.filter((id) => !state.selectedFeatureIds.includes(id));
+          return {
+            selectedFeatureIds: [...state.selectedFeatureIds, ...newIds],
+          };
+        }),
+
+      deselectFeatures: (featureIds) =>
+        set((state) => ({
+          selectedFeatureIds: state.selectedFeatureIds.filter((id) => !featureIds.includes(id)),
+        })),
+
+      selectAllFeatures: (featureIds) =>
+        set({
+          selectedFeatureIds: featureIds,
+        }),
+
+      clearSelection: () =>
+        set({
+          selectedFeatureIds: [],
+        }),
 
       // Reset
       reset: () => set(initialState),

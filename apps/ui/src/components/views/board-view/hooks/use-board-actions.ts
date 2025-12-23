@@ -78,6 +78,9 @@ export function useBoardActions({
     enableDependencyBlocking,
     isPrimaryWorktreeBranch,
     getPrimaryWorktreeBranch,
+    selectedFeatureIds,
+    clearSelection,
+    setSelectionMode,
   } = useAppStore();
   const autoMode = useAutoMode();
 
@@ -320,6 +323,72 @@ export function useBoardActions({
     },
     [features, runningAutoTasks, autoMode, removeFeature, persistFeatureDelete]
   );
+
+  const handleBatchDelete = useCallback(async () => {
+    if (selectedFeatureIds.length === 0) return;
+
+    const featuresToDelete = features.filter((f) => selectedFeatureIds.includes(f.id));
+    let deletedCount = 0;
+    let stoppedCount = 0;
+
+    for (const feature of featuresToDelete) {
+      const isRunning = runningAutoTasks.includes(feature.id);
+
+      if (isRunning) {
+        try {
+          await autoMode.stopFeature(feature.id);
+          stoppedCount++;
+        } catch (error) {
+          console.error('[Board] Error stopping feature before batch delete:', error);
+        }
+      }
+
+      // Delete associated images if any
+      if (feature.imagePaths && feature.imagePaths.length > 0) {
+        try {
+          const api = getElectronAPI();
+          for (const imagePathObj of feature.imagePaths) {
+            try {
+              await api.deleteFile(imagePathObj.path);
+              console.log(`[Board] Deleted image: ${imagePathObj.path}`);
+            } catch (error) {
+              console.error(`[Board] Failed to delete image ${imagePathObj.path}:`, error);
+            }
+          }
+        } catch (error) {
+          console.error(`[Board] Error deleting images for feature ${feature.id}:`, error);
+        }
+      }
+
+      removeFeature(feature.id);
+      persistFeatureDelete(feature.id);
+      deletedCount++;
+    }
+
+    // Clear selection and exit selection mode after batch delete
+    clearSelection();
+    setSelectionMode(false);
+
+    // Show appropriate toast based on what was deleted
+    if (stoppedCount > 0) {
+      toast.success(`Deleted ${deletedCount} feature${deletedCount !== 1 ? 's' : ''}`, {
+        description: `Stopped ${stoppedCount} running agent${stoppedCount !== 1 ? 's' : ''} and deleted all selected features.`,
+      });
+    } else {
+      toast.success(`Deleted ${deletedCount} feature${deletedCount !== 1 ? 's' : ''}`, {
+        description: 'All selected features have been permanently deleted.',
+      });
+    }
+  }, [
+    selectedFeatureIds,
+    features,
+    runningAutoTasks,
+    autoMode,
+    removeFeature,
+    persistFeatureDelete,
+    clearSelection,
+    setSelectionMode,
+  ]);
 
   const handleRunFeature = useCallback(
     async (feature: Feature) => {
@@ -865,6 +934,7 @@ export function useBoardActions({
     handleAddFeature,
     handleUpdateFeature,
     handleDeleteFeature,
+    handleBatchDelete,
     handleStartImplementation,
     handleVerifyFeature,
     handleResumeFeature,
