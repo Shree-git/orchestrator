@@ -154,6 +154,8 @@ function detectEntryType(content: string): LogEntryType {
 
   // Thinking/Preparation info (be specific to avoid matching summary content)
   if (
+    trimmed.startsWith('🧠') ||
+    trimmed.toLowerCase().includes('**thinking:**') ||
     trimmed.toLowerCase().includes('ultrathink') ||
     trimmed.match(/thinking level[:\s]*(low|medium|high|none|\d)/i) ||
     trimmed.match(/^thinking level\s*$/i) ||
@@ -379,7 +381,7 @@ function generateTitle(type: LogEntryType, content: string): string {
     case 'warning':
       return 'Warning';
     case 'thinking':
-      return 'Thinking Level';
+      return 'Thinking';
     case 'debug':
       return 'Debug Info';
     case 'prompt':

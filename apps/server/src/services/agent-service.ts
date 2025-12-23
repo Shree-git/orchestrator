@@ -245,7 +245,10 @@ export class AgentService {
               if (block.type === 'text' || block.type === 'thinking') {
                 // Handle both text and thinking blocks
                 if (block.type === 'thinking' && 'thinking' in block) {
-                  responseText += `\n\n🧠 **Thinking:**\n${block.thinking}\n\n`;
+                  // Clean thinking text - remove existing bold markers to avoid double-bold
+                  let thinkingText = block.thinking || '';
+                  thinkingText = thinkingText.replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
+                  responseText += `\n\n🧠 Thinking: ${thinkingText}\n\n`;
                 } else if (block.type === 'text' && 'text' in block) {
                   responseText += block.text;
                 }

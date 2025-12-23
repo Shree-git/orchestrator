@@ -1703,13 +1703,22 @@ This helps parse your summary correctly in the output logs.`;
     const previousContent = options?.previousContent;
 
     // Check if this planning mode can generate a spec/plan that needs approval
-    // - spec and full always generate specs
+    // - spec and full ALWAYS generate specs and require approval
     // - lite only generates approval-ready content when requirePlanApproval is true
     const planningModeRequiresApproval =
       planningMode === 'spec' ||
       planningMode === 'full' ||
       (planningMode === 'lite' && options?.requirePlanApproval === true);
-    const requiresApproval = planningModeRequiresApproval && options?.requirePlanApproval === true;
+    // For spec and full modes, ALWAYS require approval regardless of the setting
+    // For lite mode, respect the requirePlanApproval setting
+    const requiresApproval =
+      planningMode === 'spec' ||
+      planningMode === 'full' ||
+      (planningModeRequiresApproval && options?.requirePlanApproval === true);
+
+    console.log(
+      `[AutoMode] runAgent for ${featureId}: planningMode=${planningMode}, requirePlanApproval=${options?.requirePlanApproval}, planningModeRequiresApproval=${planningModeRequiresApproval}, requiresApproval=${requiresApproval}`
+    );
 
     // CI/CD Mock Mode: Return early with mock response when AUTOMAKER_MOCK_AGENT is set
     // This prevents actual API calls during automated testing
@@ -1867,7 +1876,10 @@ This mock response was generated because AUTOMAKER_MOCK_AGENT=true was set.
             // For thinking blocks, format them with a marker
             let contentToEmit = '';
             if (block.type === 'thinking' && 'thinking' in block) {
-              const thinkingContent = `🧠 **Thinking:**\n${block.thinking || ''}\n`;
+              // Clean thinking text - remove existing bold markers to avoid double-bold
+              let thinkingText = block.thinking || '';
+              thinkingText = thinkingText.replace(/^\*\*/, '').replace(/\*\*$/, '').trim();
+              const thinkingContent = `\n🧠 Thinking: ${thinkingText}\n`;
               responseText += thinkingContent;
               contentToEmit = thinkingContent;
             } else if (block.type === 'text') {
@@ -1906,6 +1918,9 @@ This mock response was generated because AUTOMAKER_MOCK_AGENT=true was set.
               !specDetected &&
               responseText.includes('[SPEC_GENERATED]')
             ) {
+              console.log(
+                `[AutoMode] SPEC_GENERATED detected for feature ${featureId}, planningModeRequiresApproval=${planningModeRequiresApproval}, requiresApproval=${requiresApproval}`
+              );
               specDetected = true;
 
               // Extract plan content (everything before the marker)

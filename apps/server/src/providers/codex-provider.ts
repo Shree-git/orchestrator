@@ -43,6 +43,16 @@ interface CodexEvent {
     call_id?: string;
     arguments?: string;
     output?: string;
+    // Fields for command_execution items
+    command?: string;
+    exit_code?: number;
+    stdout?: string;
+    stderr?: string;
+    // Fields for file operations
+    file_path?: string;
+    old_string?: string;
+    new_string?: string;
+    file_text?: string;
   };
   response?: {
     id?: string;
@@ -393,6 +403,135 @@ export class CodexProvider extends BaseProvider {
                   name: item.name || 'unknown',
                   input: item.arguments ? JSON.parse(item.arguments) : {},
                   tool_use_id: item.call_id || item.id,
+                },
+              ],
+            },
+          });
+        }
+        // Handle command_execution items (Codex's native tool format)
+        else if (item.type === 'command_execution' && item.command) {
+          // Map Codex command execution to tool_use format
+          // Determine tool type from command pattern
+          const command = item.command;
+          let toolName = 'Bash';
+          let input: Record<string, unknown> = { command };
+
+          // Try to identify specific tool types from command patterns
+          if (command.includes('cat ') || command.includes('head ') || command.includes('sed -n')) {
+            toolName = 'Read';
+            // Extract file path from command
+            const pathMatch = command.match(/(?:cat|head|sed -n[^"]*)"?\s*([^\s|>]+)/);
+            if (pathMatch) {
+              input = { file_path: pathMatch[1], command };
+            }
+          } else if (command.includes('rg ') || command.includes('grep ')) {
+            toolName = 'Grep';
+            input = { command };
+          } else if (command.includes('find ') || command.includes('ls ')) {
+            toolName = 'Glob';
+            input = { command };
+          } else if (
+            command.includes('sed -i') ||
+            command.includes('>> ') ||
+            command.includes('> ')
+          ) {
+            toolName = 'Edit';
+            input = { command };
+          }
+
+          messages.push({
+            type: 'assistant',
+            message: {
+              role: 'assistant',
+              content: [
+                {
+                  type: 'tool_use',
+                  name: toolName,
+                  input,
+                  tool_use_id: item.id || `cmd-${Date.now()}`,
+                },
+              ],
+            },
+          });
+
+          // If we have output from the command, also add a tool result
+          if (item.stdout || item.stderr || item.exit_code !== undefined) {
+            const output = [
+              item.stdout || '',
+              item.stderr ? `stderr: ${item.stderr}` : '',
+              item.exit_code !== undefined ? `exit_code: ${item.exit_code}` : '',
+            ]
+              .filter(Boolean)
+              .join('\n');
+
+            messages.push({
+              type: 'user',
+              message: {
+                role: 'user',
+                content: [
+                  {
+                    type: 'tool_result',
+                    tool_use_id: item.id || `cmd-${Date.now()}`,
+                    content: output || 'Command executed successfully',
+                  },
+                ],
+              },
+            });
+          }
+        }
+        // Handle file read operations
+        else if (item.type === 'file_read' && item.file_path) {
+          messages.push({
+            type: 'assistant',
+            message: {
+              role: 'assistant',
+              content: [
+                {
+                  type: 'tool_use',
+                  name: 'Read',
+                  input: { file_path: item.file_path },
+                  tool_use_id: item.id || `read-${Date.now()}`,
+                },
+              ],
+            },
+          });
+        }
+        // Handle file edit operations
+        else if (item.type === 'file_edit' && item.file_path) {
+          messages.push({
+            type: 'assistant',
+            message: {
+              role: 'assistant',
+              content: [
+                {
+                  type: 'tool_use',
+                  name: 'Edit',
+                  input: {
+                    file_path: item.file_path,
+                    old_string: item.old_string,
+                    new_string: item.new_string,
+                  },
+                  tool_use_id: item.id || `edit-${Date.now()}`,
+                },
+              ],
+            },
+          });
+        }
+        // Handle file write operations
+        else if (item.type === 'file_write' && item.file_path) {
+          messages.push({
+            type: 'assistant',
+            message: {
+              role: 'assistant',
+              content: [
+                {
+                  type: 'tool_use',
+                  name: 'Write',
+                  input: {
+                    file_path: item.file_path,
+                    content: item.file_text,
+                  },
+                  tool_use_id: item.id || `write-${Date.now()}`,
                 },
               ],
             },
