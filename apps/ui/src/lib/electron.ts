@@ -162,6 +162,11 @@ export interface SpecRegenerationAPI {
     success: boolean;
     error?: string;
   }>;
+  generateOverview: (projectPath: string) => Promise<{
+    success: boolean;
+    overview?: string;
+    error?: string;
+  }>;
   stop: () => Promise<{ success: boolean; error?: string }>;
   status: () => Promise<{
     success: boolean;

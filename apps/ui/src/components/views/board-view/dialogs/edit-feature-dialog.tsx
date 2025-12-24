@@ -53,6 +53,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DependencyTreeDialog } from './dependency-tree-dialog';
+import { DependencySelector } from '../components/dependency-selector';
+import { validateDependencies } from '../utils/dependency-validation';
 
 interface EditFeatureDialogProps {
   feature: Feature | null;
@@ -72,6 +74,7 @@ interface EditFeatureDialogProps {
       priority: number;
       planningMode: PlanningMode;
       requirePlanApproval: boolean;
+      dependencies: string[];
     }
   ) => void;
   categorySuggestions: string[];
@@ -115,6 +118,9 @@ export function EditFeatureDialog({
   const [requirePlanApproval, setRequirePlanApproval] = useState(
     feature?.requirePlanApproval ?? false
   );
+  const [selectedDependencies, setSelectedDependencies] = useState<string[]>(
+    feature?.dependencies ?? []
+  );
 
   // Get enhancement model and worktrees setting from store
   const { enhancementModel, useWorktrees } = useAppStore();
@@ -124,16 +130,29 @@ export function EditFeatureDialog({
     if (feature) {
       setPlanningMode(feature.planningMode ?? 'skip');
       setRequirePlanApproval(feature.requirePlanApproval ?? false);
+      setSelectedDependencies(feature.dependencies ?? []);
       // If feature has no branchName, default to using current branch
       setUseCurrentBranch(!feature.branchName);
     } else {
       setEditFeaturePreviewMap(new Map());
       setShowEditAdvancedOptions(false);
+      setSelectedDependencies([]);
     }
   }, [feature]);
 
   const handleUpdate = () => {
     if (!editingFeature) return;
+
+    // Validate dependencies
+    const dependencyValidation = validateDependencies(
+      editingFeature.id,
+      selectedDependencies,
+      allFeatures
+    );
+    if (!dependencyValidation.valid) {
+      toast.error(dependencyValidation.errors[0] || 'Invalid dependencies');
+      return;
+    }
 
     // Validate branch selection when "other branch" is selected and branch selector is enabled
     const isBranchSelectorEnabled = editingFeature.status === 'backlog';
@@ -172,6 +191,7 @@ export function EditFeatureDialog({
       priority: editingFeature.priority ?? 2,
       planningMode,
       requirePlanApproval,
+      dependencies: selectedDependencies,
     };
 
     onUpdate(editingFeature.id, updates);
@@ -399,6 +419,17 @@ export function EditFeatureDialog({
               }
               testIdPrefix="edit-priority"
             />
+
+            {/* Dependencies Selector */}
+            <div className="space-y-2">
+              <Label>Dependencies</Label>
+              <DependencySelector
+                currentFeatureId={editingFeature.id}
+                selectedDependencies={selectedDependencies}
+                onDependenciesChange={setSelectedDependencies}
+                allFeatures={allFeatures}
+              />
+            </div>
           </TabsContent>
 
           {/* Model Tab */}

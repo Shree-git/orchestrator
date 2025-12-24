@@ -564,6 +564,214 @@ describe('terminal-service.ts', () => {
     });
   });
 
+  describe('project-based session management', () => {
+    beforeEach(() => {
+      // Clean up any existing sessions first
+      service.cleanup();
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.statSync).mockReturnValue({ isDirectory: () => true } as any);
+      vi.spyOn(process, 'env', 'get').mockReturnValue({ SHELL: '/bin/bash' });
+    });
+
+    describe('getSessionsForProject', () => {
+      it('should return sessions for specific project', () => {
+        const session1 = service.createSession({ projectId: 'project1' });
+        const session2 = service.createSession({ projectId: 'project2' });
+        const session3 = service.createSession({ projectId: 'project1' });
+
+        const project1Sessions = service.getSessionsForProject('project1');
+        expect(project1Sessions).toHaveLength(2);
+        expect(project1Sessions.map((s) => s.id)).toEqual([session1.id, session3.id]);
+      });
+
+      it('should return empty array for non-existent project', () => {
+        service.createSession({ projectId: 'project1' });
+        const sessions = service.getSessionsForProject('non-existent');
+        expect(sessions).toEqual([]);
+      });
+
+      it('should handle default project sessions', () => {
+        const session1 = service.createSession(); // defaults to 'default'
+        const session2 = service.createSession({ projectId: 'default' });
+
+        const defaultSessions = service.getSessionsForProject('default');
+        expect(defaultSessions).toHaveLength(2);
+        expect(defaultSessions.map((s) => s.id)).toEqual([session1.id, session2.id]);
+      });
+    });
+
+    describe('killSessionsForProject', () => {
+      it('should kill all sessions for a project', () => {
+        vi.useFakeTimers();
+
+        const session1 = service.createSession({ projectId: 'project1' });
+        const session2 = service.createSession({ projectId: 'project2' });
+        const session3 = service.createSession({ projectId: 'project1' });
+
+        const killedCount = service.killSessionsForProject('project1');
+
+        expect(killedCount).toBe(2);
+
+        // Advance time to trigger the timeout that removes sessions
+        vi.advanceTimersByTime(1000);
+
+        expect(service.getSessionsForProject('project1')).toHaveLength(0);
+        expect(service.getSessionsForProject('project2')).toHaveLength(1);
+
+        vi.useRealTimers();
+      });
+
+      it('should return 0 for non-existent project', () => {
+        service.createSession({ projectId: 'project1' });
+        const killedCount = service.killSessionsForProject('non-existent');
+        expect(killedCount).toBe(0);
+      });
+
+      it('should handle kill errors gracefully', () => {
+        mockPtyProcess.kill.mockImplementation(() => {
+          throw new Error('Kill failed');
+        });
+
+        service.createSession({ projectId: 'project1' });
+        const killedCount = service.killSessionsForProject('project1');
+
+        expect(killedCount).toBe(0); // Should handle error and return 0
+        // Even though kill failed, session is still removed from map (per killSession implementation)
+        expect(service.getSessionsForProject('project1')).toHaveLength(0);
+      });
+    });
+
+    describe('cleanupOrphanedSessions', () => {
+      it('should remove sessions for deleted projects', () => {
+        vi.useFakeTimers();
+
+        const session1 = service.createSession({ projectId: 'project1' });
+        const session2 = service.createSession({ projectId: 'project2' });
+        const session3 = service.createSession({ projectId: 'project3' });
+
+        const validProjectIds = ['project1', 'project3'];
+        const cleanedCount = service.cleanupOrphanedSessions(validProjectIds);
+
+        expect(cleanedCount).toBe(1); // project2 session should be removed
+
+        // Advance time to trigger the timeout that removes sessions
+        vi.advanceTimersByTime(1000);
+
+        expect(service.getSessionsForProject('project1')).toHaveLength(1);
+        expect(service.getSessionsForProject('project2')).toHaveLength(0);
+        expect(service.getSessionsForProject('project3')).toHaveLength(1);
+
+        vi.useRealTimers();
+      });
+
+      it('should keep default project sessions', () => {
+        const session1 = service.createSession(); // defaults to 'default'
+        const session2 = service.createSession({ projectId: 'project1' });
+
+        const cleanedCount = service.cleanupOrphanedSessions(['project1']);
+
+        expect(cleanedCount).toBe(0); // default project sessions should not be cleaned
+        expect(service.getSessionsForProject('default')).toHaveLength(1);
+        expect(service.getSessionsForProject('project1')).toHaveLength(1);
+      });
+
+      it('should return 0 if no orphaned sessions', () => {
+        service.createSession({ projectId: 'project1' });
+        service.createSession({ projectId: 'project2' });
+
+        const cleanedCount = service.cleanupOrphanedSessions(['project1', 'project2']);
+        expect(cleanedCount).toBe(0);
+      });
+    });
+
+    describe('cleanupSessionsForProject', () => {
+      it('should remove sessions by project path exact match', () => {
+        vi.useFakeTimers();
+
+        const session1 = service.createSession({ cwd: '/home/user/project1' });
+        const session2 = service.createSession({ cwd: '/home/user/project2' });
+        const session3 = service.createSession({ cwd: '/home/user/other' });
+
+        const cleanedCount = service.cleanupSessionsForProject('/home/user/project1');
+
+        expect(cleanedCount).toBe(1);
+
+        // Advance time to trigger the timeout that removes sessions
+        vi.advanceTimersByTime(1000);
+
+        expect(service.getAllSessions()).toHaveLength(2);
+        expect(service.getSession(session1.id)).toBeUndefined();
+        expect(service.getSession(session2.id)).toBeDefined();
+        expect(service.getSession(session3.id)).toBeDefined();
+
+        vi.useRealTimers();
+      });
+
+      it('should remove sessions by project path prefix match', () => {
+        vi.useFakeTimers();
+
+        const session1 = service.createSession({ cwd: '/home/user/project1' });
+        const session2 = service.createSession({ cwd: '/home/user/project1/subdir' });
+        const session3 = service.createSession({ cwd: '/home/user/project1/another/deep/path' });
+        const session4 = service.createSession({ cwd: '/home/user/project2' });
+
+        const cleanedCount = service.cleanupSessionsForProject('/home/user/project1');
+
+        expect(cleanedCount).toBe(3);
+
+        // Advance time to trigger the timeout that removes sessions
+        vi.advanceTimersByTime(1000);
+
+        expect(service.getAllSessions()).toHaveLength(1);
+        expect(service.getSession(session4.id)).toBeDefined();
+
+        vi.useRealTimers();
+      });
+
+      it('should not match partial path names', () => {
+        vi.useFakeTimers();
+
+        const session1 = service.createSession({ cwd: '/home/user/project1' });
+        const session2 = service.createSession({ cwd: '/home/user/project123' }); // Similar but different project
+
+        const cleanedCount = service.cleanupSessionsForProject('/home/user/project1');
+
+        expect(cleanedCount).toBe(1);
+
+        // Advance time to trigger the timeout that removes sessions
+        vi.advanceTimersByTime(1000);
+
+        expect(service.getAllSessions()).toHaveLength(1);
+        expect(service.getSession(session1.id)).toBeUndefined();
+        expect(service.getSession(session2.id)).toBeDefined();
+
+        vi.useRealTimers();
+      });
+
+      it('should return 0 if no matching sessions', () => {
+        service.createSession({ cwd: '/home/user/project1' });
+        service.createSession({ cwd: '/home/user/project2' });
+
+        const cleanedCount = service.cleanupSessionsForProject('/home/user/nonexistent');
+        expect(cleanedCount).toBe(0);
+      });
+
+      it('should handle kill errors gracefully', () => {
+        mockPtyProcess.kill.mockImplementation(() => {
+          throw new Error('Kill failed');
+        });
+
+        service.createSession({ cwd: '/home/user/project1' });
+        const cleanedCount = service.cleanupSessionsForProject('/home/user/project1');
+
+        expect(cleanedCount).toBe(0); // Should handle error and return 0
+        // Even though kill failed, session is still removed from map (per killSession implementation)
+        expect(service.getAllSessions()).toHaveLength(0);
+      });
+    });
+  });
+
   describe('getTerminalService', () => {
     it('should return singleton instance', () => {
       const instance1 = getTerminalService();

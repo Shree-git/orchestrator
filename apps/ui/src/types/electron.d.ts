@@ -335,6 +335,12 @@ export interface SpecRegenerationAPI {
     error?: string;
   }>;
 
+  generateOverview: (projectPath: string) => Promise<{
+    success: boolean;
+    overview?: string;
+    error?: string;
+  }>;
+
   stop: () => Promise<{
     success: boolean;
     error?: string;
@@ -348,6 +354,18 @@ export interface SpecRegenerationAPI {
   }>;
 
   onEvent: (callback: (event: SpecRegenerationEvent) => void) => () => void;
+}
+
+export interface ContextFilesAPI {
+  autoDiscover: (projectPath: string) => Promise<{
+    success: boolean;
+    files?: Array<{
+      path: string;
+      type: 'readme' | 'package' | 'config' | 'docs' | 'source';
+      relevanceScore: number;
+    }>;
+    error?: string;
+  }>;
 }
 
 export interface AutoModeAPI {
@@ -521,6 +539,9 @@ export interface ElectronAPI {
 
   // Auto Mode APIs
   autoMode: AutoModeAPI;
+
+  // Context Files API
+  contextFiles: ContextFilesAPI;
 
   // Claude CLI Detection API
   checkClaudeCli: () => Promise<{

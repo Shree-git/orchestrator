@@ -51,11 +51,24 @@ export function ClaudeUsagePopover() {
         if ('error' in data) {
           setError({
             code: ERROR_CODES.AUTH_ERROR,
-            message: data.message || data.error,
+            message: data.message || data.error || 'Authentication failed',
           });
           return;
         }
-        setClaudeUsage(data);
+        // Transform ClaudeUsageResponse to ClaudeUsage
+        const claudeUsage = {
+          sessionPercentage: data.sessionPercentage || 0,
+          sessionResetText: data.sessionResetText || '',
+          weeklyPercentage: data.weeklyPercentage || 0,
+          weeklyResetText: data.weeklyResetText || '',
+          sonnetWeeklyPercentage: data.sonnetWeeklyPercentage || 0,
+          sonnetResetText: data.sonnetResetText || '',
+          costUsed: data.costUsed,
+          costLimit: data.costLimit,
+          costCurrency: data.costCurrency,
+          lastUpdated: new Date().toISOString(),
+        };
+        setClaudeUsage(claudeUsage);
       } catch (err) {
         setError({
           code: ERROR_CODES.UNKNOWN,

@@ -474,4 +474,25 @@ export class ClaudeUsageService {
       return result.toISOString();
     }
   }
+
+  /**
+   * Format time remaining until reset
+   */
+  private formatTimeRemaining(resetTime: Date): string {
+    const now = new Date();
+    const diff = resetTime.getTime() - now.getTime();
+
+    if (diff <= 0) {
+      return '0 min';
+    }
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (hours > 0) {
+      return `${hours} hr ${minutes} min`;
+    } else {
+      return `${minutes} min`;
+    }
+  }
 }

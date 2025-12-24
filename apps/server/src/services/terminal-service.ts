@@ -35,6 +35,7 @@ export interface TerminalSession {
   cwd: string;
   createdAt: Date;
   shell: string;
+  projectId: string; // Project association for session isolation
   scrollbackBuffer: string; // Store recent output for replay on reconnect
   outputBuffer: string; // Pending output to be flushed
   flushTimeout: NodeJS.Timeout | null; // Throttle timer
@@ -48,6 +49,7 @@ export interface TerminalOptions {
   cols?: number;
   rows?: number;
   env?: Record<string, string>;
+  projectId?: string; // Project ID for session association
 }
 
 type DataCallback = (sessionId: string, data: string) => void;
@@ -272,6 +274,7 @@ export class TerminalService extends EventEmitter {
       cwd,
       createdAt: new Date(),
       shell,
+      projectId: options.projectId || 'default', // Ensure all sessions have a project association
       scrollbackBuffer: '',
       outputBuffer: '',
       flushTimeout: null,
@@ -488,13 +491,100 @@ export class TerminalService extends EventEmitter {
     cwd: string;
     createdAt: Date;
     shell: string;
+    projectId: string;
   }> {
     return Array.from(this.sessions.values()).map((s) => ({
       id: s.id,
       cwd: s.cwd,
       createdAt: s.createdAt,
       shell: s.shell,
+      projectId: s.projectId,
     }));
+  }
+
+  /**
+   * Get all sessions for a specific project
+   */
+  getSessionsForProject(projectId: string): Array<{
+    id: string;
+    cwd: string;
+    createdAt: Date;
+    shell: string;
+    projectId: string;
+  }> {
+    return Array.from(this.sessions.values())
+      .filter((s) => s.projectId === projectId)
+      .map((s) => ({
+        id: s.id,
+        cwd: s.cwd,
+        createdAt: s.createdAt,
+        shell: s.shell,
+        projectId: s.projectId,
+      }));
+  }
+
+  /**
+   * Kill all sessions for a specific project
+   * Useful for cleanup when a project is deleted or when user wants to reset project terminals
+   */
+  killSessionsForProject(projectId: string): number {
+    let killedCount = 0;
+    const sessionsToKill = Array.from(this.sessions.values()).filter(
+      (s) => s.projectId === projectId
+    );
+
+    sessionsToKill.forEach((session) => {
+      if (this.killSession(session.id)) {
+        killedCount++;
+      }
+    });
+
+    console.log(`[Terminal] Killed ${killedCount} sessions for project ${projectId}`);
+    return killedCount;
+  }
+
+  /**
+   * Clean up orphaned sessions for projects that no longer exist
+   */
+  cleanupOrphanedSessions(validProjectIds: string[]): number {
+    let cleanedCount = 0;
+    const sessionsToClean = Array.from(this.sessions.values()).filter(
+      (s) => s.projectId !== 'default' && !validProjectIds.includes(s.projectId)
+    );
+
+    sessionsToClean.forEach((session) => {
+      if (this.killSession(session.id)) {
+        cleanedCount++;
+      }
+    });
+
+    if (cleanedCount > 0) {
+      console.log(`[Terminal] Cleaned up ${cleanedCount} orphaned sessions`);
+    }
+    return cleanedCount;
+  }
+
+  /**
+   * Clean up all sessions for a specific project path (when project is deleted)
+   */
+  cleanupSessionsForProject(projectPath: string): number {
+    let cleanedCount = 0;
+    const sessionsToClean = Array.from(this.sessions.values()).filter(
+      (s) => s.cwd === projectPath || s.cwd.startsWith(projectPath + path.sep)
+    );
+
+    sessionsToClean.forEach((session) => {
+      if (this.killSession(session.id)) {
+        cleanedCount++;
+      }
+    });
+
+    if (cleanedCount > 0) {
+      console.log(
+        `[Terminal] Cleaned up ${cleanedCount} sessions for deleted project: ${projectPath}`
+      );
+    }
+    return cleanedCount;
   }
 
   /**

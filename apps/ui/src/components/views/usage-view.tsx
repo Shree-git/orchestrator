@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, BarChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ClaudeUsageCard } from './usage-view/claude-usage-card';
+import { CodexUsageCard } from './usage-view/codex-usage-card';
 
 export function UsageView() {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -54,19 +55,7 @@ export function UsageView() {
 
           {/* Codex Usage Section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-foreground">Codex Usage</h2>
-            </div>
-            <div className="rounded-lg border border-border/60 bg-card/50 p-6">
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">
-                  Codex usage card will be implemented in a future task
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  This will show OpenAI API usage information through the Codex service
-                </p>
-              </div>
-            </div>
+            <CodexUsageCard />
           </div>
 
           {/* Additional Information */}

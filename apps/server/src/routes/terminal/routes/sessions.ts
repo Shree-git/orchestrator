@@ -11,9 +11,18 @@ import { createLogger } from '@automaker/utils';
 const logger = createLogger('Terminal');
 
 export function createSessionsListHandler() {
-  return (_req: Request, res: Response): void => {
+  return (req: Request, res: Response): void => {
     const terminalService = getTerminalService();
-    const sessions = terminalService.getAllSessions();
+    const projectId = req.query.projectId as string;
+
+    // If projectId is provided, filter sessions for that project
+    let sessions;
+    if (projectId) {
+      sessions = terminalService.getSessionsForProject(projectId);
+    } else {
+      sessions = terminalService.getAllSessions();
+    }
+
     res.json({
       success: true,
       data: sessions,

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Feature, useAppStore } from '@/store/app-store';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AlertCircle, Lock, Hand, Sparkles } from 'lucide-react';
+import { AlertCircle, Lock, Hand, Sparkles, GitBranch } from 'lucide-react';
 import { getBlockingDependencies } from '@automaker/dependency-resolver';
 
 interface CardBadgeProps {
@@ -164,7 +164,8 @@ export function PriorityBadges({ feature }: PriorityBadgesProps) {
   const showPriorityBadges =
     feature.priority ||
     (feature.skipTests && !feature.error && feature.status === 'backlog') ||
-    isJustFinished;
+    isJustFinished ||
+    (feature.dependencies && feature.dependencies.length > 0);
 
   if (!showPriorityBadges) {
     return null;
@@ -238,6 +239,45 @@ export function PriorityBadges({ feature }: PriorityBadgesProps) {
         >
           <Sparkles className="w-3 h-3" />
         </CardBadge>
+      )}
+
+      {/* Dependencies count badge */}
+      {feature.dependencies && feature.dependencies.length > 0 && (
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CardBadge
+                className={cn(
+                  'bg-blue-500/20 border-blue-500/50 text-blue-600 dark:text-blue-400',
+                  'bg-opacity-90 border rounded-[6px] px-1.5 py-0.5 flex items-center justify-center border-[1.5px] min-w-[20px] h-5'
+                )}
+                data-testid={`dependencies-badge-${feature.id}`}
+              >
+                <GitBranch className="w-3 h-3 mr-0.5" />
+                <span className="font-bold text-xs">{feature.dependencies.length}</span>
+              </CardBadge>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs max-w-[250px]">
+              <p className="font-medium mb-1">
+                {feature.dependencies.length === 1
+                  ? '1 dependency'
+                  : `${feature.dependencies.length} dependencies`}
+              </p>
+              <div className="text-muted-foreground">
+                {feature.dependencies
+                  .map((depId) => {
+                    const dep = features.find((f) => f.id === depId);
+                    return dep?.description?.slice(0, 50) || depId;
+                  })
+                  .join(', ')}
+                {feature.dependencies.some((depId) => {
+                  const dep = features.find((f) => f.id === depId);
+                  return dep?.description && dep.description.length > 50;
+                }) && '...'}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
     </div>
   );

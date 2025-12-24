@@ -36,6 +36,9 @@ export function useSpecGeneration({ loadSpec }: UseSpecGenerationOptions) {
   // Generate features only state
   const [isGeneratingFeatures, setIsGeneratingFeatures] = useState(false);
 
+  // Auto-generate overview state
+  const [isGeneratingOverview, setIsGeneratingOverview] = useState(false);
+
   // Logs state (kept for internal tracking)
   const [logs, setLogs] = useState<string>('');
   const logsRef = useRef<string>('');
@@ -543,6 +546,49 @@ export function useSpecGeneration({ loadSpec }: UseSpecGenerationOptions) {
     }
   }, [currentProject]);
 
+  const handleAutoGenerateOverview = useCallback(async () => {
+    if (!currentProject) return;
+
+    setIsGeneratingOverview(true);
+    setErrorMessage('');
+    console.log('[useSpecGeneration] Starting auto-generate overview');
+
+    try {
+      const api = getElectronAPI();
+      if (!api.specRegeneration) {
+        console.error('[useSpecGeneration] Spec regeneration not available');
+        setIsGeneratingOverview(false);
+        return;
+      }
+
+      const result = await api.specRegeneration.generateOverview(currentProject.path);
+
+      if (result.success && result.overview) {
+        console.log('[useSpecGeneration] Generated overview:', result.overview);
+        setProjectOverview(result.overview);
+        toast.success('Overview Generated', {
+          description: 'Project overview has been automatically generated from your codebase.',
+        });
+      } else {
+        const errorMsg = result.error || 'Failed to generate overview';
+        console.error('[useSpecGeneration] Failed to generate overview:', errorMsg);
+        setErrorMessage(errorMsg);
+        toast.error('Failed to Generate Overview', {
+          description: errorMsg,
+        });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[useSpecGeneration] Failed to auto-generate overview:', errorMsg);
+      setErrorMessage(errorMsg);
+      toast.error('Failed to Generate Overview', {
+        description: errorMsg,
+      });
+    } finally {
+      setIsGeneratingOverview(false);
+    }
+  }, [currentProject]);
+
   return {
     // Dialog state
     showCreateDialog,
@@ -575,6 +621,9 @@ export function useSpecGeneration({ loadSpec }: UseSpecGenerationOptions) {
     // Feature generation state
     isGeneratingFeatures,
 
+    // Auto-generate overview state
+    isGeneratingOverview,
+
     // Status state
     currentPhase,
     errorMessage,
@@ -584,5 +633,6 @@ export function useSpecGeneration({ loadSpec }: UseSpecGenerationOptions) {
     handleCreateSpec,
     handleRegenerate,
     handleGenerateFeatures,
+    handleAutoGenerateOverview,
   };
 }

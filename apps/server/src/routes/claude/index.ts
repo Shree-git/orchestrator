@@ -20,7 +20,19 @@ export function createClaudeRoutes(service: ClaudeUsageService): Router {
       const usage = await service.fetchUsageData();
       res.json(usage);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      let message = 'Unknown error';
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'string') {
+        message = error;
+      } else if (error && typeof error === 'object' && 'toString' in error) {
+        try {
+          message = error.toString();
+        } catch (e) {
+          message = 'Error converting error message to string';
+        }
+      }
 
       if (message.includes('Authentication required') || message.includes('token_expired')) {
         res.status(401).json({

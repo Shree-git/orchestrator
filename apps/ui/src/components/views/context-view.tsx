@@ -17,6 +17,8 @@ import {
   EditIcon,
   Eye,
   Pencil,
+  Search,
+  Loader2,
 } from 'lucide-react';
 import {
   useKeyboardShortcuts,
@@ -62,6 +64,7 @@ export function ContextView() {
   const [newFileContent, setNewFileContent] = useState('');
   const [isDropHovering, setIsDropHovering] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isAutoDiscovering, setIsAutoDiscovering] = useState(false);
 
   // Keyboard shortcuts for this view
   const contextShortcuts: KeyboardShortcut[] = useMemo(
@@ -382,6 +385,52 @@ export function ContextView() {
     setIsDropHovering(false);
   };
 
+  // Auto-discover relevant context files
+  const handleAutoDiscover = useCallback(async () => {
+    if (!currentProject) return;
+
+    setIsAutoDiscovering(true);
+    try {
+      const api = getElectronAPI();
+      const result = await api.contextFiles?.autoDiscover(currentProject.path);
+
+      if (result?.success && result.files) {
+        const contextPath = getContextPath();
+        if (!contextPath) return;
+
+        // Create context directory if it doesn't exist
+        await api.mkdir(contextPath);
+
+        // Copy discovered files to context directory
+        let addedCount = 0;
+        for (const file of result.files) {
+          const fileName = file.path.split('/').pop() || 'unknown';
+          const contextFilePath = `${contextPath}/${fileName}`;
+
+          // Check if file already exists
+          const exists = await api.exists(contextFilePath);
+          if (!exists) {
+            const fileResult = await api.readFile(file.path);
+            if (fileResult.success && fileResult.content !== undefined) {
+              await api.writeFile(contextFilePath, fileResult.content);
+              addedCount++;
+            }
+          }
+        }
+
+        // Reload context files
+        await loadContextFiles();
+
+        // Show success message
+        console.log(`Auto-discovered ${addedCount} context files`);
+      }
+    } catch (error) {
+      console.error('Failed to auto-discover context files:', error);
+    } finally {
+      setIsAutoDiscovering(false);
+    }
+  }, [currentProject, getContextPath, loadContextFiles]);
+
   if (!currentProject) {
     return (
       <div
@@ -415,6 +464,20 @@ export function ContextView() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleAutoDiscover}
+            disabled={isAutoDiscovering}
+            data-testid="auto-discover-context-files"
+          >
+            {isAutoDiscovering ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Search className="w-4 h-4 mr-2" />
+            )}
+            {isAutoDiscovering ? 'Discovering...' : 'Auto-discover'}
+          </Button>
           <HotkeyButton
             size="sm"
             onClick={() => setIsAddDialogOpen(true)}

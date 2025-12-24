@@ -844,6 +844,10 @@ export interface AppActions {
   selectAllFeatures: (featureIds: string[]) => void;
   clearSelection: () => void;
 
+  // Usage actions
+  setClaudeUsage: (usage: ClaudeUsage | null) => void;
+  setCodexUsage: (usage: CodexUsage | null) => void;
+
   // Reset
   reset: () => void;
 }
@@ -945,6 +949,37 @@ const initialState: AppState = {
   pendingPlanApproval: null,
   isSelectionMode: false,
   selectedFeatureIds: [],
+  claudeUsage: null,
+  claudeUsageLastUpdated: null,
+  codexUsage: null,
+  codexUsageLastUpdated: null,
+};
+
+// Helper to cleanup orphaned terminal sessions for a project
+const cleanupProjectSessions = async (projectPath: string) => {
+  try {
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3008';
+    const response = await fetch(`${serverUrl}/api/terminal/cleanup-orphaned`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectPath }),
+    });
+
+    if (!response.ok) {
+      console.warn('[Store] Failed to cleanup terminal sessions for project:', projectPath);
+    } else {
+      const data = await response.json();
+      if (data.success) {
+        console.log(
+          `[Store] Cleaned up ${data.cleaned} terminal sessions for project: ${projectPath}`
+        );
+      }
+    }
+  } catch (error) {
+    console.warn('[Store] Error cleaning up terminal sessions:', error);
+  }
 };
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -1034,12 +1069,34 @@ export const useAppStore = create<AppState & AppActions>()(
       },
 
       deleteTrashedProject: (projectId) => {
+        const trashedProject = get().trashedProjects.find((p) => p.id === projectId);
+        if (trashedProject) {
+          // Cleanup orphaned terminal sessions for this project
+          cleanupProjectSessions(trashedProject.path).catch((err) => {
+            console.warn('[Store] Failed to cleanup sessions for deleted project:', err);
+          });
+        }
+
         set({
           trashedProjects: get().trashedProjects.filter((p) => p.id !== projectId),
         });
       },
 
-      emptyTrash: () => set({ trashedProjects: [] }),
+      emptyTrash: () => {
+        const trashedProjects = get().trashedProjects;
+        // Cleanup orphaned terminal sessions for all trashed projects
+        trashedProjects.forEach((project) => {
+          cleanupProjectSessions(project.path).catch((err) => {
+            console.warn(
+              '[Store] Failed to cleanup sessions for deleted project:',
+              project.path,
+              err
+            );
+          });
+        });
+
+        set({ trashedProjects: [] });
+      },
 
       reorderProjects: (oldIndex, newIndex) => {
         const projects = [...get().projects];
@@ -2584,6 +2641,19 @@ export const useAppStore = create<AppState & AppActions>()(
       clearSelection: () =>
         set({
           selectedFeatureIds: [],
+        }),
+
+      // Usage actions
+      setClaudeUsage: (usage: ClaudeUsage | null) =>
+        set({
+          claudeUsage: usage,
+          claudeUsageLastUpdated: usage ? Date.now() : null,
+        }),
+
+      setCodexUsage: (usage: CodexUsage | null) =>
+        set({
+          codexUsage: usage,
+          codexUsageLastUpdated: usage ? Date.now() : null,
         }),
 
       // Reset

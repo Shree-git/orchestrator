@@ -9,6 +9,7 @@ import { createGenerateHandler } from './routes/generate.js';
 import { createGenerateFeaturesHandler } from './routes/generate-features.js';
 import { createStopHandler } from './routes/stop.js';
 import { createStatusHandler } from './routes/status.js';
+import { autoGenerateOverview } from './routes/auto-generate-overview.js';
 
 export function createSpecRegenerationRoutes(events: EventEmitter): Router {
   const router = Router();
@@ -16,6 +17,7 @@ export function createSpecRegenerationRoutes(events: EventEmitter): Router {
   router.post('/create', createCreateHandler(events));
   router.post('/generate', createGenerateHandler(events));
   router.post('/generate-features', createGenerateFeaturesHandler(events));
+  router.post('/auto-generate-overview', autoGenerateOverview);
   router.post('/stop', createStopHandler());
   router.get('/status', createStatusHandler());
 

@@ -29,6 +29,8 @@ export interface CreateSpecDialogProps {
   showSkipButton?: boolean;
   title?: string;
   description?: string;
+  onAutoGenerateOverview?: () => void;
+  isGeneratingOverview?: boolean;
 }
 
 // Props for the regenerate spec dialog

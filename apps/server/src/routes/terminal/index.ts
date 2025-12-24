@@ -19,6 +19,7 @@ import { createSessionsListHandler, createSessionsCreateHandler } from './routes
 import { createSessionDeleteHandler } from './routes/session-delete.js';
 import { createSessionResizeHandler } from './routes/session-resize.js';
 import { createSettingsGetHandler, createSettingsUpdateHandler } from './routes/settings.js';
+import { createCleanupHandler } from './routes/cleanup.js';
 
 // Re-export for use in main index.ts
 export { validateTerminalToken, isTerminalEnabled, isTerminalPasswordRequired };
@@ -37,6 +38,7 @@ export function createTerminalRoutes(): Router {
   router.post('/sessions', createSessionsCreateHandler());
   router.delete('/sessions/:id', createSessionDeleteHandler());
   router.post('/sessions/:id/resize', createSessionResizeHandler());
+  router.post('/cleanup-orphaned', createCleanupHandler());
   router.get('/settings', createSettingsGetHandler());
   router.put('/settings', createSettingsUpdateHandler());
 

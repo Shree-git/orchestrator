@@ -558,10 +558,9 @@ export function TerminalView() {
       return;
     }
 
-    // ALWAYS clear existing terminals when switching projects
-    // This is critical - prevents old project's terminals from "bleeding" into new project
-    // We need to kill server sessions first to prevent orphans
-    killAndClear();
+    // Clear UI state but preserve server sessions for potential reuse
+    // This allows terminals to persist when switching between projects
+    clearTerminalState();
 
     // Check for saved layout for this project
     const savedLayout = getPersistedTerminalLayout(currentPath);

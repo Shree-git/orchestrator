@@ -55,17 +55,59 @@ export function ClaudeUsageCard() {
         }
         const data = await api.claude.getUsage();
         if ('error' in data) {
+          // Safely extract error message
+          let errorMessage = 'Authentication failed';
+
+          if (data.message && typeof data.message === 'string') {
+            errorMessage = data.message;
+          } else if (data.error && typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (data.error && typeof data.error === 'object') {
+            try {
+              errorMessage = JSON.stringify(data.error);
+            } catch (e) {
+              errorMessage = 'Authentication failed';
+            }
+          }
+
           setError({
             code: ERROR_CODES.AUTH_ERROR,
-            message: data.message || data.error,
+            message: errorMessage,
           });
           return;
         }
-        setClaudeUsage(data);
+        // Transform ClaudeUsageResponse to ClaudeUsage
+        const claudeUsage = {
+          sessionPercentage: data.sessionPercentage || 0,
+          sessionResetText: data.sessionResetText || '',
+          weeklyPercentage: data.weeklyPercentage || 0,
+          weeklyResetText: data.weeklyResetText || '',
+          sonnetWeeklyPercentage: data.sonnetWeeklyPercentage || 0,
+          sonnetResetText: data.sonnetResetText || '',
+          costUsed: data.costUsed,
+          costLimit: data.costLimit,
+          costCurrency: data.costCurrency,
+          lastUpdated: new Date().toISOString(),
+        };
+        setClaudeUsage(claudeUsage);
       } catch (err) {
+        let errorMessage = 'Failed to fetch usage';
+
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === 'string') {
+          errorMessage = err;
+        } else if (err && typeof err === 'object') {
+          try {
+            errorMessage = JSON.stringify(err);
+          } catch (e) {
+            errorMessage = 'Failed to fetch usage';
+          }
+        }
+
         setError({
           code: ERROR_CODES.UNKNOWN,
-          message: err instanceof Error ? err.message : 'Failed to fetch usage',
+          message: errorMessage,
         });
       } finally {
         if (!isAutoRefresh) setLoading(false);

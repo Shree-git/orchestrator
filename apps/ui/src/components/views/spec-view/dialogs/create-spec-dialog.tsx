@@ -1,4 +1,4 @@
-import { Sparkles, Clock, Loader2 } from 'lucide-react';
+import { Sparkles, Clock, Loader2, FileSearch } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,8 @@ export function CreateSpecDialog({
   showSkipButton = false,
   title = 'Create App Specification',
   description = "We didn't find an app_spec.txt file. Let us help you generate your app_spec.txt to help describe your project for our system. We'll analyze your project's tech stack and create a comprehensive specification.",
+  onAutoGenerateOverview,
+  isGeneratingOverview = false,
 }: CreateSpecDialogProps) {
   const selectedOption = FEATURE_COUNT_OPTIONS.find((o) => o.value === featureCount);
 
@@ -52,7 +54,31 @@ export function CreateSpecDialog({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Project Overview</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Project Overview</label>
+              {onAutoGenerateOverview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onAutoGenerateOverview}
+                  disabled={isCreatingSpec || isGeneratingOverview}
+                  className="gap-1"
+                >
+                  {isGeneratingOverview ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <FileSearch className="w-3 h-3" />
+                      Auto-generate Overview
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               Describe what your project does and what features you want to build. Be as detailed as
               you want - this will help us create a better specification.
@@ -63,7 +89,7 @@ export function CreateSpecDialog({
               onChange={(e) => onProjectOverviewChange(e.target.value)}
               placeholder="e.g., A project management tool that allows teams to track tasks, manage sprints, and visualize progress through kanban boards. It should support user authentication, real-time updates, and file attachments..."
               autoFocus
-              disabled={isCreatingSpec}
+              disabled={isCreatingSpec || isGeneratingOverview}
             />
           </div>
 

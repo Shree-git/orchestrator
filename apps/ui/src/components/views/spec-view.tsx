@@ -52,6 +52,9 @@ export function SpecView() {
     // Feature generation
     isGeneratingFeatures,
 
+    // Auto-generate overview
+    isGeneratingOverview,
+
     // Status
     currentPhase,
     errorMessage,
@@ -59,6 +62,7 @@ export function SpecView() {
     // Handlers
     handleCreateSpec,
     handleRegenerate,
+    handleAutoGenerateOverview,
   } = useSpecGeneration({ loadSpec });
 
   // Reset hasChanges when spec is reloaded
@@ -108,6 +112,8 @@ export function SpecView() {
           onFeatureCountChange={setFeatureCountOnCreate}
           onCreateSpec={handleCreateSpec}
           isCreatingSpec={isCreating}
+          onAutoGenerateOverview={handleAutoGenerateOverview}
+          isGeneratingOverview={isGeneratingOverview}
         />
       </>
     );

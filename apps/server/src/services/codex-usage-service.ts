@@ -81,37 +81,45 @@ export class CodexUsageService {
       console.log('[CodexUsageService] OpenAI API usage not available:', error);
     }
 
-    // Return default structure with any data we managed to collect
+    // If no authentication is available, throw an error
+    const isAuthenticated = await this.isAuthenticated();
+    if (!isAuthenticated) {
+      throw new Error(
+        "Authentication required - please set OPENAI_API_KEY environment variable or run 'codex login'"
+      );
+    }
+
+    // Return structure with any real data we managed to collect, or defaults
     return {
       // Daily usage (OpenAI typically tracks daily, not session)
-      dailyTokensUsed: usageInfo.dailyTokensUsed || 0,
-      dailyLimit: usageInfo.dailyLimit || 0,
-      dailyPercentage: usageInfo.dailyPercentage || 0,
-      dailyResetTime: usageInfo.dailyResetTime || this.getNextDayResetTime(),
-      dailyResetText: usageInfo.dailyResetText || 'Resets daily at midnight UTC',
+      dailyTokensUsed: usageInfo.dailyTokensUsed ?? 0,
+      dailyLimit: usageInfo.dailyLimit ?? 0,
+      dailyPercentage: usageInfo.dailyPercentage ?? 0,
+      dailyResetTime: usageInfo.dailyResetTime ?? this.getNextDayResetTime(),
+      dailyResetText: usageInfo.dailyResetText ?? 'Resets daily at midnight UTC',
 
       // Monthly usage (OpenAI billing cycle)
-      monthlyTokensUsed: usageInfo.monthlyTokensUsed || 0,
-      monthlyLimit: usageInfo.monthlyLimit || 0,
-      monthlyPercentage: usageInfo.monthlyPercentage || 0,
-      monthlyResetTime: usageInfo.monthlyResetTime || this.getNextMonthResetTime(),
-      monthlyResetText: usageInfo.monthlyResetText || 'Resets monthly on billing date',
+      monthlyTokensUsed: usageInfo.monthlyTokensUsed ?? 0,
+      monthlyLimit: usageInfo.monthlyLimit ?? 0,
+      monthlyPercentage: usageInfo.monthlyPercentage ?? 0,
+      monthlyResetTime: usageInfo.monthlyResetTime ?? this.getNextMonthResetTime(),
+      monthlyResetText: usageInfo.monthlyResetText ?? 'Resets monthly on billing date',
 
       // Cost information
-      costUsed: usageInfo.costUsed || null,
-      costLimit: usageInfo.costLimit || null,
-      costCurrency: usageInfo.costCurrency || 'USD',
+      costUsed: usageInfo.costUsed ?? null,
+      costLimit: usageInfo.costLimit ?? null,
+      costCurrency: usageInfo.costCurrency ?? 'USD',
 
       // Request rate limits (OpenAI has RPM limits)
-      requestsUsed: usageInfo.requestsUsed || 0,
-      requestsLimit: usageInfo.requestsLimit || 0,
-      requestsPercentage: usageInfo.requestsPercentage || 0,
-      requestsResetTime: usageInfo.requestsResetTime || this.getNextMinuteResetTime(),
-      requestsResetText: usageInfo.requestsResetText || 'Resets every minute',
+      requestsUsed: usageInfo.requestsUsed ?? 0,
+      requestsLimit: usageInfo.requestsLimit ?? 0,
+      requestsPercentage: usageInfo.requestsPercentage ?? 0,
+      requestsResetTime: usageInfo.requestsResetTime ?? this.getNextMinuteResetTime(),
+      requestsResetText: usageInfo.requestsResetText ?? 'Resets every minute',
 
       lastUpdated: new Date().toISOString(),
       userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      authenticationRequired: !(await this.isAuthenticated()),
+      authenticationRequired: !isAuthenticated,
     };
   }
 

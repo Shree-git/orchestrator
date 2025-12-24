@@ -647,6 +647,12 @@ export class HttpApiClient implements ElectronAPI {
       this.post('/api/features/generate-title', { description }),
   };
 
+  // Context Files API
+  contextFiles = {
+    autoDiscover: (projectPath: string) =>
+      this.post('/api/context-files/auto-discover', { projectPath }),
+  };
+
   // Auto Mode API
   autoMode: AutoModeAPI = {
     start: (projectPath: string, maxConcurrency?: number) =>
@@ -839,6 +845,10 @@ export class HttpApiClient implements ElectronAPI {
       this.post('/api/spec-regeneration/generate-features', {
         projectPath,
         maxFeatures,
+      }),
+    generateOverview: (projectPath: string) =>
+      this.post('/api/spec-regeneration/auto-generate-overview', {
+        projectPath,
       }),
     stop: () => this.post('/api/spec-regeneration/stop'),
     status: () => this.get('/api/spec-regeneration/status'),

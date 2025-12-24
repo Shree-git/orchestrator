@@ -13,7 +13,30 @@ import {
 import { cn } from '@/lib/utils';
 import { getElectronAPI } from '@/lib/electron';
 import { useAppStore } from '@/store/app-store';
-import type { CodexUsage } from '../../../server/src/routes/codex/types';
+// Create a local type definition for CodexUsage to avoid import issues
+type CodexUsage = {
+  dailyTokensUsed: number;
+  dailyLimit: number;
+  dailyPercentage: number;
+  dailyResetTime: string;
+  dailyResetText: string;
+  monthlyTokensUsed: number;
+  monthlyLimit: number;
+  monthlyPercentage: number;
+  monthlyResetTime: string;
+  monthlyResetText: string;
+  costUsed: number | null;
+  costLimit: number | null;
+  costCurrency: string | null;
+  requestsUsed: number;
+  requestsLimit: number;
+  requestsPercentage: number;
+  requestsResetTime: string;
+  requestsResetText: string;
+  lastUpdated: string;
+  userTimezone: string;
+  authenticationRequired: boolean;
+};
 
 // Error codes for distinguishing failure modes
 const ERROR_CODES = {
